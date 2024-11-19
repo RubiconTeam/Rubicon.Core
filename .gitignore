@@ -1,0 +1,16 @@
+# Godot specific ignores
+.godot/
+.import/
+.mono/
+Exclude/
+Export/
+
+# macOS
+.DS_Store
+
+# IDE Specific ignores
+.idea/
+.vs/
+.vscode/
+*DotSettings.user
+/.cr/personal/FavoritesList

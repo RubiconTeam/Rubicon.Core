@@ -11,10 +11,10 @@ public partial class CharacterMeta : Resource
     /// <summary>
     /// The name of the bar line (strum line) to link this character to.
     /// </summary>
-    [Export] public string BarLine = "";
+    [Export] public StringName BarLine = "";
 
     /// <summary>
     /// The name of the spawn point to link this character to.
     /// </summary>
-    [Export] public string SpawnPoint = "";
+    [Export] public StringName SpawnPoint = "";
 }

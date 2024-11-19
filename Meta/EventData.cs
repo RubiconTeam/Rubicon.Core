@@ -15,7 +15,7 @@ public partial class EventData : Resource
     /// <summary>
     /// The event's name.
     /// </summary>
-    [Export] public string Name = "normal";
+    [Export] public StringName Name = "normal";
 
     /// <summary>
     /// The event's arguments.

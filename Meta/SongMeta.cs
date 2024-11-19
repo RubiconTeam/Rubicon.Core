@@ -47,7 +47,7 @@ public partial class SongMeta : Resource
     /// <summary>
     /// Marks the playable charts in this song.
     /// </summary>
-    [Export] public string[] PlayableCharts = ["Player"];
+    [Export] public StringName[] PlayableCharts = ["Player"];
 
     /// <summary>
     /// The characters to spawn in the song.

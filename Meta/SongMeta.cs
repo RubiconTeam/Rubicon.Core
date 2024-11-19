@@ -53,9 +53,9 @@ public partial class SongMeta : Resource
     [Export] public CharacterMeta[] Characters = [];
 
     /// <summary>
-    /// If turned on when the song loads, the game will load into a 3D stage instead of a 2D one. Only use when you need to, 3D spaces can be expensive on the computer.
+    /// Determines what type of backend the engine will use when loading into a song.
     /// </summary>
-    [Export] public bool Enable3D = false;
+    [Export] public GameEnvironment Environment = GameEnvironment.CanvasItem;
 
     /// <summary>
     /// The stage to spawn in for this song.

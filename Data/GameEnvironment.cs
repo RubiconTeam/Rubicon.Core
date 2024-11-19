@@ -1,4 +1,4 @@
-namespace Rubicon.Core.Meta;
+namespace Rubicon.Core.Data;
 
 /// <summary>
 /// Which type of environment the song's stage will spawn in.

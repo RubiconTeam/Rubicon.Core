@@ -1,3 +1,5 @@
+using Rubicon.Core.Data;
+
 namespace Rubicon.Core.Meta;
 
 /// <summary>

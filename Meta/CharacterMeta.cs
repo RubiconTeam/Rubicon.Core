@@ -9,7 +9,7 @@ public partial class CharacterMeta : Resource
     [Export] public string Character = "";
 
     /// <summary>
-    /// The nickname this character will be given.
+    /// The nickname this character will be given. This also determines where it will spawn on-stage.
     /// </summary>
     [Export] public StringName Nickname = "";
     
@@ -17,9 +17,4 @@ public partial class CharacterMeta : Resource
     /// The name of the bar line (strum line) to link this character to.
     /// </summary>
     [Export] public StringName BarLine = "";
-
-    /// <summary>
-    /// The name of the spawn point to link this character to.
-    /// </summary>
-    [Export] public StringName SpawnPoint = "";
 }

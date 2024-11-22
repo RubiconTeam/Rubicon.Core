@@ -2,7 +2,7 @@ using System.Linq;
 using Rubicon.Core.Chart;
 using Array = Godot.Collections.Array;
 
-namespace Rubicon.Core.Meta;
+namespace Rubicon.Core.Events;
 
 [GlobalClass]
 public partial class EventData : Resource

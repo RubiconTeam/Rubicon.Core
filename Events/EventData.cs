@@ -21,7 +21,7 @@ public partial class EventData : Resource
     /// <summary>
     /// The event's arguments.
     /// </summary>
-    [Export] public Dictionary<string, Array> Arguments = new();
+    [Export] public Dictionary<StringName, Variant> Arguments = new();
         
     /// <summary>
     /// The time converted from measures to milliseconds. Should be ignored when serialized.

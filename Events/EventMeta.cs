@@ -8,7 +8,7 @@ namespace Rubicon.Core.Events;
     /// <summary>
     /// A container storing all of its events.
     /// </summary>
-    [Export] public EventData[] Events;
+    [Export] public EventData[] Events = [];
 
     /// <summary>
     /// The current index.

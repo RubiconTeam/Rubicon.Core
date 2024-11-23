@@ -34,7 +34,7 @@ public partial class NoteData : Resource
     /// <summary>
     /// Any extra parameters will be stored here.
     /// </summary>
-    [Export] public Dictionary<string, Array> Parameters = new();
+    [Export] public Dictionary<string, Variant> Parameters = new();
 
     /// <summary>
     /// The associated hit object, if the note has spawned in-game.

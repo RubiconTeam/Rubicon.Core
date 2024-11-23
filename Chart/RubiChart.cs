@@ -24,11 +24,6 @@ public partial class RubiChart : Resource
     /// The Rubicon Engine version this chart was created on.
     /// </summary>
     [Export] public uint Version = RubiconEngineInstance.Version.Raw;
-    
-    /// <summary>
-    /// A list of BPM changes.
-    /// </summary>
-    [Export] public BpmInfo[] BpmInfo = [];
 
     /// <summary>
     /// The default scroll speed for this chart.
@@ -51,22 +46,18 @@ public partial class RubiChart : Resource
     /// Converts everything in this chart to millisecond format.
     /// </summary>
     /// <returns>Itself</returns>
-    public RubiChart ConvertData()
+    public RubiChart ConvertData(BpmInfo[] bpmInfo)
     {
-        // Takes care of setting bpm and time signature's exact millisecond time.
-        for (int i = 1; i < BpmInfo.Length; i++)
-            BpmInfo[i].MsTime = BpmInfo[i - 1].MsTime + ConductorUtility.MeasureToMs(BpmInfo[i].Time - BpmInfo[i - 1].Time, BpmInfo[i - 1].Bpm, BpmInfo[i].TimeSignatureNumerator);
-
         foreach (IndividualChart curChart in Charts)
         {
             for (int n = 0; n < curChart.Notes.Length; n++)
-                curChart.Notes[n].ConvertData(BpmInfo, curChart.SvChanges);
+                curChart.Notes[n].ConvertData(bpmInfo, curChart.SvChanges);
 
             if (curChart.SvChanges.Length <= 1)
                 continue;
 
             for (int s = 1; s < curChart.SvChanges.Length; s++)
-                curChart.SvChanges[s].ConvertData(BpmInfo, curChart.SvChanges[s - 1]);
+                curChart.SvChanges[s].ConvertData(bpmInfo, curChart.SvChanges[s - 1]);
         }
         
         return this;

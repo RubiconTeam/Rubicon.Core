@@ -40,7 +40,7 @@ public static class ConductorUtility
 
         double measureValue = MeasureToMs(1, bpm.Bpm, bpm.TimeSignatureNumerator);
         double offset = msTime - bpm.MsTime;
-        return offset / measureValue;
+        return bpm.Time + (offset / measureValue);
     }
 
     /// <summary>

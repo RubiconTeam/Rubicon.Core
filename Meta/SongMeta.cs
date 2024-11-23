@@ -1,3 +1,4 @@
+using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
 
 namespace Rubicon.Core.Meta;
@@ -53,6 +54,11 @@ public partial class SongMeta : Resource
     /// The characters to spawn in the song.
     /// </summary>
     [Export] public CharacterMeta[] Characters = [];
+    
+    /// <summary>
+    /// A list of BPM changes.
+    /// </summary>
+    [Export] public BpmInfo[] BpmInfo = [];
 
     /// <summary>
     /// Determines what type of backend the engine will use when loading into a song.
@@ -63,4 +69,16 @@ public partial class SongMeta : Resource
     /// The stage to spawn in for this song.
     /// </summary>
     [Export] public string Stage = "stage";
+
+    /// <summary>
+    /// Converts everything in this chart to millisecond format.
+    /// </summary>
+    /// <returns>Itself</returns>
+    public SongMeta ConvertData()
+    {
+        for (int i = 1; i < BpmInfo.Length; i++)
+            BpmInfo[i].MsTime = BpmInfo[i - 1].MsTime + ConductorUtility.MeasureToMs(BpmInfo[i].Time - BpmInfo[i - 1].Time, BpmInfo[i - 1].Bpm, BpmInfo[i].TimeSignatureNumerator);
+
+        return this;
+    }
 }

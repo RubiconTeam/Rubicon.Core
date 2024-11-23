@@ -1,4 +1,5 @@
 using System.Linq;
+using Godot.Collections;
 using Rubicon.Core.Chart;
 using Array = Godot.Collections.Array;
 
@@ -20,7 +21,7 @@ public partial class EventData : Resource
     /// <summary>
     /// The event's arguments.
     /// </summary>
-    [Export] public Array Arguments = new();
+    [Export] public Dictionary<string, Array> Arguments = new();
         
     /// <summary>
     /// The time converted from measures to milliseconds. Should be ignored when serialized.

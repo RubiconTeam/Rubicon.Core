@@ -11,7 +11,7 @@ public partial class IndividualChart : Resource
     /// <summary>
     /// What to name this bar-line. Used primarily for <see cref="SongMeta."/>
     /// </summary>
-    [Export] public string Name = "Player";
+    [Export] public StringName Name = "Player";
     
     /// <summary>
     /// How many lanes this specific chart will have.

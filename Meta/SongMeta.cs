@@ -24,6 +24,11 @@ public partial class SongMeta : Resource
     /// The artist who made the song.
     /// </summary>
     [Export] public string Artist = "Hideo Kojima";
+
+    /// <summary>
+    /// The chart offset.
+    /// </summary>
+    [Export] public double Offset = 0d;
     
     /// <summary>
     /// The default ruleset for this chart.

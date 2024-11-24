@@ -31,11 +31,6 @@ public partial class RubiChart : Resource
     [Export] public float ScrollSpeed = 1.6f;
 
     /// <summary>
-    /// The chart offset.
-    /// </summary>
-    [Export] public double Offset;
-
-    /// <summary>
     /// The individual charts (or "strum lines") that each contain its own notes.
     /// </summary>
     [Export] public IndividualChart[] Charts = [];

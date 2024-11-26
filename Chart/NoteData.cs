@@ -19,7 +19,7 @@ public partial class NoteData : Resource
     /// <summary>
     /// The note's type.
     /// </summary>
-    [Export] public string Type = "normal";
+    [Export] public StringName Type = "normal";
 
     /// <summary>
     /// Starting point of the note. Stored on disk in measures.
@@ -34,7 +34,7 @@ public partial class NoteData : Resource
     /// <summary>
     /// Any extra parameters will be stored here.
     /// </summary>
-    [Export] public Dictionary<string, Variant> Parameters = new();
+    [Export] public Dictionary<StringName, Variant> Parameters = new();
         
     /// <summary>
     /// Length of the note converted to milliseconds. Should be ignored when serialized.

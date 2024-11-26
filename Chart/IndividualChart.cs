@@ -9,7 +9,7 @@ namespace Rubicon.Core.Chart;
 public partial class IndividualChart : Resource
 {
     /// <summary>
-    /// What to name this bar-line. Used primarily for <see cref="SongMeta."/>
+    /// What to name this bar-line. Used primarily for <see cref="SongMeta"/>.
     /// </summary>
     [Export] public StringName Name = "Player";
     
@@ -27,4 +27,9 @@ public partial class IndividualChart : Resource
     /// Stores data about scroll velocity changes.
     /// </summary>
     [Export] public SvChange[] SvChanges = [ new SvChange() ];
+
+    /// <summary>
+    /// If this chart is the target bar line, these target bar line switches will activate.
+    /// </summary>
+    [Export] public TargetSwitch[] Switches = [];
 }

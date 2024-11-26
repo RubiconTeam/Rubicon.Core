@@ -1,5 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using Godot.Collections;
+using Rubicon.Core.Data;
+using Array = Godot.Collections.Array;
 
 namespace Rubicon.Core.Chart;
 
@@ -9,6 +13,11 @@ namespace Rubicon.Core.Chart;
 [GlobalClass]
 public partial class RubiChart : Resource
 {
+    /// <summary>
+    /// The current chart version.
+    /// </summary>
+    public readonly static VersionInfo ChartVersion = new(1, 0, 0, 0);
+    
     #region Public Variables
     /// <summary>
     /// The name of the people who helped with this chart.
@@ -23,7 +32,7 @@ public partial class RubiChart : Resource
     /// <summary>
     /// The Rubicon Engine version this chart was created on.
     /// </summary>
-    [Export] public uint Version = RubiconEngineInstance.Version.Raw;
+    [Export] public uint Version = ChartVersion.Raw;
 
     /// <summary>
     /// The default scroll speed for this chart.
@@ -37,6 +46,12 @@ public partial class RubiChart : Resource
     #endregion
 
     #region Public Methods
+    /// <summary>
+    /// Gets the current version of the RubiChart format.
+    /// </summary>
+    /// <returns>The current version of the RubiChart format</returns>
+    public VersionInfo GetVersion() => ChartVersion;
+    
     /// <summary>
     /// Converts everything in this chart to millisecond format.
     /// </summary>
@@ -121,5 +136,120 @@ public partial class RubiChart : Resource
             Charts[c].Notes = notes.ToArray();
         }
     }
+    #endregion
+
+    #region Serialization
+    
+    /// <summary>
+    /// Serializes this chart into <see cref="byte"/>[] form.
+    /// </summary>
+    /// <returns>An array of bytes containing information about this chart</returns>
+    public byte[] ToBytes()
+    {
+        // Cache note types
+        List<StringName> noteTypes = new List<StringName>();
+        System.Collections.Generic.Dictionary<StringName, int> noteTypeIndexes = new();
+        for (int i = 0; i < Charts.Length; i++)
+        {
+            for (int j = 0; j < Charts[i].Notes.Length; j++)
+            {
+                NoteData note = Charts[i].Notes[j];
+                if (noteTypes.Contains(note.Type))
+                    continue;
+                
+                noteTypes.Add(note.Type);
+                noteTypeIndexes.Add(note.Type, noteTypes.Count - 1);
+            }
+        }
+        
+        // Creation of bytes
+        List<byte> bytes = new List<byte>();
+        
+        // Version
+        bytes.AddRange(BitConverter.GetBytes(ChartVersion.Raw));
+        
+        // Difficulty
+        bytes.AddRange(BitConverter.GetBytes(Difficulty));
+        
+        // Scroll Speed
+        bytes.AddRange(BitConverter.GetBytes(ScrollSpeed));
+        
+        // Charter
+        byte[] cName = Encoding.UTF8.GetBytes(Charter);
+        bytes.AddRange(BitConverter.GetBytes(cName.Length));
+        bytes.AddRange(cName);
+        
+        // Note Types
+        bytes.AddRange(BitConverter.GetBytes(noteTypes.Count));
+        for (int i = 0; i < noteTypes.Count; i++)
+        {
+            byte[] tBytes = Encoding.UTF8.GetBytes(noteTypes[i]);
+            bytes.AddRange(BitConverter.GetBytes(tBytes.Length));
+            bytes.AddRange(tBytes);
+        }
+        
+        // Charts
+        for (int i = 0; i < Charts.Length; i++)
+        {
+            IndividualChart chart = Charts[i];
+            
+            // Name
+            byte[] nameBytes = Encoding.UTF8.GetBytes(chart.Name.ToString());
+            bytes.AddRange(BitConverter.GetBytes(nameBytes.Length));
+            bytes.AddRange(nameBytes);
+            
+            // Lanes
+            bytes.AddRange(BitConverter.GetBytes(chart.Lanes));
+            
+            // Target Switching
+            bytes.AddRange(BitConverter.GetBytes(chart.Switches.Length));
+            for (int j = 0; j < chart.Switches.Length; j++)
+            {
+                TargetSwitch tSwitch = chart.Switches[j];
+                bytes.AddRange(BitConverter.GetBytes(tSwitch.Time));
+
+                byte[] sNameBytes = Encoding.UTF8.GetBytes(tSwitch.Name);
+                bytes.AddRange(BitConverter.GetBytes(sNameBytes.Length));
+                bytes.AddRange(sNameBytes);
+            }
+            
+            // SV Changes
+            bytes.AddRange(BitConverter.GetBytes(chart.SvChanges.Length));
+            for (int j = 0; j < chart.SvChanges.Length; j++)
+            {
+                SvChange svChange = chart.SvChanges[j];
+                bytes.AddRange(BitConverter.GetBytes(svChange.Time));
+                bytes.AddRange(BitConverter.GetBytes(svChange.Multiplier));
+            }
+            
+            // Notes
+            bytes.AddRange(BitConverter.GetBytes(chart.Notes.Length));
+            for (int j = 0; j < chart.Notes.Length; j++)
+            {
+                NoteData note = chart.Notes[j];
+                bytes.AddRange(BitConverter.GetBytes(note.Time));
+                bytes.AddRange(BitConverter.GetBytes(note.Length));
+                bytes.AddRange(BitConverter.GetBytes(note.Lane));
+                bytes.AddRange(BitConverter.GetBytes(noteTypeIndexes[note.Type])); // Number that points to note type
+                
+                // Parameters
+                bytes.AddRange(BitConverter.GetBytes(note.Parameters.Count));
+                foreach (KeyValuePair<StringName, Variant> pair in note.Parameters)
+                {
+                    byte[] paramName = Encoding.UTF8.GetBytes(pair.Key);
+                    bytes.AddRange(BitConverter.GetBytes(paramName.Length));
+                    bytes.AddRange(paramName);
+                    
+                    byte[] valueBytes = GD.VarToBytes(pair.Value);
+                    bytes.AddRange(BitConverter.GetBytes(valueBytes.Length));
+                    bytes.AddRange(valueBytes);
+                }
+            }
+        }
+        
+        return bytes.ToArray();
+    }
+    
+
     #endregion
 }

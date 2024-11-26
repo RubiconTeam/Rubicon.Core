@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using Godot.Collections;
 using Rubicon.Core.Data;
 using Array = Godot.Collections.Array;
+using Range = System.Range;
 
 namespace Rubicon.Core.Chart;
 
@@ -139,7 +141,22 @@ public partial class RubiChart : Resource
     #endregion
 
     #region Serialization
-    
+
+    /// <summary>
+    /// Loads RubiChart data from an array of bytes.
+    /// </summary>
+    /// <param name="bytes">An array of bytes</param>
+    public void LoadBytes(byte[] bytes)
+    {
+        Version = BitConverter.ToUInt32(bytes.Take(new Range(0, 4)).ToArray());
+        switch (Version)
+        {
+            default:
+                this.SetupFromVersionOne(bytes);
+                break;
+        }
+    }
+
     /// <summary>
     /// Serializes this chart into <see cref="byte"/>[] form.
     /// </summary>
@@ -189,6 +206,7 @@ public partial class RubiChart : Resource
         }
         
         // Charts
+        bytes.AddRange(BitConverter.GetBytes(Charts.Length));
         for (int i = 0; i < Charts.Length; i++)
         {
             IndividualChart chart = Charts[i];
@@ -249,7 +267,6 @@ public partial class RubiChart : Resource
         
         return bytes.ToArray();
     }
-    
 
     #endregion
 }

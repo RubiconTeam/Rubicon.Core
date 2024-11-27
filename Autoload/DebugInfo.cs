@@ -35,7 +35,6 @@ public partial class DebugInfo : CanvasLayer
 	
 	public override void _Ready()
 	{
-		this.OnReady();
 		if (!OS.IsDebugBuild()) VRAM.Visible = false;
 		DebugInformation.VisibilityChanged += () =>
 		{

@@ -4,7 +4,7 @@ namespace Rubicon.Core.Chart;
 /// Keeps track of a BPM / time signature change.
 /// </summary>
 [GlobalClass]
-public partial class BpmInfo : Resource
+public partial class BpmInfo : RefCounted
 {
 	/// <summary>
 	/// The exact time this change happens in milliseconds.

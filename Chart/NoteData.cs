@@ -9,7 +9,7 @@ namespace Rubicon.Core.Chart;
 /// Used for storing a note's data values. Is not the actual Note object.
 /// </summary>
 [GlobalClass]
-public partial class NoteData : Resource
+public partial class NoteData : RefCounted
 {
     /// <summary>
     /// The note's lane.

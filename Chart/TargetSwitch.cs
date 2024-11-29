@@ -5,8 +5,7 @@ namespace Rubicon.Core.Chart;
 /// <summary>
 /// Keeps track of a target bar line change.
 /// </summary>
-[GlobalClass]
-public partial class TargetSwitch : Resource
+[GlobalClass] public partial class TargetSwitch : RefCounted
 {
     /// <summary>
     /// The time to trigger this switch. Stored on disk in measures.

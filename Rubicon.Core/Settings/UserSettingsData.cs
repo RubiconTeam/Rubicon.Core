@@ -99,5 +99,5 @@ public class MiscSection
 [RubiconSettingsSection("Keybinds", true, "res://Assets/UI/Menus/Settings/Keybinds.png")]
 public class InputMapSection
 {
-    public Dictionary<string, Array<InputEvent>> Map = RubiconEngine.DefaultInputMap.Duplicate();
+    public Dictionary<string, Array<InputEvent>> Map;
 }

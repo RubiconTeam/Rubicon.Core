@@ -26,7 +26,7 @@ public partial class RuleSet : Resource
     /// <summary>
     /// The version this ruleset is on.
     /// </summary>
-    [Export] public VersionInfo Version = RubiconEngineInstance.Version;
+    [Export] public VersionInfo Version = new();
 
     /// <summary>
     /// Mainly for Discord RPC, will display this verb while you are playing.

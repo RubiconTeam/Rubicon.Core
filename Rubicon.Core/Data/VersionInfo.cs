@@ -96,7 +96,7 @@ public partial class VersionInfo : Resource // Would be super useful if custom s
     /// <param name="tag">The tag added on</param>
     public VersionInfo(byte major, byte minor, byte patch, byte build, string tag = null)
     {
-        Raw = RubiconUtility.CreateVersion(major, minor, patch, build);
+        Raw = ((uint)major << 24) | ((uint)minor << 16) | ((uint)patch << 8) | build;
         Tag = tag ?? string.Empty;
     }
 

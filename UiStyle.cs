@@ -1,5 +1,3 @@
-using Rubicon.Core.Data;
-
 namespace Rubicon.Core;
 
 [GlobalClass]

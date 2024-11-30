@@ -1,12 +1,10 @@
 using System.Linq;
 using System.Text;
-using Rubicon.Core.Chart;
-using Rubicon.Rulesets;
 using Range = System.Range;
 
-namespace Rubicon.Core;
+namespace Rubicon.Core.Chart;
 
-public static class RubiChartConverter
+public static class RubiChartLoader
 {
     public static void SetupFromVersionOne(this RubiChart chart, byte[] bytes)
     {

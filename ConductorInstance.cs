@@ -1,5 +1,4 @@
 using Rubicon.Core.Chart;
-using Rubicon.Data.Generation;
 
 namespace Rubicon.Core.Autoload;
 

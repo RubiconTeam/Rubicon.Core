@@ -2,7 +2,7 @@ using System.Linq;
 using System.Text;
 using Rubicon.Core.Chart;
 
-namespace Rubicon.Core.Autoload;
+namespace Rubicon.Core.UI;
 
 public partial class DebugInfo : CanvasLayer
 {

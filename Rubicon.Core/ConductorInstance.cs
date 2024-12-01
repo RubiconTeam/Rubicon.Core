@@ -8,7 +8,6 @@ namespace Rubicon.Core.Autoload;
 [GlobalClass, StaticAutoloadSingleton("Rubicon.Core", "Conductor")]
 public partial class ConductorInstance : Node
 {
-	#region Status Variables
 	/// <summary>
 	/// The current BPM at the moment.
 	/// </summary>
@@ -33,9 +32,7 @@ public partial class ConductorInstance : Node
 	/// Is true when the Conductor has been started with Start() or Play(), false when either Pause() or Stop() is called.
 	/// </summary>
 	[Export] public bool Playing = false;
-	#endregion
-
-	#region Time Variables
+	
 	/// <summary>
 	/// The raw timestamp of this Conductor, without any corrections made to it.
 	/// </summary>
@@ -66,14 +63,11 @@ public partial class ConductorInstance : Node
 	/// The current measure according to the time, which also keeps BPM changes in mind.
 	/// </summary>
 	public double CurrentMeasure => GetCurrentMeasure();
-	#endregion
-
-	#region Other Variables
+	
 	/// <summary>
 	/// Get all BPMs listed in the Conductor currently.
 	/// </summary>
-	[ExportGroup("Info")] 
-	[Export] public BpmInfo[] BpmList { get => GetBpmList(); set => SetBpmList(value); }
+	[ExportGroup("Info"), Export] public BpmInfo[] BpmList { get => GetBpmList(); set => SetBpmList(value); }
 		
 	/// <summary>
 	/// A whole number that indicates the number of beats in each measure.
@@ -84,9 +78,7 @@ public partial class ConductorInstance : Node
 	/// A whole number representing how many steps are in a beat.
 	/// </summary>
 	[Export] public int TimeSigDenominator = 4;
-	#endregion
 
-	#region Signals
 	/// <summary>
 	/// Event triggered when the next beat is hit.
 	/// </summary>
@@ -101,7 +93,11 @@ public partial class ConductorInstance : Node
 	/// Event triggered when the next measure is hit.
 	/// </summary>
 	[Signal] public delegate void MeasureHitEventHandler(int measure);
-	#endregion
+	
+	/// <summary>
+	/// Event triggered when the next bpm change is done.
+	/// </summary>
+	[Signal] public delegate void BpmChangedEventHandler(BpmInfo currentBpm);
 
 	#region Private Fields
 	private double _relativeStartTime = 0;
@@ -126,7 +122,6 @@ public partial class ConductorInstance : Node
 	private int _lastMeasure = -int.MaxValue;
 	#endregion
 		
-	#region Public Methods
 	public override void _Process(double delta)
 	{
 		if (!Playing)
@@ -142,6 +137,7 @@ public partial class ConductorInstance : Node
 		{
 			BpmIndex++;
 			Bpm = BpmList[BpmIndex].Bpm;
+			EmitSignalBpmChanged(BpmList[BpmIndex]);
 		}
 		
 		int curMeasure = Mathf.FloorToInt(CurrentMeasure);
@@ -211,7 +207,6 @@ public partial class ConductorInstance : Node
 		Speed = 1f;
 		Stop();
 	}
-	#endregion
 		
 	#region Getters and Setters
 	/// <summary>

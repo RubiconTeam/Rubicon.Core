@@ -51,7 +51,7 @@ namespace Rubicon.Core.Rulesets;
 		if (Chart?.SvChanges == null)
 			return;
 		
-		double time = Conductor.Time * 1000d;
+		float time = Conductor.Time * 1000f;
 		SvChange[] svChangeList = Chart.SvChanges;
 		while (ScrollVelocityIndex + 1 < svChangeList.Length && svChangeList[ScrollVelocityIndex + 1].MsTime - time <= 0)
 			ScrollVelocityIndex++;

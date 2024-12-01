@@ -9,17 +9,17 @@ public partial class BpmInfo : Resource
 	/// <summary>
 	/// The exact time this change happens in milliseconds.
 	/// </summary>
-	public double MsTime = 0d;
+	public float MsTime = 0f;
 
 	/// <summary>
 	/// The measure this change happens in.
 	/// </summary>
-	[Export] public double Time;
+	[Export] public float Time;
 			
 	/// <summary>
 	/// The BPM to set with this change.
 	/// </summary>
-	[Export] public double Bpm;
+	[Export] public float Bpm;
 		
 	/// <summary>
 	/// The number of beats in a measure with this change.

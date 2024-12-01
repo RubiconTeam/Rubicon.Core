@@ -11,7 +11,7 @@ public partial class ConductorInstance : Node
 	/// <summary>
 	/// The current BPM at the moment.
 	/// </summary>
-	[Export] public double Bpm = 100;
+	[Export] public float Bpm = 100;
 
 	/// <summary>
 	/// The index pointing to which BPM is currently set based on the bpms array.
@@ -21,12 +21,12 @@ public partial class ConductorInstance : Node
 	/// <summary>
 	/// Corrects the time so the chart can be accurate.
 	/// </summary>
-	[Export] public double ChartOffset = 0f;
+	[Export] public float ChartOffset = 0f;
 
 	/// <summary>
 	/// How fast the Conductor goes.
 	/// </summary>
-	[Export] public double Speed = 1f;
+	[Export] public float Speed = 1f;
 
 	/// <summary>
 	/// Is true when the Conductor has been started with Start() or Play(), false when either Pause() or Stop() is called.
@@ -36,33 +36,33 @@ public partial class ConductorInstance : Node
 	/// <summary>
 	/// The raw timestamp of this Conductor, without any corrections made to it.
 	/// </summary>
-	public double RawTime => GetRawTime();
+	public float RawTime => GetRawTime();
 		
 	/// <summary>
 	/// The raw timestamp of this Conductor + the chart offset.
 	/// </summary>
-	public double UncorrectedTime => GetUncorrectedTime();
+	public float UncorrectedTime => GetUncorrectedTime();
 
 	/// <summary>
 	/// The current timestamp from when the time was last set.
 	/// Equivalent to Conductor.songPosition in most other FNF projects.
 	/// </summary>
-	public double Time { get => GetTime(); set => SetTime(value); }
+	[Export] public float Time { get => GetTime(); set => SetTime(value); }
 
 	/// <summary>
 	/// The current step according to the time, which also keeps BPM changes in mind.
 	/// </summary>
-	public double CurrentStep => GetCurrentStep();
+	public float CurrentStep => GetCurrentStep();
 
 	/// <summary>
 	/// The current beat according to the time, which also keeps BPM changes in mind.
 	/// </summary>
-	public double CurrentBeat => GetCurrentBeat();
+	public float CurrentBeat => GetCurrentBeat();
 
 	/// <summary>
 	/// The current measure according to the time, which also keeps BPM changes in mind.
 	/// </summary>
-	public double CurrentMeasure => GetCurrentMeasure();
+	public float CurrentMeasure => GetCurrentMeasure();
 	
 	/// <summary>
 	/// Get all BPMs listed in the Conductor currently.
@@ -102,18 +102,18 @@ public partial class ConductorInstance : Node
 	#region Private Fields
 	private double _relativeStartTime = 0;
 	private double _relativeTimeOffset = 0;
-	private double _lastTime = double.NegativeInfinity;
-	private double _delta = 0d;
+	private float _lastTime = float.NegativeInfinity;
+	private float _delta = 0f;
 	private double _time = 0d;
 		
-	private double _cachedStep;
-	private double _cachedStepTime;
+	private float _cachedStep;
+	private float _cachedStepTime;
 
-	private double _cachedBeat;
-	private double _cachedBeatTime;
+	private float _cachedBeat;
+	private float _cachedBeatTime;
 
-	private double _cachedMeasure;
-	private double _cachedMeasureTime;
+	private float _cachedMeasure;
+	private float _cachedMeasureTime;
 		
 	private BpmInfo[] _bpmList = { new() { Bpm = 100 } };
 
@@ -162,7 +162,7 @@ public partial class ConductorInstance : Node
 	/// Starts the Conductor at the time provided.
 	/// </summary>
 	/// <param name="time">The time the Conductor starts at. Default is 0</param>
-	public void Play(double time = 0d)
+	public void Play(float time = 0f)
 	{
 		Resume();
 		Time = time;
@@ -213,26 +213,26 @@ public partial class ConductorInstance : Node
 	/// Gets the raw time of this Conductor, without any corrections made to it.
 	/// </summary>
 	/// <returns>The raw time, in seconds</returns>
-	public double GetRawTime()
+	public float GetRawTime()
 	{
-		return Playing ? Godot.Time.GetUnixTimeFromSystem() - _relativeStartTime + _relativeTimeOffset :
-			_time != 0d ? _time : 0d;
+		return Playing ? (float)(Godot.Time.GetUnixTimeFromSystem() - _relativeStartTime + _relativeTimeOffset) :
+			_time != 0d ? (float)_time : 0f;
 	}
 
 	/// <summary>
 	/// Gets the raw time of this Conductor + the chart offset.
 	/// </summary>
 	/// <returns>The raw time + the chart offset, in seconds</returns>
-	public double GetUncorrectedTime()
+	public float GetUncorrectedTime()
 	{
-		return RawTime + ChartOffset / 1000d;
+		return RawTime + ChartOffset / 1000f;
 	}
 
 	/// <summary>
 	/// Gets the calculated time of this Conductor.
 	/// </summary>
 	/// <returns>The raw time + the chart offset multiplied by the speed, in seconds</returns>
-	public double GetTime()
+	public float GetTime()
 	{
 		return UncorrectedTime * Speed;
 	}
@@ -241,7 +241,7 @@ public partial class ConductorInstance : Node
 	/// Sets the time of this Conductor.
 	/// </summary>
 	/// <param name="time">The time to set it to, in seconds.</param>
-	public void SetTime(double time)
+	public void SetTime(float time)
 	{
 		_time = time;
 		_relativeStartTime = Godot.Time.GetUnixTimeFromSystem();
@@ -252,16 +252,16 @@ public partial class ConductorInstance : Node
 	/// Gets the current step of this Conductor, with decimals.
 	/// </summary>
 	/// <returns>The current step</returns>
-	public double GetCurrentStep()
+	public float GetCurrentStep()
 	{
 		if (_cachedStepTime == Time)
 			return _cachedStep;
 
 		if (BpmList.Length <= 1)
-			return Time / (60d / (Bpm * TimeSigDenominator));
+			return Time / (60f / (Bpm * TimeSigDenominator));
 
 		_cachedStepTime = Time;
-		_cachedStep = (Time - BpmList[BpmIndex].MsTime / 1000d) / (60 / (Bpm * TimeSigDenominator)) + (BpmList[BpmIndex].Time * TimeSigNumerator * TimeSigDenominator);
+		_cachedStep = (Time - BpmList[BpmIndex].MsTime / 1000f) / (60f / (Bpm * TimeSigDenominator)) + (BpmList[BpmIndex].Time * TimeSigNumerator * TimeSigDenominator);
 		return _cachedStep;
 	}
 
@@ -269,16 +269,16 @@ public partial class ConductorInstance : Node
 	/// Gets the current beat of this Conductor, with decimals.
 	/// </summary>
 	/// <returns>The current beat</returns>
-	public double GetCurrentBeat()
+	public float GetCurrentBeat()
 	{
 		if (_cachedBeatTime == Time)
 			return _cachedBeat;
 
 		if (BpmList.Length <= 1)
-			return Time / (60d / Bpm);
+			return Time / (60f / Bpm);
 
 		_cachedBeatTime = Time;
-		_cachedBeat = (Time - BpmList[BpmIndex].MsTime / 1000d) / (60d / Bpm) + BpmList[BpmIndex].Time * TimeSigNumerator;
+		_cachedBeat = (Time - BpmList[BpmIndex].MsTime / 1000f) / (60f / Bpm) + BpmList[BpmIndex].Time * TimeSigNumerator;
 		return _cachedBeat;
 	}
 
@@ -286,16 +286,16 @@ public partial class ConductorInstance : Node
 	/// Gets the current measure of this Conductor, with decimals.
 	/// </summary>
 	/// <returns>The current measure</returns>
-	public double GetCurrentMeasure()
+	public float GetCurrentMeasure()
 	{
 		if (_cachedMeasureTime == Time)
 			return _cachedMeasure;
 
 		if (BpmList.Length <= 1)
-			return Time / (60d / (Bpm / TimeSigNumerator));
+			return Time / (60f / (Bpm / TimeSigNumerator));
 
 		_cachedMeasureTime = Time;
-		_cachedMeasure = (Time - BpmList[BpmIndex].MsTime / 1000d) / (60d / (Bpm / TimeSigNumerator)) + BpmList[BpmIndex].Time;
+		_cachedMeasure = (Time - BpmList[BpmIndex].MsTime / 1000f) / (60f / (Bpm / TimeSigNumerator)) + BpmList[BpmIndex].Time;
 		return _cachedMeasure;
 	}
 

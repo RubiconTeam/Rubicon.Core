@@ -71,7 +71,7 @@ namespace Rubicon.Core.Rulesets.Mania;
         else
         {
             float baseNoteValue = ((float)MaxScore / ScoreTracker.NoteCount) / 2f;
-            float baseScore = (float)((baseNoteValue * ScoreTracker.PerfectHits) + (baseNoteValue * (ScoreTracker.GreatHits * 0.9375)) + (baseNoteValue * (ScoreTracker.GoodHits * 0.625)) + (baseNoteValue * (ScoreTracker.OkayHits * 0.3125)) + (baseNoteValue * (ScoreTracker.BadHits * 0.15625)));
+            float baseScore = (baseNoteValue * ScoreTracker.PerfectHits) + (baseNoteValue * (ScoreTracker.GreatHits * 0.9375f)) + (baseNoteValue * (ScoreTracker.GoodHits * 0.625f)) + (baseNoteValue * (ScoreTracker.OkayHits * 0.3125f)) + (baseNoteValue * (ScoreTracker.BadHits * 0.15625f));
             float bonusScore = Mathf.Sqrt(((float)ScoreTracker.HighestCombo / ScoreTracker.NoteCount) * 100f) * MaxScore * 0.05f; 
             ScoreTracker.Score = (int)Math.Floor(baseScore + bonusScore);
         }

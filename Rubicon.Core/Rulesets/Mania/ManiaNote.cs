@@ -30,7 +30,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 	/// </summary>
 	public AnimatedSprite2D Tail;
 
-	private double _tailOffset = 0d;
+	private float _tailOffset = 0f;
 
 	public override void Initialize()
 	{
@@ -122,7 +122,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 		// Updating position and all that, whatever the base class does.
 		base._Process(delta);
 
-		double songPos = Conductor.Time * 1000d;
+		float songPos = Conductor.Time * 1000f;
 		bool isHeld = parent.NoteHeld == Info;
 		if (Info.MsLength > 0)
 		{
@@ -152,7 +152,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 		
 		float startingPos = ParentController.ParentBarLine.DistanceOffset * ParentController.ScrollSpeed;
 		SvChange svChange = ParentController.ParentBarLine.Chart.SvChanges[Info.StartingScrollVelocity];
-		float distance = (float)(svChange.Position + Info.MsTime - svChange.MsTime - _tailOffset) * ParentController.ScrollSpeed;
+		float distance = (svChange.Position + Info.MsTime - svChange.MsTime - _tailOffset) * ParentController.ScrollSpeed;
 		Vector2 posMult = new Vector2(Mathf.Cos(maniaNoteManager.DirectionAngle), Mathf.Sin(maniaNoteManager.DirectionAngle));
 		Position = maniaNoteManager.NoteHeld != Info ? (startingPos + distance) * posMult : Vector2.Zero;
 	}
@@ -215,7 +215,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 	/// <summary>
 	/// Resizes the entire hold in general according to the length provided.
 	/// </summary>
-	public void AdjustTailLength(double length)
+	public void AdjustTailLength(float length)
 	{
 		if (ParentController is not ManiaNoteController maniaNoteManager)
 			return;
@@ -260,7 +260,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 	{
 		base.Reset();
 		Note.Visible = true;
-		_tailOffset = 0d;
+		_tailOffset = 0f;
 	}
 	
 	/// <summary>
@@ -268,10 +268,10 @@ namespace Rubicon.Core.Rulesets.Mania;
 	/// </summary>
 	/// <param name="length">The current length of the note</param>
 	/// <returns>The on-screen length</returns>
-	private float GetOnScreenHoldLength(double length)
+	private float GetOnScreenHoldLength(float length)
 	{
 		SvChange[] svChangeList = ParentController.ParentBarLine.Chart.SvChanges;
-		double startTime = Info.MsTime + (Info.MsLength - length);
+		float startTime = Info.MsTime + (Info.MsLength - length);
 		int startIndex = Info.StartingScrollVelocity;
 		for (int i = startIndex; i <= Info.EndingScrollVelocity; i++)
 		{
@@ -282,8 +282,8 @@ namespace Rubicon.Core.Rulesets.Mania;
 		}
 		
 		SvChange startingSvChange = svChangeList[startIndex];
-		double startingPosition = startingSvChange.Position + ((startTime - startingSvChange.MsTime) * startingSvChange.Multiplier);
+		float startingPosition = startingSvChange.Position + ((startTime - startingSvChange.MsTime) * startingSvChange.Multiplier);
 
-		return (float)(GetEndingPoint() - startingPosition);
+		return GetEndingPoint() - startingPosition;
 	}
 }

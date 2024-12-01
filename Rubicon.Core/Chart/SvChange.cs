@@ -10,7 +10,7 @@ namespace Rubicon.Core.Chart;
     /// <summary>
     /// The time to execute this scroll velocity change, in milliseconds.
     /// </summary>
-    public double MsTime = 0d;
+    public float MsTime = 0f;
 
     /// <summary>
     /// The starting position of this scroll velocity change. Is set by <see cref="RubiChart.ConvertData">RubiChart.ConvertData</see>.
@@ -20,7 +20,7 @@ namespace Rubicon.Core.Chart;
     /// <summary>
     /// The measure to execute this scroll velocity change.
     /// </summary>
-    [Export] public double Time = 0;
+    [Export] public float Time = 0;
 
     /// <summary>
     /// The scroll velocity value

@@ -21,7 +21,7 @@ namespace Rubicon.Core.Rulesets;
     /// <summary>
     /// The distance from the note's actual hit time.
     /// </summary>
-    [Export] public double Distance;
+    [Export] public float Distance;
 
     /// <summary>
     /// Indicates whether the NoteManager was holding this note or not, if this note is a hold note.
@@ -39,12 +39,12 @@ namespace Rubicon.Core.Rulesets;
     /// <returns>Itself, for chaining purposes</returns>
     public NoteInputElement AutoDetectHit()
     {
-        double[] hitWindows = [ 
-            ProjectSettings.GetSetting("rubicon/judgments/perfect_hit_window").AsDouble(),
-            ProjectSettings.GetSetting("rubicon/judgments/great_hit_window").AsDouble(),
-            ProjectSettings.GetSetting("rubicon/judgments/good_hit_window").AsDouble(),
-            ProjectSettings.GetSetting("rubicon/judgments/okay_hit_window").AsDouble(),
-            ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsDouble()
+        float[] hitWindows = [ 
+            ProjectSettings.GetSetting("rubicon/judgments/perfect_hit_window").AsSingle(),
+            ProjectSettings.GetSetting("rubicon/judgments/great_hit_window").AsSingle(),
+            ProjectSettings.GetSetting("rubicon/judgments/good_hit_window").AsSingle(),
+            ProjectSettings.GetSetting("rubicon/judgments/okay_hit_window").AsSingle(),
+            ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle()
         ]; 
         int hit = hitWindows.Length;
         for (int i = 0; i < hitWindows.Length; i++)

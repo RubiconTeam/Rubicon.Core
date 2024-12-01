@@ -28,7 +28,7 @@ public partial class SongMeta : Resource
     /// <summary>
     /// The chart offset.
     /// </summary>
-    [Export] public double Offset = 0d;
+    [Export] public float Offset = 0f;
     
     /// <summary>
     /// The default ruleset for this chart.

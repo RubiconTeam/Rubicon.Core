@@ -61,7 +61,7 @@ namespace Rubicon.Core.Rulesets;
 	/// <summary>
 	/// Is true when the manager has no notes to hit for at least a measure.
 	/// </summary>
-	public bool OnBreak => !IsComplete && Notes[NoteHitIndex].MsTime - Conductor.Time * 1000d >
+	public bool OnBreak => !IsComplete && Notes[NoteHitIndex].MsTime - Conductor.Time * 1000f >
 		ConductorUtility.MeasureToMs(Conductor.CurrentMeasure, Conductor.Bpm, Conductor.TimeSigNumerator);
 	
 	/// <summary>
@@ -91,12 +91,12 @@ namespace Rubicon.Core.Rulesets;
 		base._Process(delta);
 		
 		// Handle note spawning
-		double time = Conductor.Time * 1000d;
+		float time = Conductor.Time * 1000f;
 		if (NoteSpawnIndex < Notes.Length && Visible)
 		{
-			while (NoteSpawnIndex < Notes.Length && Notes[NoteSpawnIndex].MsTime - time <= 2000)
+			while (NoteSpawnIndex < Notes.Length && Notes[NoteSpawnIndex].MsTime - time <= 2000f)
 			{
-				if (Notes[NoteSpawnIndex].MsTime - time < 0 || Notes[NoteSpawnIndex].WasSpawned)
+				if (Notes[NoteSpawnIndex].MsTime - time < 0f || Notes[NoteSpawnIndex].WasSpawned)
 				{
 					NoteSpawnIndex++;
 					continue;
@@ -119,14 +119,14 @@ namespace Rubicon.Core.Rulesets;
 			NoteData curNoteData = Notes[NoteHitIndex];
 			if (Autoplay && InputsEnabled)
 			{
-				while (curNoteData.MsTime - time <= 0)
+				while (curNoteData.MsTime - time <= 0f)
 				{
 					if (!curNoteData.ShouldMiss)
 						ProcessQueue.Add(new NoteInputElement
 						{
 							Note = curNoteData,
-							Distance = 0,
-							Holding = curNoteData.Length > 0,
+							Distance = 0f,
+							Holding = curNoteData.Length > 0f,
 							Index = NoteHitIndex
 						}.AutoDetectHit());
 				
@@ -143,7 +143,7 @@ namespace Rubicon.Core.Rulesets;
 				ProcessQueue.Add(new NoteInputElement
 				{
 					Note = Notes[NoteHitIndex],
-					Distance = -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsDouble() - 1,
+					Distance = -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle() - 1f,
 					Holding = false,
 					Index = NoteHitIndex
 				}.AutoDetectHit());

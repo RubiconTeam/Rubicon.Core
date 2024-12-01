@@ -23,12 +23,12 @@ public partial class NoteData : RefCounted
     /// <summary>
     /// Starting point of the note. Stored on disk in measures.
     /// </summary>
-    [Export] public double Time;
+    [Export] public float Time;
 
     /// <summary>
     /// Length of the note. Stored on disk in measures.
     /// </summary>
-    [Export] public double Length;
+    [Export] public float Length;
 
     /// <summary>
     /// Any extra parameters will be stored here.
@@ -38,12 +38,12 @@ public partial class NoteData : RefCounted
     /// <summary>
     /// Length of the note converted to milliseconds. Should be ignored when serialized.
     /// </summary>
-    public double MsTime;
+    public float MsTime;
         
     /// <summary>
     /// Length of the note converted to milliseconds. Should be ignored when serialized.
     /// </summary>
-    public double MsLength;
+    public float MsLength;
 
     /// <summary>
     /// The starting scroll velocity this note is associated with.

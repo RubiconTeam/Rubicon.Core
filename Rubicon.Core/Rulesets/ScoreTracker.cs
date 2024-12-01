@@ -41,10 +41,10 @@ namespace Rubicon.Core.Rulesets;
         if (firstChart == null)
             return;
         
-        double startTime = 0;
+        float startTime = 0;
         List<NoteData> notes = new List<NoteData>();
         List<TargetSwitch> switches = new List<TargetSwitch>(firstChart.Switches);
-        switches.Insert(0, new TargetSwitch{ Time = 0.0, MsTime = 0.0, Name = target });
+        switches.Insert(0, new TargetSwitch{ Time = 0f, MsTime = 0f, Name = target });
         for (int i = 0; i < switches.Count; i++)
         {
             IndividualChart curChart = chart.Charts.FirstOrDefault(x => x.Name == switches[i].Name);

@@ -11,7 +11,7 @@ public partial class EventData : Resource
     /// <summary>
     /// The time to trigger this event. Stored on disk in measures.
     /// </summary>
-    [Export] public double Time = 0d;
+    [Export] public float Time = 0f;
         
     /// <summary>
     /// The event's name.
@@ -26,7 +26,7 @@ public partial class EventData : Resource
     /// <summary>
     /// The time converted from measures to milliseconds. Should be ignored when serialized.
     /// </summary>
-    public double MsTime = 0d;
+    public float MsTime = 0f;
 
     /// <summary>
     /// Converts the pre-existing Time and Length variables to milliseconds and stores them in MsTime and MsLength, using the provided BpmInfo.

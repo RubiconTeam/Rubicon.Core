@@ -15,9 +15,9 @@ public static class ConductorUtility
     /// <param name="bpm">The BPM</param>
     /// <param name="timeSignatureNumerator">The number of beats in a measure.</param>
     /// <returns>The measure, in milliseconds.</returns>
-    public static double MeasureToMs(double measure, double bpm, double timeSignatureNumerator = 4d)
+    public static float MeasureToMs(float measure, float bpm, float timeSignatureNumerator = 4f)
     {
-        return measure * (60000d / (bpm / timeSignatureNumerator));
+        return measure * (60000f / (bpm / timeSignatureNumerator));
     }
 
     /// <summary>
@@ -26,7 +26,7 @@ public static class ConductorUtility
     /// <param name="msTime">The time in milliseconds</param>
     /// <param name="bpmList">The bpm list (<see cref="RubiChart.ConvertData"/> needs to be invoked beforehand!)</param>
     /// <returns>The milliseconds, in measures</returns>
-    public static double MsToMeasures(double msTime, BpmInfo[] bpmList)
+    public static float MsToMeasures(float msTime, BpmInfo[] bpmList)
     {
         BpmInfo bpm = bpmList.Last();
         for (int i = 0; i < bpmList.Length; i++)
@@ -38,8 +38,8 @@ public static class ConductorUtility
             }
         }
 
-        double measureValue = MeasureToMs(1, bpm.Bpm, bpm.TimeSignatureNumerator);
-        double offset = msTime - bpm.MsTime;
+        float measureValue = MeasureToMs(1, bpm.Bpm, bpm.TimeSignatureNumerator);
+        float offset = msTime - bpm.MsTime;
         return bpm.Time + (offset / measureValue);
     }
 
@@ -49,7 +49,7 @@ public static class ConductorUtility
     /// <param name="measure">The measure.</param>
     /// <param name="timeSignatureNumerator">The number of beats in a measure.</param>
     /// <returns>The measure, in beats.</returns>
-    public static double MeasureToBeats(double measure, double timeSignatureNumerator = 4d)
+    public static float MeasureToBeats(float measure, float timeSignatureNumerator = 4f)
     {
         return measure * timeSignatureNumerator;
     }
@@ -61,7 +61,7 @@ public static class ConductorUtility
     /// <param name="timeSignatureNumerator">The number of beats in a measure.</param>
     /// <param name="timeSignatureDenominator">The type of note which equals one beat.</param>
     /// <returns>The measure, in steps.</returns>
-    public static double MeasureToSteps(double measure, double timeSignatureNumerator = 4d, double timeSignatureDenominator = 4d)
+    public static float MeasureToSteps(float measure, float timeSignatureNumerator = 4f, float timeSignatureDenominator = 4f)
     {
         return measure * timeSignatureNumerator * timeSignatureDenominator;
     }
@@ -72,7 +72,7 @@ public static class ConductorUtility
     /// <param name="beats">The beats</param>
     /// <param name="timeSignatureDenominator">The type of note which equals one beat.</param>
     /// <returns>The beats, in steps.</returns>
-    public static double BeatsToSteps(double beats, double timeSignatureDenominator = 4f)
+    public static float BeatsToSteps(float beats, float timeSignatureDenominator = 4f)
     {
         return beats * timeSignatureDenominator;
     }
@@ -84,7 +84,7 @@ public static class ConductorUtility
     /// <param name="timeSignatureNumerator">The number of beats in a measure.</param>
     /// <param name="timeSignatureDenominator">The type of note which equals one beat.</param>
     /// <returns>The steps, in measures.</returns>
-    public static double StepsToMeasures(double steps, double timeSignatureNumerator = 4d, double timeSignatureDenominator = 4d)
+    public static float StepsToMeasures(float steps, float timeSignatureNumerator = 4f, float timeSignatureDenominator = 4f)
     {
         return steps / (timeSignatureNumerator * timeSignatureDenominator);
     }

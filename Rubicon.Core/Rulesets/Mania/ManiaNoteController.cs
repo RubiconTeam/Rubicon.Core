@@ -81,8 +81,8 @@ namespace Rubicon.Core.Rulesets.Mania;
 
 	public override void _Process(double delta)
 	{
-		if (NoteHeld != null && NoteHeld.MsTime + NoteHeld.MsLength < Conductor.Time * 1000d)
-			ProcessQueue.Add(new NoteInputElement{Note = NoteHeld, Distance = 0d, Holding = false, Index = HoldingIndex});
+		if (NoteHeld != null && NoteHeld.MsTime + NoteHeld.MsLength < Conductor.Time * 1000f)
+			ProcessQueue.Add(new NoteInputElement{Note = NoteHeld, Distance = 0f, Holding = false, Index = HoldingIndex});
 		
 		base._Process(delta);
 	}
@@ -161,7 +161,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 				NoteHeld = null;
 			}
 
-			if (inputElement.Note.MsLength <= 0)
+			if (inputElement.Note.MsLength <= 0f)
 			{
 				RemoveChild(HitObjects[inputElement.Index]);
 				HitObjects[inputElement.Index].PrepareRecycle();
@@ -191,16 +191,16 @@ namespace Rubicon.Core.Rulesets.Mania;
 				return;
 			}
 
-			double songPos = Conductor.Time * 1000d;
-			while (notes[NoteHitIndex].MsTime - songPos <= -(float)ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window"))
+			float songPos = Conductor.Time * 1000f;
+			while (notes[NoteHitIndex].MsTime - songPos <= -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle())
 			{
 				// Miss every note thats too late first
-				ProcessQueue.Add(new NoteInputElement{Note = notes[NoteHitIndex], Distance = -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsDouble() - 1, Holding = false, Index = NoteHitIndex}.AutoDetectHit());
+				ProcessQueue.Add(new NoteInputElement{Note = notes[NoteHitIndex], Distance = -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle() - 1f, Holding = false, Index = NoteHitIndex}.AutoDetectHit());
 				NoteHitIndex++;
 			}
 
-			double hitTime = notes[NoteHitIndex].MsTime - songPos;
-			if (Mathf.Abs(hitTime) <= ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsDouble()) // Literally any other rating
+			float hitTime = notes[NoteHitIndex].MsTime - songPos;
+			if (Mathf.Abs(hitTime) <= ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle()) // Literally any other rating
 			{
 				ProcessQueue.Add(new NoteInputElement{Note = notes[NoteHitIndex], Distance = hitTime, Holding = notes[NoteHitIndex].Length > 0, Index = NoteHitIndex}.AutoDetectHit());
 				NoteHitIndex++;
@@ -215,8 +215,8 @@ namespace Rubicon.Core.Rulesets.Mania;
 		{
 			if (NoteHeld != null)
 			{
-				double length = NoteHeld.MsTime + NoteHeld.MsLength - (Conductor.Time * 1000d);
-				bool holding = length <= ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsDouble();
+				float length = NoteHeld.MsTime + NoteHeld.MsLength - (Conductor.Time * 1000f);
+				bool holding = length <= ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle();
 				ProcessQueue.Add(new NoteInputElement{Note = NoteHeld, Distance = length, Holding = !holding, Index = HoldingIndex}.AutoDetectHit());
 			}
 

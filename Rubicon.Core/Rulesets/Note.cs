@@ -71,7 +71,7 @@ namespace Rubicon.Core.Rulesets;
     protected float GetStartingPoint()
     {
         SvChange[] svChangeList = ParentController.ParentBarLine.Chart.SvChanges;
-        return (float)(svChangeList[Info.StartingScrollVelocity].Position + ((Info.MsTime - svChangeList[Info.StartingScrollVelocity].MsTime) * svChangeList[Info.StartingScrollVelocity].Multiplier));
+        return svChangeList[Info.StartingScrollVelocity].Position + ((Info.MsTime - svChangeList[Info.StartingScrollVelocity].MsTime) * svChangeList[Info.StartingScrollVelocity].Multiplier);
     }
 
     /// <summary>
@@ -81,7 +81,7 @@ namespace Rubicon.Core.Rulesets;
     protected float GetEndingPoint()
     {
         SvChange[] svChangeList = ParentController.ParentBarLine.Chart.SvChanges;
-        return (float)(svChangeList[Info.EndingScrollVelocity].Position +
-            ((Info.MsTime + Info.MsLength - svChangeList[Info.EndingScrollVelocity].MsTime) * svChangeList[Info.EndingScrollVelocity].Multiplier));
+        return svChangeList[Info.EndingScrollVelocity].Position +
+            ((Info.MsTime + Info.MsLength - svChangeList[Info.EndingScrollVelocity].MsTime) * svChangeList[Info.EndingScrollVelocity].Multiplier);
     }
 }

@@ -54,8 +54,8 @@ public static class RubiChartLoader
             {
                 TargetSwitch @switch = new TargetSwitch();
 
-                @switch.Time = BitConverter.ToDouble(bytes.Take(new Range(offset, offset + 8)).ToArray());
-                offset += 8;
+                @switch.Time = BitConverter.ToSingle(bytes.Take(new Range(offset, offset + 8)).ToArray());
+                offset += 4;
 
                 int lineNameLength = BitConverter.ToInt32(bytes.Take(new Range(offset, offset + 4)).ToArray());
                 offset += 4;
@@ -73,8 +73,8 @@ public static class RubiChartLoader
             {
                 SvChange svChange = new SvChange();
 
-                svChange.Time = BitConverter.ToDouble(bytes.Take(new Range(offset, offset + 8)).ToArray());
-                offset += 8;
+                svChange.Time = BitConverter.ToSingle(bytes.Take(new Range(offset, offset + 8)).ToArray());
+                offset += 4;
 
                 svChange.Multiplier = BitConverter.ToSingle(bytes.Take(new Range(offset, offset + 4)).ToArray());
                 offset += 4;
@@ -89,11 +89,11 @@ public static class RubiChartLoader
             {
                 NoteData noteData = new NoteData();
 
-                noteData.Time = BitConverter.ToDouble(bytes.Take(new Range(offset, offset + 8)).ToArray());
-                offset += 8;
+                noteData.Time = BitConverter.ToSingle(bytes.Take(new Range(offset, offset + 8)).ToArray());
+                offset += 4;
 
-                noteData.Length = BitConverter.ToDouble(bytes.Take(new Range(offset, offset + 8)).ToArray());
-                offset += 8;
+                noteData.Length = BitConverter.ToSingle(bytes.Take(new Range(offset, offset + 8)).ToArray());
+                offset += 4;
 
                 noteData.Lane = BitConverter.ToInt32(bytes.Take(new Range(offset, offset + 4)).ToArray());
                 offset += 4;

@@ -18,7 +18,7 @@ public partial class RubiChart : RefCounted
     /// <summary>
     /// The current chart version.
     /// </summary>
-    public readonly static VersionInfo ChartVersion = new(1, 0, 0, 0);
+    public readonly static VersionInfo ChartVersion = new(1, 1, 0, 0);
     
     #region Public Variables
     /// <summary>
@@ -151,10 +151,21 @@ public partial class RubiChart : RefCounted
         Version = BitConverter.ToUInt32(bytes.Take(new Range(0, 4)).ToArray());
         switch (Version)
         {
-            default:
+            case 16777216: // Version 1
                 this.SetupFromVersionOne(bytes);
                 break;
+            default:
+                this.SetupFromVersionOneM1(bytes);
+                break;
         }
+
+        int cnt = 0;
+        foreach (IndividualChart curChart in Charts)
+            foreach (NoteData curNote in curChart.Notes)
+                if (curNote.GetSerializedType() == 2)
+                    cnt++;
+        
+        GD.Print(cnt);
     }
 
     /// <summary>
@@ -171,7 +182,7 @@ public partial class RubiChart : RefCounted
             for (int j = 0; j < Charts[i].Notes.Length; j++)
             {
                 NoteData note = Charts[i].Notes[j];
-                if (noteTypes.Contains(note.Type))
+                if (noteTypes.Contains(note.Type) || note.Type == "normal")
                     continue;
                 
                 noteTypes.Add(note.Type);
@@ -245,23 +256,9 @@ public partial class RubiChart : RefCounted
             for (int j = 0; j < chart.Notes.Length; j++)
             {
                 NoteData note = chart.Notes[j];
-                bytes.AddRange(BitConverter.GetBytes(note.Time));
-                bytes.AddRange(BitConverter.GetBytes(note.Length));
-                bytes.AddRange(BitConverter.GetBytes(note.Lane));
-                bytes.AddRange(BitConverter.GetBytes(noteTypeIndexes[note.Type])); // Number that points to note type
-                
-                // Parameters
-                bytes.AddRange(BitConverter.GetBytes(note.Parameters.Count));
-                foreach (KeyValuePair<StringName, Variant> pair in note.Parameters)
-                {
-                    byte[] paramName = Encoding.UTF8.GetBytes(pair.Key);
-                    bytes.AddRange(BitConverter.GetBytes(paramName.Length));
-                    bytes.AddRange(paramName);
-                    
-                    byte[] valueBytes = GD.VarToBytes(pair.Value);
-                    bytes.AddRange(BitConverter.GetBytes(valueBytes.Length));
-                    bytes.AddRange(valueBytes);
-                }
+                byte serializeType = note.GetSerializedType();
+                bytes.Add(serializeType);
+                bytes.AddRange(note.AsBytes(noteTypeIndexes));
             }
         }
         

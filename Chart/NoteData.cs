@@ -1,5 +1,6 @@
+using System.Collections.Generic;
 using System.Linq;
-using Godot.Collections;
+using System.Text;
 using Array = Godot.Collections.Array;
 
 namespace Rubicon.Core.Chart;
@@ -33,7 +34,7 @@ public partial class NoteData : RefCounted
     /// <summary>
     /// Any extra parameters will be stored here.
     /// </summary>
-    [Export] public Dictionary<StringName, Variant> Parameters = new();
+    [Export] public Godot.Collections.Dictionary<StringName, Variant> Parameters = new();
         
     /// <summary>
     /// Length of the note converted to milliseconds. Should be ignored when serialized.
@@ -70,6 +71,38 @@ public partial class NoteData : RefCounted
     /// </summary>
     public bool WasSpawned = false;
 
+    public byte GetSerializedType()
+    {
+        if (Length > 0.0)
+        {
+            if (Type != "normal")
+            {
+                if (Parameters.Count > 0)
+                    return 7; // Typed hold note with params
+
+                return 5; // Typed hold note
+            }
+
+            if (Parameters.Count  > 0)
+                return 6; // Normal hold note with params
+            
+            return 4; // Normal hold note
+        }
+        
+        if (Type != "normal")
+        {
+            if (Parameters.Count > 0)
+                return 3; // Typed tap note with params
+
+            return 1; // Typed tap note
+        }
+
+        if (Parameters.Count > 0)
+            return 2; // Tap note with params
+        
+        return 0; // Normal tap note
+    }
+    
     /// <summary>
     /// Converts data into time used by the game and also scroll velocity changes.
     /// </summary>
@@ -109,5 +142,82 @@ public partial class NoteData : RefCounted
 
         MsTime = ConductorUtility.MeasureToMs(Time - bpm.Time, bpm.Bpm, bpm.TimeSignatureNumerator) + bpm.MsTime;
         MsLength = ConductorUtility.MeasureToMs(Length, bpm.Bpm, bpm.TimeSignatureNumerator);
+    }
+    
+    public byte[] AsBytes(Dictionary<StringName, int> typeIndexMap)
+    {
+        List<byte> bytes = new List<byte>();
+        
+        // Normal tap note
+        bytes.AddRange(BitConverter.GetBytes(Time));
+        bytes.AddRange(BitConverter.GetBytes(Lane));
+        
+        int serializedType = GetSerializedType();
+        switch (serializedType)
+        {
+            case 1: // Typed tap note
+            {
+                bytes.AddRange(BitConverter.GetBytes(typeIndexMap[Type]));
+                break;
+            }
+            case 2: // Tap note with params
+            {
+                bytes.AddRange(BitConverter.GetBytes(Parameters.Count));
+                bytes.AddRange(GetParametersAsBytes());
+                break;
+            }
+            case 3: // Typed tap note with params
+            {
+                bytes.AddRange(BitConverter.GetBytes(typeIndexMap[Type]));
+                bytes.AddRange(BitConverter.GetBytes(Parameters.Count));
+                bytes.AddRange(GetParametersAsBytes());
+                break;
+            }
+            case 4: // Normal hold note
+            {
+                bytes.AddRange(BitConverter.GetBytes(Length));
+                break;
+            }
+            case 5: // Typed hold note
+            {
+                bytes.AddRange(BitConverter.GetBytes(Length));
+                bytes.AddRange(BitConverter.GetBytes(typeIndexMap[Type]));
+                break;
+            }
+            case 6: // Hold note with params
+            {
+                bytes.AddRange(BitConverter.GetBytes(Length));
+                bytes.AddRange(BitConverter.GetBytes(Parameters.Count));
+                bytes.AddRange(GetParametersAsBytes());
+                break;
+            }
+            case 7: // Typed hold note with parameters
+            {
+                bytes.AddRange(BitConverter.GetBytes(Length));
+                bytes.AddRange(BitConverter.GetBytes(typeIndexMap[Type]));
+                bytes.AddRange(BitConverter.GetBytes(Parameters.Count));
+                bytes.AddRange(GetParametersAsBytes());
+                break;
+            }
+        }
+        
+        return bytes.ToArray();
+    }
+
+    private byte[] GetParametersAsBytes()
+    {
+        List<byte> bytes = new List<byte>();
+        foreach (KeyValuePair<StringName, Variant> pair in Parameters)
+        {
+            byte[] paramName = Encoding.UTF8.GetBytes(pair.Key);
+            bytes.AddRange(BitConverter.GetBytes(paramName.Length));
+            bytes.AddRange(paramName);
+
+            byte[] valueBytes = GD.VarToBytes(pair.Value);
+            bytes.AddRange(BitConverter.GetBytes(valueBytes.Length));
+            bytes.AddRange(valueBytes);
+        }
+
+        return bytes.ToArray();
     }
 }

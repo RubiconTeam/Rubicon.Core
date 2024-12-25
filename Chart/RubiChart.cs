@@ -254,15 +254,109 @@ public partial class RubiChart : RefCounted
             // Notes
             bytes.AddRange(BitConverter.GetBytes(chart.Notes.Length));
             for (int j = 0; j < chart.Notes.Length; j++)
-            {
-                NoteData note = chart.Notes[j];
-                byte serializeType = note.GetSerializedType();
-                bytes.Add(serializeType);
-                bytes.AddRange(note.AsBytes(noteTypeIndexes));
-            }
+                bytes.AddRange(chart.Notes[j].AsBytes(noteTypeIndexes));
         }
         
         return bytes.ToArray();
+    }
+    
+    public string ToText()
+    {
+        // Cache note types
+        List<StringName> noteTypes = new List<StringName>();
+        System.Collections.Generic.Dictionary<StringName, int> noteTypeIndexes = new();
+        for (int i = 0; i < Charts.Length; i++)
+        {
+            for (int j = 0; j < Charts[i].Notes.Length; j++)
+            {
+                NoteData note = Charts[i].Notes[j];
+                if (noteTypes.Contains(note.Type) || note.Type == "normal")
+                    continue;
+                
+                noteTypes.Add(note.Type);
+                noteTypeIndexes.Add(note.Type, noteTypes.Count - 1);
+            }
+        }
+        
+        StringBuilder text = new StringBuilder();
+        
+        // Version
+        text.AppendLine("$V:" + ChartVersion + ";");
+        
+        // Difficulty
+        text.AppendLine("$DIFF:" + Difficulty + ";");
+        
+        // Scroll Speed
+        text.AppendLine("$SPEED:" + ScrollSpeed + ";");
+        
+        // Charter
+        text.AppendLine("$CHARTER:" + Charter + ";");
+        
+        // Note Types
+        if (noteTypes.Count > 0)
+        {
+            text.Append("$TYPES:");
+
+            for (int i = 0; i < noteTypes.Count; i++)
+            {
+                text.Append(noteTypes[i]);
+                
+                if (i < noteTypes.Count - 1)
+                    text.Append(',');
+                else
+                    text.Append(";\n");
+            }
+        }
+        
+        // Charts
+        text.AppendLine("$CHARTS:");
+
+        for (int i = 0; i < Charts.Length; i++)
+        {
+            IndividualChart chart = Charts[i];
+            
+            // Name
+            text.AppendLine("*NAME:" + chart.Name);
+            
+            // Lanes
+            text.AppendLine("*LANES:" + chart.Lanes);
+            
+            // Target Switching
+            if (chart.Switches.Length > 0)
+            {
+                text.Append("*SWTCHS:");
+                for (int j = 0; j < chart.Switches.Length; j++)
+                {
+                    TargetSwitch tSwitch = chart.Switches[j];
+                    text.Append(tSwitch.Time + "-" + tSwitch.Name);
+                
+                    if (j < chart.Switches.Length - 1)
+                        text.Append(',');
+                    else
+                        text.Append(";\n");
+                }
+            }
+            
+            // SV Changes
+            text.Append("*VLCTIES:");
+            for (int j = 0; j < chart.SvChanges.Length; j++)
+            {
+                SvChange svChange = chart.SvChanges[j];
+                text.Append(svChange.Time + "-" + svChange.Multiplier);
+                
+                if (j < chart.Switches.Length - 1)
+                    text.Append(',');
+                else
+                    text.Append(";\n");
+            }
+            
+            // Notes
+            text.AppendLine("*NOTES:");
+            for (int j = 0; j < chart.Notes.Length; j++)
+                text.AppendLine(chart.Notes[j].AsText(noteTypeIndexes));
+        }
+
+        return text.ToString();
     }
 
     #endregion

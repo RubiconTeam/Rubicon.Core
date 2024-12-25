@@ -148,11 +148,13 @@ public partial class NoteData : RefCounted
     {
         List<byte> bytes = new List<byte>();
         
+        byte serializedType = GetSerializedType();
+        bytes.Add(serializedType);
+        
         // Normal tap note
         bytes.AddRange(BitConverter.GetBytes(Time));
         bytes.AddRange(BitConverter.GetBytes(Lane));
         
-        int serializedType = GetSerializedType();
         switch (serializedType)
         {
             case 1: // Typed tap note
@@ -202,6 +204,56 @@ public partial class NoteData : RefCounted
         }
         
         return bytes.ToArray();
+    }
+    
+    public string AsText(Dictionary<StringName, int> typeIndexMap)
+    {
+        StringBuilder text = new StringBuilder();
+        
+        // For every note
+        byte serializedType = GetSerializedType();
+        text.Append(serializedType + "," + Time + "," + Lane);
+        
+        switch (serializedType)
+        {
+            case 1: // Typed tap note
+            {
+                text.Append("," + typeIndexMap[Type]);
+                break;
+            }
+            case 2: // Tap note with params
+            {
+                text.Append("," + Json.Stringify(Parameters));
+                break;
+            }
+            case 3: // Typed tap note with params
+            {
+                text.Append("," + typeIndexMap[Type] + "," + Json.Stringify(Parameters));
+                break;
+            }
+            case 4: // Normal hold note
+            {
+                text.Append("," + Length);
+                break;
+            }
+            case 5: // Typed hold note
+            {
+                text.Append("," + Length + "," + typeIndexMap[Type]);
+                break;
+            }
+            case 6: // Hold note with params
+            {
+                text.Append("," + Length + "," + Json.Stringify(Parameters));
+                break;
+            }
+            case 7: // Typed hold note with parameters
+            {
+                text.Append("," + Length + "," + typeIndexMap[Type] + "," + Json.Stringify(Parameters));
+                break;
+            }
+        }
+
+        return text.ToString();
     }
 
     private byte[] GetParametersAsBytes()

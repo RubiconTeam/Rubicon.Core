@@ -21,6 +21,29 @@ public static class ConductorUtility
     }
 
     /// <summary>
+    /// Converts a beat to milliseconds based on the current BPM.
+    /// </summary>
+    /// <param name="beat">The beat</param>
+    /// <param name="bpm">The BPM</param>
+    /// <returns>The beat, in milliseconds</returns>
+    public static float BeatsToMs(float beat, float bpm)
+    {
+        return beat * (60000f / bpm);
+    }
+
+    /// <summary>
+    /// Converts a step to milliseconds based on the current BPM.
+    /// </summary>
+    /// <param name="step">The step</param>
+    /// <param name="bpm">The BPM</param>
+    /// <param name="timeSignatureDenominator">The number of steps in a beat.</param>
+    /// <returns>The beat, in milliseconds</returns>
+    public static float StepsToMs(float step, float bpm, float timeSignatureDenominator = 4f)
+    {
+        return step * (60000f / bpm / timeSignatureDenominator);
+    }
+
+    /// <summary>
     /// Converts milliseconds to measures based on a list of BPM changes.
     /// </summary>
     /// <param name="msTime">The time in milliseconds</param>

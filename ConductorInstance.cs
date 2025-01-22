@@ -80,6 +80,21 @@ public partial class ConductorInstance : Node
 	[Export] public int TimeSigDenominator = 4;
 
 	/// <summary>
+	/// How long a measure is in milliseconds.
+	/// </summary>
+	[Export] public float MeasureValue;
+	
+	/// <summary>
+	/// How long a beat is in milliseconds. Equivalent to "Conductor.crochet".
+	/// </summary>
+	[Export] public float BeatValue;
+	
+	/// <summary>
+	/// How long a step is in milliseconds. Equivalent to "Conductor.stepCrochet".
+	/// </summary>
+	[Export] public float StepValue;
+
+	/// <summary>
 	/// Event triggered when the next beat is hit.
 	/// </summary>
 	[Signal] public delegate void BeatHitEventHandler(int beat);
@@ -136,7 +151,15 @@ public partial class ConductorInstance : Node
 		if (BpmIndex < BpmList.Length - 1 && BpmList[BpmIndex + 1].MsTime / 1000f <= Time)
 		{
 			BpmIndex++;
+			
 			Bpm = BpmList[BpmIndex].Bpm;
+			TimeSigNumerator = BpmList[BpmIndex].TimeSignatureNumerator;
+			TimeSigDenominator = BpmList[BpmIndex].TimeSignatureDenominator;
+			
+			MeasureValue = ConductorUtility.MeasureToMs(1f, Bpm, TimeSigNumerator);
+			BeatValue = ConductorUtility.BeatsToMs(1f, Bpm);
+			StepValue = ConductorUtility.StepsToMs(1f, Bpm, TimeSigDenominator);
+			
 			EmitSignalBpmChanged(BpmList[BpmIndex]);
 		}
 		
@@ -312,7 +335,16 @@ public partial class ConductorInstance : Node
 	public void SetBpmList(BpmInfo[] data)
 	{
 		_bpmList = data;
-		Bpm = BpmList[0].Bpm;
+
+		BpmIndex = 0;
+		
+		Bpm = BpmList[BpmIndex].Bpm;
+		TimeSigNumerator = BpmList[BpmIndex].TimeSignatureNumerator;
+		TimeSigDenominator = BpmList[BpmIndex].TimeSignatureDenominator;
+			
+		MeasureValue = ConductorUtility.MeasureToMs(1f, Bpm, TimeSigNumerator);
+		BeatValue = ConductorUtility.BeatsToMs(1f, Bpm);
+		StepValue = ConductorUtility.StepsToMs(1f, Bpm, TimeSigDenominator);
 	}
 	#endregion
 }

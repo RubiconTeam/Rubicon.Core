@@ -74,6 +74,11 @@ namespace Rubicon.Core.Rulesets;
     /// A signal that is emitted upon failure.
     /// </summary>
     [Signal] public delegate void FailedEventHandler();
+    
+    /// <summary>
+    /// A signal that is emitted when calling for a sing animation.
+    /// </summary>
+    [Signal] public delegate void SingCalledEventHandler(StringName barLineName, NoteInputElement element);
 
     /// <summary>
     /// Readies the PlayField for gameplay!
@@ -111,6 +116,7 @@ namespace Rubicon.Core.Rulesets;
         {
             IndividualChart indChart = chart.Charts[i];
             BarLine curBarLine = CreateBarLine(indChart, i);
+            curBarLine.Name = indChart.Name;
             curBarLine.PlayField = this;
             if (indChart.Name == TargetBarLine)
             {
@@ -170,14 +176,12 @@ namespace Rubicon.Core.Rulesets;
     /// <summary>
     /// The function that is connected to the bar lines when a note is hit. Can be overriden if needed for a specific ruleset.
     /// </summary>
-    /// <param name="barLine">The bar line</param>
-    /// <param name="lane">The lane</param>
-    /// <param name="direction">The sing direction</param>
-    /// <param name="inputElement">Info about the input recieved</param>
-    protected virtual void BarLineHit(BarLine barLine, int lane, string direction, NoteInputElement inputElement)
+    /// <param name="name">The bar line's name</param>
+    /// <param name="inputElement">Info about the input received</param>
+    private void BarLineHit(StringName name, NoteInputElement inputElement)
     {
         NoteResult result = new NoteResult(NoteResultFlags.None, inputElement.Hit);
-        Variant[] results = GetNoteResults.Invoke(barLine, lane, (int)inputElement.Hit, inputElement.Holding);
+        Variant[] results = GetNoteResults.Invoke(name, inputElement.Note.Lane, (int)inputElement.Hit, inputElement.Holding);
         for (int i = 0; i < results.Length; i++)
         {
             if (results[i].VariantType != Variant.Type.Object || results[i].AsGodotObject() is not NoteResult newResult)
@@ -189,8 +193,10 @@ namespace Rubicon.Core.Rulesets;
             result = newResult;
             break;
         }
+
+        inputElement.Hit = result.Hit;
         
-        if (BarLines[TargetIndex] == barLine && !result.HasFlag(NoteResultFlags.Score))
+        if (TargetBarLine == name && !result.HasFlag(NoteResultFlags.Score))
         {
             HitType hit = result.Hit;
             ScoreTracker.Combo = hit != HitType.Miss ? ScoreTracker.Combo + 1 : 0;
@@ -223,7 +229,9 @@ namespace Rubicon.Core.Rulesets;
             EmitSignalStatisticsUpdated(ScoreTracker.Combo, result.Hit, inputElement.Distance);
         }
         
+        if (!result.HasFlag(NoteResultFlags.Animation))
+            EmitSignalSingCalled(name, inputElement);
+        
         result.Free();
-        inputElement.Free();
     }
 }

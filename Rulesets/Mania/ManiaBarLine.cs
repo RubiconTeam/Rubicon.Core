@@ -38,9 +38,9 @@ namespace Rubicon.Core.Rulesets.Mania;
     }
     
     /// <inheritdoc/>
-    public override void OnNoteHit(int lane, NoteInputElement inputElement)
+    public override void OnNoteHit(NoteInputElement inputElement)
     {
-        EmitSignal(SignalName.NoteHit, this, NoteSkin.GetDirection(lane, Managers.Length), lane, inputElement);
+        EmitSignalNoteHit(Name, inputElement);
     }
 
     /// <summary>

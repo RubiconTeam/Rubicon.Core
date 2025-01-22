@@ -2,6 +2,7 @@ using System.Linq;
 using Godot.Collections;
 using Rubicon.Core;
 using Rubicon.Core.Chart;
+using Rubicon.Core.Data;
 
 namespace Rubicon.Core.Rulesets;
 
@@ -85,6 +86,7 @@ namespace Rubicon.Core.Rulesets;
 	[Export] public Array<NoteInputElement> ProcessQueue = new();
 
 	private NoteData[] _notes = [];
+	private NoteInputElement _inputElement = new();
 
 	public override void _Process(double delta)
 	{
@@ -122,13 +124,7 @@ namespace Rubicon.Core.Rulesets;
 				while (curNoteData.MsTime - time <= 0f)
 				{
 					if (!curNoteData.ShouldMiss)
-						ProcessQueue.Add(new NoteInputElement
-						{
-							Note = curNoteData,
-							Distance = 0f,
-							Holding = curNoteData.Length > 0f,
-							Index = NoteHitIndex
-						}.AutoDetectHit());
+						ProcessQueue.Add(GetInputElement(noteIndex: NoteHitIndex, distance: 0f, holding: curNoteData.Length > 0f));
 				
 					NoteHitIndex++;
 					if (NoteHitIndex >= Notes.Length)
@@ -140,14 +136,7 @@ namespace Rubicon.Core.Rulesets;
 
 			if (curNoteData.MsTime - time <= -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsDouble())
 			{
-				ProcessQueue.Add(new NoteInputElement
-				{
-					Note = Notes[NoteHitIndex],
-					Distance = -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle() - 1f,
-					Holding = false,
-					Index = NoteHitIndex
-				}.AutoDetectHit());
-				
+				ProcessQueue.Add(GetInputElement(noteIndex: NoteHitIndex, distance: -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle() - 1f, holding: false));
 				NoteHitIndex++;
 			}	
 		}
@@ -159,6 +148,37 @@ namespace Rubicon.Core.Rulesets;
 	}
 	
 	protected abstract void AssignData(Note note, NoteData noteData);
+
+	protected virtual NoteInputElement GetInputElement(int noteIndex, float distance, bool holding)
+	{
+		NoteInputElement element = _inputElement;
+		element.Note = Notes[noteIndex];
+		element.Distance = distance;
+		element.Holding = holding;
+		element.Index = noteIndex;
+		
+		// Auto detect hit based on distance
+		float[] hitWindows = [ 
+			ProjectSettings.GetSetting("rubicon/judgments/perfect_hit_window").AsSingle(),
+			ProjectSettings.GetSetting("rubicon/judgments/great_hit_window").AsSingle(),
+			ProjectSettings.GetSetting("rubicon/judgments/good_hit_window").AsSingle(),
+			ProjectSettings.GetSetting("rubicon/judgments/okay_hit_window").AsSingle(),
+			ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle()
+		]; 
+		int hit = hitWindows.Length;
+		for (int i = 0; i < hitWindows.Length; i++)
+		{
+			if (Mathf.Abs(element.Distance) <= hitWindows[i])
+			{
+				hit = i;
+				break;
+			}
+		}
+
+		element.Hit = (HitType)hit;
+		
+		return element;
+	}
 
 	public override void _Input(InputEvent @event)
 	{

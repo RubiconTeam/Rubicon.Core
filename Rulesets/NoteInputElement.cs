@@ -29,34 +29,12 @@ namespace Rubicon.Core.Rulesets;
     [Export] public bool Holding = false;
 
     /// <summary>
-    /// The type of hit that was retrieved. Automatically set when setting Distance.
+    /// The type of hit that was retrieved.
     /// </summary>
     [Export] public HitType Hit;
 
     /// <summary>
-    /// Sets up <see cref="Hit"/> based on <see cref="Distance"/>.
+    /// The direction to call upon singing.
     /// </summary>
-    /// <returns>Itself, for chaining purposes</returns>
-    public NoteInputElement AutoDetectHit()
-    {
-        float[] hitWindows = [ 
-            ProjectSettings.GetSetting("rubicon/judgments/perfect_hit_window").AsSingle(),
-            ProjectSettings.GetSetting("rubicon/judgments/great_hit_window").AsSingle(),
-            ProjectSettings.GetSetting("rubicon/judgments/good_hit_window").AsSingle(),
-            ProjectSettings.GetSetting("rubicon/judgments/okay_hit_window").AsSingle(),
-            ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle()
-        ]; 
-        int hit = hitWindows.Length;
-        for (int i = 0; i < hitWindows.Length; i++)
-        {
-            if (Mathf.Abs(Distance) <= hitWindows[i])
-            {
-                hit = i;
-                break;
-            }
-        }
-
-        Hit = (HitType)hit;
-        return this;
-    }
+    [Export] public string Direction = "";
 }

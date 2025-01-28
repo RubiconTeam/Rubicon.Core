@@ -59,7 +59,7 @@ public partial class NoteData : RefCounted
     /// <summary>
     /// Basically tells the autoplay whether to miss this note or not. Should be ignored when serialized.
     /// </summary>
-    public bool ShouldMiss = false;
+    [Export] public bool ShouldMiss = false;
     
     /// <summary>
     /// True if the note has already been hit.

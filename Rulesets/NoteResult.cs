@@ -6,7 +6,7 @@ namespace Rubicon.Core.Rulesets;
 /// <summary>
 /// An element for notes to be placed in a queue to be processed next frame. 
 /// </summary>
-[GlobalClass] public partial class NoteResult : GodotObject
+[GlobalClass] public partial class NoteResult : RefCounted
 {
     /// <summary>
     /// The note data linked with this object.

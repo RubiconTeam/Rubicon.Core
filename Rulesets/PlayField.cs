@@ -247,7 +247,5 @@ namespace Rubicon.Core.Rulesets;
         
         if (!result.Flags.HasFlag(NoteResultFlags.Animation))
             EmitSignalSingCalled(name, result);
-        
-        result.Free();
     }
 }

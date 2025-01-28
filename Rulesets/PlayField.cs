@@ -68,7 +68,7 @@ namespace Rubicon.Core.Rulesets;
     /// <summary>
     /// Triggers upon the statistics updating.
     /// </summary>
-    [Signal] public delegate void StatisticsUpdatedEventHandler(long combo, HitType hit, double distance);
+    [Signal] public delegate void StatisticsUpdatedEventHandler(long combo, HitType hit, float distance);
     
     /// <summary>
     /// A signal that is emitted upon failure.

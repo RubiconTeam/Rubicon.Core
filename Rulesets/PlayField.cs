@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
@@ -76,9 +77,19 @@ namespace Rubicon.Core.Rulesets;
     [Signal] public delegate void FailedEventHandler();
     
     /// <summary>
+    /// Emitted for every note type to set everything up initially.
+    /// </summary>
+    [Signal] public delegate void InitializeNoteEventHandler(NoteData[] notes, StringName noteType);
+    
+    /// <summary>
+    /// A signal that is emitted in case other note types need to modify the note result. Always is called.
+    /// </summary>
+    [Signal] public delegate void NoteHitEventHandler(StringName barLineName, NoteResult element);
+    
+    /// <summary>
     /// A signal that is emitted when calling for a sing animation.
     /// </summary>
-    [Signal] public delegate void SingCalledEventHandler(StringName barLineName, NoteInputElement element);
+    [Signal] public delegate void SingCalledEventHandler(StringName barLineName, NoteResult element);
 
     /// <summary>
     /// Readies the PlayField for gameplay!
@@ -112,9 +123,21 @@ namespace Rubicon.Core.Rulesets;
         
         BarLines = new BarLine[chart.Charts.Length];
         TargetBarLine = meta.PlayableCharts[targetIndex];
+        Dictionary<StringName, List<NoteData>> noteTypeMap = new Dictionary<StringName, List<NoteData>>();
         for (int i = 0; i < chart.Charts.Length; i++)
         {
             IndividualChart indChart = chart.Charts[i];
+            for (int n = 0; n < indChart.Notes.Length; n++)
+            {
+                NoteData curNote = indChart.Notes[n];
+                StringName noteType = curNote.Type;
+                
+                if (!noteTypeMap.ContainsKey(noteType))
+                    noteTypeMap[noteType] = new List<NoteData>();
+                
+                noteTypeMap[noteType].Add(curNote);
+            }
+            
             BarLine curBarLine = CreateBarLine(indChart, i);
             curBarLine.Name = indChart.Name;
             curBarLine.PlayField = this;
@@ -128,6 +151,13 @@ namespace Rubicon.Core.Rulesets;
             BarLines[i] = curBarLine;
             curBarLine.NoteHit += BarLineHit;
         }
+
+        foreach (var pair in noteTypeMap)
+        {
+            EmitSignalInitializeNote(pair.Value.ToArray(), pair.Key);
+            pair.Value.Clear();
+        }
+        noteTypeMap.Clear();
         
         ScoreTracker.Initialize(chart, TargetBarLine);
         UpdateOptions();
@@ -177,26 +207,12 @@ namespace Rubicon.Core.Rulesets;
     /// The function that is connected to the bar lines when a note is hit. Can be overriden if needed for a specific ruleset.
     /// </summary>
     /// <param name="name">The bar line's name</param>
-    /// <param name="inputElement">Info about the input received</param>
-    private void BarLineHit(StringName name, NoteInputElement inputElement)
+    /// <param name="result">Info about the input received</param>
+    private void BarLineHit(StringName name, NoteResult result)
     {
-        NoteResult result = new NoteResult(NoteResultFlags.None, inputElement.Hit);
-        Variant[] results = GetNoteResults.Invoke(name, inputElement.Note.Lane, (int)inputElement.Hit, inputElement.Holding);
-        for (int i = 0; i < results.Length; i++)
-        {
-            if (results[i].VariantType != Variant.Type.Object || results[i].AsGodotObject() is not NoteResult newResult)
-                continue;
-
-            if (result.Equals(newResult))
-                continue;
-            
-            result = newResult;
-            break;
-        }
-
-        inputElement.Hit = result.Hit;
+        EmitSignalNoteHit(name, result);
         
-        if (TargetBarLine == name && !result.HasFlag(NoteResultFlags.Score))
+        if (TargetBarLine == name && !result.Flags.HasFlag(NoteResultFlags.Score))
         {
             HitType hit = result.Hit;
             ScoreTracker.Combo = hit != HitType.Miss ? ScoreTracker.Combo + 1 : 0;
@@ -226,11 +242,11 @@ namespace Rubicon.Core.Rulesets;
             }
             
             UpdateStatistics();
-            EmitSignalStatisticsUpdated(ScoreTracker.Combo, result.Hit, inputElement.Distance);
+            EmitSignalStatisticsUpdated(ScoreTracker.Combo, result.Hit, result.Distance);
         }
         
-        if (!result.HasFlag(NoteResultFlags.Animation))
-            EmitSignalSingCalled(name, inputElement);
+        if (!result.Flags.HasFlag(NoteResultFlags.Animation))
+            EmitSignalSingCalled(name, result);
         
         result.Free();
     }

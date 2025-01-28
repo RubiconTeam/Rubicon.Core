@@ -82,16 +82,16 @@ namespace Rubicon.Core.Rulesets.Mania;
 	public override void _Process(double delta)
 	{
 		if (NoteHeld != null && NoteHeld.MsTime + NoteHeld.MsLength < Conductor.Time * 1000f)
-			ProcessQueue.Add(GetInputElement(noteIndex: HoldingIndex, distance: 0f, holding: false));
+			ProcessQueue.Add(GetResult(noteIndex: HoldingIndex, distance: 0f, holding: false));
 		
 		base._Process(delta);
 	}
 
-	protected override NoteInputElement GetInputElement(int noteIndex, float distance, bool holding)
+	protected override NoteResult GetResult(int noteIndex, float distance, bool holding)
 	{
-		NoteInputElement inputElement = base.GetInputElement(noteIndex, distance, holding);
-		inputElement.Direction = Direction;
-		return inputElement;
+		NoteResult result = base.GetResult(noteIndex, distance, holding);
+		result.Direction = Direction;
+		return result;
 	}
 
 	/// <summary>
@@ -134,11 +134,11 @@ namespace Rubicon.Core.Rulesets.Mania;
 	}
 
 	/// <inheritdoc/>
-	protected override void OnNoteHit(NoteInputElement inputElement)
+	protected override void OnNoteHit(NoteResult result)
 	{
-		if (inputElement.Hit != HitType.Miss)
+		if (result.Hit != HitType.Miss)
 		{
-			if (!inputElement.Holding)
+			if (!result.Holding)
 			{
 				if (NoteHeld == null || NoteHeld != null && (Autoplay || !Autoplay && Input.IsActionPressed($"play_mania_{ParentBarLine.Managers.Length}k_{Lane}")))
 					LaneObject.Animation = $"{Direction}LaneConfirm";
@@ -147,36 +147,36 @@ namespace Rubicon.Core.Rulesets.Mania;
 				HoldingIndex = -1;
 				LaneObject.Play();
 				
-				RemoveChild(HitObjects[inputElement.Index]);
-				HitObjects[inputElement.Index].PrepareRecycle();
+				RemoveChild(HitObjects[result.Index]);
+				HitObjects[result.Index].PrepareRecycle();
 			}
 			else
 			{
-				NoteHeld = inputElement.Note;
-				HoldingIndex = inputElement.Index;
+				NoteHeld = result.Note;
+				HoldingIndex = result.Index;
 				LaneObject.Animation = $"{Direction}LaneConfirm";
 				LaneObject.Pause();   
 			}	
 		}
 		else
 		{
-			if (inputElement.Note == NoteHeld)
+			if (result.Note == NoteHeld)
 			{
-				if (HitObjects[inputElement.Index] is ManiaNote maniaNote)
+				if (HitObjects[result.Index] is ManiaNote maniaNote)
 					maniaNote.UnsetHold();
 			
 				NoteHeld = null;
 			}
 
-			if (inputElement.Note.MsLength <= 0f)
+			if (result.Note.MsLength <= 0f)
 			{
-				RemoveChild(HitObjects[inputElement.Index]);
-				HitObjects[inputElement.Index].PrepareRecycle();
+				RemoveChild(HitObjects[result.Index]);
+				HitObjects[result.Index].PrepareRecycle();
 			}
 		}
 
-		inputElement.Note.WasHit = true;
-		ParentBarLine.OnNoteHit(inputElement);
+		result.Note.WasHit = true;
+		ParentBarLine.OnNoteHit(result);
 	}
 	
 	public override void _Input(InputEvent @event)
@@ -202,14 +202,14 @@ namespace Rubicon.Core.Rulesets.Mania;
 			while (notes[NoteHitIndex].MsTime - songPos <= -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle())
 			{
 				// Miss every note thats too late first
-				ProcessQueue.Add(GetInputElement(noteIndex: NoteHitIndex, distance: -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle() - 1f, holding: false));
+				ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle() - 1f, holding: false));
 				NoteHitIndex++;
 			}
 
 			float hitTime = notes[NoteHitIndex].MsTime - songPos;
 			if (Mathf.Abs(hitTime) <= ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle()) // Literally any other rating
 			{
-				ProcessQueue.Add(GetInputElement(noteIndex: NoteHitIndex, distance: hitTime, holding: notes[NoteHitIndex].Length > 0));
+				ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: hitTime, holding: notes[NoteHitIndex].Length > 0));
 				NoteHitIndex++;
 			}
 			else
@@ -224,7 +224,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 			{
 				float length = NoteHeld.MsTime + NoteHeld.MsLength - (Conductor.Time * 1000f);
 				bool holding = length <= ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle();
-				ProcessQueue.Add(GetInputElement(noteIndex: HoldingIndex, distance: length, holding: !holding));
+				ProcessQueue.Add(GetResult(noteIndex: HoldingIndex, distance: length, holding: !holding));
 			}
 
 			if (LaneObject.Animation != $"{Direction}LaneNeutral")

@@ -83,10 +83,10 @@ namespace Rubicon.Core.Rulesets;
 	/// <summary>
 	/// The queue list for notes to be processed next frame.
 	/// </summary>
-	[Export] public Array<NoteInputElement> ProcessQueue = new();
+	[Export] public Array<NoteResult> ProcessQueue = new();
 
 	private NoteData[] _notes = [];
-	private NoteInputElement _inputElement = new();
+	private NoteResult _result = new();
 
 	public override void _Process(double delta)
 	{
@@ -124,7 +124,7 @@ namespace Rubicon.Core.Rulesets;
 				while (curNoteData.MsTime - time <= 0f)
 				{
 					if (!curNoteData.ShouldMiss)
-						ProcessQueue.Add(GetInputElement(noteIndex: NoteHitIndex, distance: 0f, holding: curNoteData.Length > 0f));
+						ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: 0f, holding: curNoteData.Length > 0f));
 				
 					NoteHitIndex++;
 					if (NoteHitIndex >= Notes.Length)
@@ -136,7 +136,7 @@ namespace Rubicon.Core.Rulesets;
 
 			if (curNoteData.MsTime - time <= -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsDouble())
 			{
-				ProcessQueue.Add(GetInputElement(noteIndex: NoteHitIndex, distance: -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle() - 1f, holding: false));
+				ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle() - 1f, holding: false));
 				NoteHitIndex++;
 			}	
 		}
@@ -149,13 +149,13 @@ namespace Rubicon.Core.Rulesets;
 	
 	protected abstract void AssignData(Note note, NoteData noteData);
 
-	protected virtual NoteInputElement GetInputElement(int noteIndex, float distance, bool holding)
+	protected virtual NoteResult GetResult(int noteIndex, float distance, bool holding)
 	{
-		NoteInputElement element = _inputElement;
-		element.Note = Notes[noteIndex];
-		element.Distance = distance;
-		element.Holding = holding;
-		element.Index = noteIndex;
+		NoteResult result = _result;
+		result.Note = Notes[noteIndex];
+		result.Distance = distance;
+		result.Holding = holding;
+		result.Index = noteIndex;
 		
 		// Auto detect hit based on distance
 		float[] hitWindows = [ 
@@ -168,16 +168,16 @@ namespace Rubicon.Core.Rulesets;
 		int hit = hitWindows.Length;
 		for (int i = 0; i < hitWindows.Length; i++)
 		{
-			if (Mathf.Abs(element.Distance) <= hitWindows[i])
+			if (Mathf.Abs(result.Distance) <= hitWindows[i])
 			{
 				hit = i;
 				break;
 			}
 		}
 
-		element.Hit = (HitType)hit;
+		result.Hit = (HitType)hit;
 		
-		return element;
+		return result;
 	}
 
 	public override void _Input(InputEvent @event)
@@ -197,5 +197,5 @@ namespace Rubicon.Core.Rulesets;
 	/// Triggers upon this note manager hitting/missing a note.
 	/// </summary>
 	/// <param name="element">Contains information about a note and its hits</param>
-	protected abstract void OnNoteHit(NoteInputElement element);
+	protected abstract void OnNoteHit(NoteResult element);
 }

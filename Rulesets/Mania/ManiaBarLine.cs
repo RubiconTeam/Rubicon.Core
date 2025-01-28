@@ -38,9 +38,9 @@ namespace Rubicon.Core.Rulesets.Mania;
     }
     
     /// <inheritdoc/>
-    public override void OnNoteHit(NoteInputElement inputElement)
+    public override void OnNoteHit(NoteResult result)
     {
-        EmitSignalNoteHit(Name, inputElement);
+        EmitSignalNoteHit(Name, result);
     }
 
     /// <summary>

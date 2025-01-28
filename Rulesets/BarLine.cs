@@ -36,7 +36,7 @@ namespace Rubicon.Core.Rulesets;
 	/// <summary>
 	/// A signal that is emitted every time a manager in this bar line hits a note. Can be a miss.
 	/// </summary>
-	[Signal] public delegate void NoteHitEventHandler(StringName name, NoteInputElement inputElement);
+	[Signal] public delegate void NoteHitEventHandler(StringName name, NoteResult result);
 
 	/// <summary>
 	/// A signal that is emitted every time a manager in this bar line either presses or lets go of a bind.
@@ -63,8 +63,8 @@ namespace Rubicon.Core.Rulesets;
 	/// <summary>
 	/// Triggers upon one of its note managers hitting a note in any way, even if it's a miss.
 	/// </summary>
-	/// <param name="inputElement">The input element received</param>
-	public abstract void OnNoteHit(NoteInputElement inputElement);
+	/// <param name="result">The input element received</param>
+	public abstract void OnNoteHit(NoteResult result);
 
 	public void SetAutoPlay(bool autoplay)
 	{

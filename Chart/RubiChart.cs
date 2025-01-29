@@ -13,7 +13,7 @@ namespace Rubicon.Core.Chart;
 /// The general chart format for this engine.
 /// </summary>
 [GlobalClass]
-public partial class RubiChart : RefCounted
+public partial class RubiChart : Resource
 {
     /// <summary>
     /// The current chart version.

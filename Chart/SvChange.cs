@@ -5,7 +5,7 @@ namespace Rubicon.Core.Chart;
 /// <summary>
 /// Keeps track of a scroll velocity change.
 /// </summary>
-[GlobalClass] public partial class SvChange : RefCounted
+[GlobalClass] public partial class SvChange : Resource
 {
     /// <summary>
     /// The time to execute this scroll velocity change, in milliseconds.

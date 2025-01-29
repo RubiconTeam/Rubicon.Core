@@ -6,7 +6,7 @@ namespace Rubicon.Core.Chart;
 /// A class to store data for individual charts (referred to as "strum lines" for some).
 /// </summary>
 [GlobalClass]
-public partial class IndividualChart : RefCounted
+public partial class IndividualChart : Resource
 {
     /// <summary>
     /// What to name this bar-line. Used primarily for <see cref="SongMeta"/>.

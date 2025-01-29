@@ -27,14 +27,14 @@ namespace Rubicon.Core.Rulesets.Mania;
     {
         // REALLY SHITTY, REPLACE BELOW LATER !!!
         string noteSkinName = meta.NoteSkin;
-        if (!ResourceLoader.Exists($"res://Resources/UI/{noteSkinName}/Mania.tres"))
+        if (!ResourceLoader.Exists($"res://Resources/UI/Styles/{noteSkinName}/Mania.tres"))
         {
             string defaultPath = ProjectSettings.GetSetting("rubicon/rulesets/mania/default_note_skin").AsString();
             GD.PrintErr($"Mania Note Skin Path: {noteSkinName} does not exist. Defaulting to {defaultPath}");
             noteSkinName = defaultPath;
         }
         
-        NoteSkin = GD.Load<ManiaNoteSkin>($"res://Resources/UI/{noteSkinName}/Mania.tres");
+        NoteSkin = ResourceLoader.LoadThreadedGet($"res://Resources/UI/Styles/{noteSkinName}/Mania.tres") as ManiaNoteSkin;
         ManiaNoteFactory maniaFactory = new ManiaNoteFactory();
         maniaFactory.NoteSkin = NoteSkin;
         Factory = maniaFactory;

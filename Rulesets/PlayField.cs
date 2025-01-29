@@ -104,16 +104,18 @@ namespace Rubicon.Core.Rulesets;
         Chart = chart;
         SetAnchorsPreset(LayoutPreset.FullRect);
         Input.UseAccumulatedInput = false;
+
+        Chart.ConvertData(meta.BpmInfo).Format();
         
         // Handle UI Style
-        string uiStylePath = $"res://Resources/UI/{Metadata.UiStyle}/Style.tres";
+        string uiStylePath = $"res://Resources/UI/Styles/{Metadata.UiStyle}/Style.tres";
         if (!ResourceLoader.Exists(uiStylePath))
         {
-            string defaultUiPath = $"res://Resources/UI/{ProjectSettings.GetSetting("rubicon/general/default_ui_style")}/style.tres";
+            string defaultUiPath = $"res://Resources/UI/Styles/{ProjectSettings.GetSetting("rubicon/general/default_ui_style")}/style.tres";
             GD.PrintErr($"UI Style Path: {uiStylePath} does not exist. Defaulting to {defaultUiPath}");
             uiStylePath = defaultUiPath;
         }
-        UiStyle = GD.Load<UiStyle>(uiStylePath);
+        UiStyle = ResourceLoader.LoadThreadedGet(uiStylePath) as UiStyle;
         if (UiStyle.HitDistance != null && UiStyle.HitDistance.CanInstantiate())
             AddChild(UiStyle.HitDistance.Instantiate());
         if (UiStyle.Judgment != null && UiStyle.Judgment.CanInstantiate())

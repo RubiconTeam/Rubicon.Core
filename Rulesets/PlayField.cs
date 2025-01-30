@@ -253,6 +253,9 @@ namespace Rubicon.Core.Rulesets;
         if (TargetBarLine != name)
             return;
         
+        if (!result.Flags.HasFlag(NoteResultFlags.Health))
+            UpdateHealth(result.Hit);
+        
         if (!result.Flags.HasFlag(NoteResultFlags.Score))
         {
             HitType hit = result.Hit;
@@ -290,8 +293,5 @@ namespace Rubicon.Core.Rulesets;
             UpdateStatistics();
             EmitSignalStatisticsUpdated(ScoreTracker.Combo, result.Hit, result.Distance);
         }
-        
-        if (!result.Flags.HasFlag(NoteResultFlags.Health))
-            UpdateHealth(result.Hit);
     }
 }

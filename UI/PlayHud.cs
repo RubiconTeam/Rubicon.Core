@@ -10,11 +10,6 @@ namespace Rubicon.Core.UI;
 [GlobalClass] public partial class PlayHud : Control
 {
     /// <summary>
-    /// What direction the health bar goes.
-    /// </summary>
-    [Export] public BarDirection HealthBarDirection = BarDirection.RightToLeft;
-
-    /// <summary>
     /// If a child is placed in this array, it is ignored in <see cref="UpdatePosition"/>.
     /// </summary>
     [Export] public Node[] UpdateExceptions = [];
@@ -43,11 +38,14 @@ namespace Rubicon.Core.UI;
             float anchorBottom = control.AnchorBottom;
             float anchorTop = control.AnchorTop;
 
-            control.AnchorBottom = 1f - anchorBottom;
-            control.AnchorTop = 1f - anchorTop;
+            control.AnchorBottom = 1f - anchorTop;
+            control.AnchorTop = 1f - anchorBottom;
 
-            control.OffsetBottom *= -1f;
-            control.OffsetTop *= -1f;
+            float offsetBottom = control.OffsetBottom;
+            float offsetTop = control.OffsetTop;
+
+            control.OffsetBottom = offsetTop * -1f;
+            control.OffsetTop = offsetBottom * -1f;
         }
 
         _inDownScrollPositions = downScroll;

@@ -134,7 +134,7 @@ namespace Rubicon.Core.Rulesets.Mania;
                 healthAddition = -2;
                 break;
             case HitType.Miss:
-                healthAddition = -5 - (int)ScoreTracker.MissStreak * 2;
+                healthAddition = -5 - (int)ScoreTracker.MissStreak * 4;
                 break;
         }
 
@@ -143,6 +143,8 @@ namespace Rubicon.Core.Rulesets.Mania;
             healthAddition -= predictedHealth % MaxHealth;
 
         Health += healthAddition;
+        if (Health < 0)
+            Health = 0;
     }
 
     /// <inheritdoc />

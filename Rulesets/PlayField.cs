@@ -9,7 +9,7 @@ namespace Rubicon.Core.Rulesets;
 /// <summary>
 /// A control node with all general ruleset gameplay-related functions.
 /// </summary>
-[GlobalClass] public abstract partial class PlayField : Control
+[GlobalClass] public abstract partial class PlayField : CanvasLayer
 {
     /// <summary>
     /// The current health the player has.

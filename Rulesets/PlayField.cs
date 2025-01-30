@@ -102,7 +102,6 @@ namespace Rubicon.Core.Rulesets;
         Name = "Base PlayField";
         Metadata = meta;
         Chart = chart;
-        SetAnchorsPreset(LayoutPreset.FullRect);
         Input.UseAccumulatedInput = false;
 
         Chart.ConvertData(meta.BpmInfo).Format();

@@ -1,5 +1,6 @@
 using System.Linq;
 using Rubicon.Core.Chart;
+using Rubicon.Core.Data;
 using Rubicon.Core.Meta;
 using Rubicon.Core.Settings;
 
@@ -70,9 +71,9 @@ namespace Rubicon.Core.Rulesets.Mania;
         if (ScoreTracker.PerfectHits == ScoreTracker.NoteCount) ScoreTracker.Score = MaxScore;
         else
         {
-            float baseNoteValue = ((float)MaxScore / ScoreTracker.NoteCount) / 2f;
+            float baseNoteValue = ((float)MaxScore / ScoreTracker.NoteCount) * 0.5f;
             float baseScore = (baseNoteValue * ScoreTracker.PerfectHits) + (baseNoteValue * (ScoreTracker.GreatHits * 0.9375f)) + (baseNoteValue * (ScoreTracker.GoodHits * 0.625f)) + (baseNoteValue * (ScoreTracker.OkayHits * 0.3125f)) + (baseNoteValue * (ScoreTracker.BadHits * 0.15625f));
-            float bonusScore = Mathf.Sqrt(((float)ScoreTracker.HighestCombo / ScoreTracker.NoteCount) * 100f) * MaxScore * 0.05f; 
+            float bonusScore = Mathf.Sqrt(((float)ScoreTracker.HighestCombo / ScoreTracker.NoteCount)) * MaxScore * 0.5f; 
             ScoreTracker.Score = (int)Math.Floor(baseScore + bonusScore);
         }
         
@@ -82,6 +83,34 @@ namespace Rubicon.Core.Rulesets.Mania;
             ? 100f
             : ((ScoreTracker.PerfectHits + (ScoreTracker.GreatHits * 0.95f) + (ScoreTracker.GoodHits * 0.65f) + (ScoreTracker.OkayHits * 0.3f) + (ScoreTracker.BadHits + 0.15f)) /
                hitNotes) * 100f;
+        
+        // Rank
+        if (ScoreTracker.Score >= MaxScore)
+            ScoreTracker.Rank = ScoreRank.P;
+        else if (ScoreTracker.Score >= 975000)
+            ScoreTracker.Rank = ScoreRank.Sss;
+        else if (ScoreTracker.Score >= 950000)
+            ScoreTracker.Rank = ScoreRank.Ss;
+        else if (ScoreTracker.Score >= 900000)
+            ScoreTracker.Rank = ScoreRank.S;
+        else if (ScoreTracker.Score >= 800000)
+            ScoreTracker.Rank = ScoreRank.A;
+        else if (ScoreTracker.Score >= 700000)
+            ScoreTracker.Rank = ScoreRank.B;
+        else if (ScoreTracker.Score >= 600000)
+            ScoreTracker.Rank = ScoreRank.C;
+        else
+            ScoreTracker.Rank = ScoreRank.D;
+        
+        // Clear Rank
+        if (ScoreTracker.Misses > 0)
+            ScoreTracker.Clear = ClearRank.Clear;
+        else if (ScoreTracker.GoodHits + ScoreTracker.OkayHits + ScoreTracker.BadHits > 0)
+            ScoreTracker.Clear = ClearRank.FullCombo;
+        else if (ScoreTracker.GreatHits > 0)
+            ScoreTracker.Clear = ClearRank.GreatFullCombo;
+        else
+            ScoreTracker.Clear = ClearRank.Perfect;
     }
 
     /// <inheritdoc />

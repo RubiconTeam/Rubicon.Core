@@ -11,15 +11,17 @@ namespace Rubicon.Core.Rulesets;
 /// </summary>
 [GlobalClass] public abstract partial class PlayField : CanvasLayer
 {
+    public static PlayField Instance;
+    
     /// <summary>
     /// The current health the player has.
     /// </summary>
-    [Export] public uint Health = 0;
+    [Export] public uint Health = 100;
 
     /// <summary>
     /// The max health the player can have.
     /// </summary>
-    [Export] public uint MaxHealth = 1000;
+    [Export] public uint MaxHealth = 100;
 
     /// <summary>
     /// Keeps track of the player's combos and score.
@@ -40,6 +42,11 @@ namespace Rubicon.Core.Rulesets;
     /// The UiStyle currently being used
     /// </summary>
     [Export] public UiStyle UiStyle;
+
+    /// <summary>
+    /// A control node that displays cool things + potentially important statistics for the player.
+    /// </summary>
+    [Export] public Control Hud;
     
     /// <summary>
     /// The bar lines associated with this play field.
@@ -99,6 +106,14 @@ namespace Rubicon.Core.Rulesets;
     /// <param name="targetIndex">The index to play in <see cref="SongMeta.PlayableCharts"/>.</param>
     public virtual void Setup(SongMeta meta, RubiChart chart, int targetIndex)
     {
+        if (Instance != null)
+        {
+            QueueFree();
+            return;
+        }
+
+        Instance = this;
+        
         Name = "Base PlayField";
         Metadata = meta;
         Chart = chart;
@@ -114,6 +129,7 @@ namespace Rubicon.Core.Rulesets;
             GD.PrintErr($"UI Style Path: {uiStylePath} does not exist. Defaulting to {defaultUiPath}");
             uiStylePath = defaultUiPath;
         }
+        
         UiStyle = ResourceLoader.LoadThreadedGet(uiStylePath) as UiStyle;
         if (UiStyle.HitDistance != null && UiStyle.HitDistance.CanInstantiate())
             AddChild(UiStyle.HitDistance.Instantiate());
@@ -121,6 +137,8 @@ namespace Rubicon.Core.Rulesets;
             AddChild(UiStyle.Judgment.Instantiate());
         if (UiStyle.Combo != null && UiStyle.Combo.CanInstantiate())
             AddChild(UiStyle.Combo.Instantiate());
+        if (UiStyle.GameHud != null && UiStyle.GameHud.CanInstantiate())
+            AddChild(UiStyle.GameHud.Instantiate());
         
         BarLines = new BarLine[chart.Charts.Length];
         TargetBarLine = meta.PlayableCharts[targetIndex];
@@ -177,6 +195,9 @@ namespace Rubicon.Core.Rulesets;
     /// </summary>
     public void Fail()
     {
+        ScoreTracker.Rank = ScoreRank.F;
+        ScoreTracker.Clear = ClearRank.Failure;
+        
         EmitSignalFailed();
     }
 

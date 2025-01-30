@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Rubicon.Core.Chart;
+using Rubicon.Core.Data;
 using Range = System.Range;
 
 namespace Rubicon.Core.Rulesets;
@@ -8,6 +9,10 @@ namespace Rubicon.Core.Rulesets;
 [GlobalClass] public partial class ScoreTracker : RefCounted
 {
     [Export] public int Score = 0;
+
+    [Export] public ScoreRank Rank = ScoreRank.D;
+
+    [Export] public ClearRank Clear = ClearRank.Clear;
 
     [Export] public float Accuracy = 100f;
 
@@ -62,7 +67,13 @@ namespace Rubicon.Core.Rulesets;
         }
         
         _playableNotes = notes.ToArray();
-        NoteCount = _playableNotes.LongLength;
+        
+        long totalNotes = _playableNotes.LongLength;
+        for (int i = 0; i < _playableNotes.Length; i++)
+            if (_playableNotes[i].Length > 0)
+                totalNotes++;
+
+        NoteCount = totalNotes;
     }
 
     public NoteData[] GetPlayableNotes() => _playableNotes;

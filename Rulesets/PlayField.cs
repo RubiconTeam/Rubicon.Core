@@ -3,6 +3,8 @@ using System.Linq;
 using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
 using Rubicon.Core.Meta;
+using Rubicon.Core.Settings;
+using Rubicon.Core.UI;
 
 namespace Rubicon.Core.Rulesets;
 
@@ -16,12 +18,12 @@ namespace Rubicon.Core.Rulesets;
     /// <summary>
     /// The current health the player has.
     /// </summary>
-    [Export] public uint Health = 100;
+    [Export] public int Health = 50;
 
     /// <summary>
     /// The max health the player can have.
     /// </summary>
-    [Export] public uint MaxHealth = 100;
+    [Export] public int MaxHealth = 100;
 
     /// <summary>
     /// Keeps track of the player's combos and score.
@@ -46,7 +48,7 @@ namespace Rubicon.Core.Rulesets;
     /// <summary>
     /// A control node that displays cool things + potentially important statistics for the player.
     /// </summary>
-    [Export] public Control Hud;
+    [Export] public PlayHud Hud;
     
     /// <summary>
     /// The bar lines associated with this play field.
@@ -137,8 +139,14 @@ namespace Rubicon.Core.Rulesets;
             AddChild(UiStyle.Judgment.Instantiate());
         if (UiStyle.Combo != null && UiStyle.Combo.CanInstantiate())
             AddChild(UiStyle.Combo.Instantiate());
-        if (UiStyle.GameHud != null && UiStyle.GameHud.CanInstantiate())
-            AddChild(UiStyle.GameHud.Instantiate());
+
+        if (UiStyle.PlayHud != null && UiStyle.PlayHud.CanInstantiate())
+        {
+            Hud = UiStyle.PlayHud.Instantiate<PlayHud>();
+            AddChild(Hud);
+            
+            Hud.UpdatePosition(UserSettings.Gameplay.DownScroll);
+        }
         
         BarLines = new BarLine[chart.Charts.Length];
         TargetBarLine = meta.PlayableCharts[targetIndex];
@@ -210,6 +218,11 @@ namespace Rubicon.Core.Rulesets;
     /// Triggers every time the player hits a note to update the in-game statistics
     /// </summary>
     public abstract void UpdateStatistics();
+
+    /// <summary>
+    /// Triggers every time the player hits a note to update their health.
+    /// </summary>
+    public abstract void UpdateHealth(HitType hit);
     
     /// <summary>
     /// The fail condition for this play field.
@@ -234,7 +247,13 @@ namespace Rubicon.Core.Rulesets;
     {
         EmitSignalNoteHit(name, result);
         
-        if (TargetBarLine == name && !result.Flags.HasFlag(NoteResultFlags.Score))
+        if (!result.Flags.HasFlag(NoteResultFlags.Animation))
+            EmitSignalSingCalled(name, result);
+        
+        if (TargetBarLine != name)
+            return;
+        
+        if (!result.Flags.HasFlag(NoteResultFlags.Score))
         {
             HitType hit = result.Hit;
             ScoreTracker.Combo = hit != HitType.Miss ? ScoreTracker.Combo + 1 : 0;
@@ -262,12 +281,17 @@ namespace Rubicon.Core.Rulesets;
                     ScoreTracker.Misses++;
                     break;
             }
+
+            if (hit == HitType.Miss)
+                ScoreTracker.MissStreak++;
+            else
+                ScoreTracker.MissStreak = 0;
             
             UpdateStatistics();
             EmitSignalStatisticsUpdated(ScoreTracker.Combo, result.Hit, result.Distance);
         }
         
-        if (!result.Flags.HasFlag(NoteResultFlags.Animation))
-            EmitSignalSingCalled(name, result);
+        if (!result.Flags.HasFlag(NoteResultFlags.Health))
+            UpdateHealth(result.Hit);
     }
 }

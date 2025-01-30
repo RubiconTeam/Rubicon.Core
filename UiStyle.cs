@@ -3,7 +3,7 @@ namespace Rubicon.Core;
 [GlobalClass]
 public partial class UiStyle : Resource
 {
-    [Export] public PackedScene GameHud;
+    [Export] public PackedScene PlayHud;
     
     [ExportGroup("Judgment"), Export] public PackedScene Judgment;
 

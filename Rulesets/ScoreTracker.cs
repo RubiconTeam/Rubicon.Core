@@ -28,6 +28,8 @@ namespace Rubicon.Core.Rulesets;
     
     [Export] public long Misses = 0;
 
+    [Export] public long MissStreak = 0;
+
     [Export] public long Combo = 0;
 
     [Export] public long HighestCombo = 0;

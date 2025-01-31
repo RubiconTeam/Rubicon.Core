@@ -32,6 +32,8 @@ namespace Rubicon.Core.Rulesets;
 
     [Export] public long Combo = 0;
 
+    [Export] public long ComboBreaks = 0;
+
     [Export] public long HighestCombo = 0;
 
     [Export] public long NoteCount = 0;

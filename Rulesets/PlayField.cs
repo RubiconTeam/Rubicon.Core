@@ -256,31 +256,39 @@ namespace Rubicon.Core.Rulesets;
         if (!result.Flags.HasFlag(NoteResultFlags.Score))
         {
             HitType hit = result.Hit;
-            ScoreTracker.Combo = hit != HitType.Miss ? ScoreTracker.Combo + 1 : 0;
-            if (ScoreTracker.Combo > ScoreTracker.HighestCombo)
-                ScoreTracker.HighestCombo = ScoreTracker.Combo;
-
             switch (hit)
             {
                 case HitType.Perfect:
                     ScoreTracker.PerfectHits++;
+                    ScoreTracker.Combo++;
                     break;
                 case HitType.Great:
                     ScoreTracker.GreatHits++;
+                    ScoreTracker.Combo++;
                     break;
                 case HitType.Good:
                     ScoreTracker.GoodHits++;
+                    ScoreTracker.Combo++;
                     break;
                 case HitType.Okay:
                     ScoreTracker.OkayHits++;
+                    ScoreTracker.ComboBreaks++;
+                    ScoreTracker.Combo = 0;
                     break;
                 case HitType.Bad:
                     ScoreTracker.BadHits++;
+                    ScoreTracker.ComboBreaks++;
+                    ScoreTracker.Combo = 0;
                     break;
                 case HitType.Miss:
                     ScoreTracker.Misses++;
+                    ScoreTracker.ComboBreaks++;
+                    ScoreTracker.Combo = 0;
                     break;
             }
+            
+            if (ScoreTracker.Combo > ScoreTracker.HighestCombo)
+                ScoreTracker.HighestCombo = ScoreTracker.Combo;
 
             if (hit == HitType.Miss)
                 ScoreTracker.MissStreak++;

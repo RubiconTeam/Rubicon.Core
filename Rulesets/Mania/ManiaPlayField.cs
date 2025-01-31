@@ -26,16 +26,16 @@ namespace Rubicon.Core.Rulesets.Mania;
     /// <param name="targetIndex">The index to play in <see cref="SongMeta.PlayableCharts"/>.</param>
     public override void Setup(SongMeta meta, RubiChart chart, int targetIndex)
     {
-        // REALLY SHITTY, REPLACE BELOW LATER !!!
         string noteSkinName = meta.NoteSkin;
-        if (!ResourceLoader.Exists($"res://Resources/UI/Styles/{noteSkinName}/Mania.tres"))
+        string noteSkinPath = PathUtility.GetResourcePath($"res://Resources/UI/Styles/{noteSkinName}/Mania");
+        if (string.IsNullOrWhiteSpace(noteSkinPath))
         {
-            string defaultPath = ProjectSettings.GetSetting("rubicon/rulesets/mania/default_note_skin").AsString();
-            GD.PrintErr($"Mania Note Skin Path: {noteSkinName} does not exist. Defaulting to {defaultPath}");
-            noteSkinName = defaultPath;
+            string defaultSkin = ProjectSettings.GetSetting("rubicon/rulesets/mania/default_note_skin").AsString();
+            GD.PrintErr($"Mania Note Skin Path: {noteSkinName} does not exist. Defaulting to {defaultSkin}");
+            noteSkinPath = PathUtility.GetResourcePath($"res://Resources/UI/Styles/{defaultSkin}/Mania");
         }
-        
-        NoteSkin = ResourceLoader.LoadThreadedGet($"res://Resources/UI/Styles/{noteSkinName}/Mania.tres") as ManiaNoteSkin;
+
+        NoteSkin = ResourceLoader.LoadThreadedGet(noteSkinPath) as ManiaNoteSkin;
         ManiaNoteFactory maniaFactory = new ManiaNoteFactory();
         maniaFactory.NoteSkin = NoteSkin;
         Factory = maniaFactory;

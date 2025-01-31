@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
@@ -69,11 +70,6 @@ namespace Rubicon.Core.Rulesets;
     /// Creates notes for bar lines to use.
     /// </summary>
     [Export] public NoteFactory Factory;
-
-    /// <summary>
-    /// An event that is invoked when a note is hit.
-    /// </summary>
-    [Export] public RubiconEvent GetNoteResults = new();
     
     /// <summary>
     /// Triggers upon the statistics updating.
@@ -124,15 +120,16 @@ namespace Rubicon.Core.Rulesets;
         Chart.ConvertData(meta.BpmInfo).Format();
         
         // Handle UI Style
-        string uiStylePath = $"res://Resources/UI/Styles/{Metadata.UiStyle}/Style.tres";
-        if (!ResourceLoader.Exists(uiStylePath))
+        string uiStylePath = $"res://Resources/UI/Styles/{Metadata.UiStyle}/Style";
+        if (!PathUtility.ResourceExists(uiStylePath))
         {
-            string defaultUiPath = $"res://Resources/UI/Styles/{ProjectSettings.GetSetting("rubicon/general/default_ui_style")}/style.tres";
-            GD.PrintErr($"UI Style Path: {uiStylePath} does not exist. Defaulting to {defaultUiPath}");
+            string defaultUi = ProjectSettings.GetSetting("rubicon/general/default_ui_style").AsString();
+            string defaultUiPath = $"res://Resources/UI/Styles/{defaultUi}/Style";
+            GD.PrintErr($"[PlayField] UI Style {Metadata.UiStyle} does not exist. Defaulting to {defaultUi}");
             uiStylePath = defaultUiPath;
         }
         
-        UiStyle = ResourceLoader.LoadThreadedGet(uiStylePath) as UiStyle;
+        UiStyle = ResourceLoader.LoadThreadedGet(PathUtility.GetResourcePath(uiStylePath)) as UiStyle;
         if (UiStyle.HitDistance != null && UiStyle.HitDistance.CanInstantiate())
             AddChild(UiStyle.HitDistance.Instantiate());
         if (UiStyle.Judgment != null && UiStyle.Judgment.CanInstantiate())

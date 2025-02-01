@@ -207,7 +207,7 @@ namespace Rubicon.Core.Rulesets;
         Conductor.BpmList = Metadata.BpmInfo;
 
         Music = AudioManager.Music.Player;
-        AudioManager.Music.Player.Stream = Metadata.Music; 
+        AudioManager.Music.Player.Stream = Metadata.Instrumental;
         
         // TODO: LOAD AUTOLOADS AND NOTE TYPES!!!!
         

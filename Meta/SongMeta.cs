@@ -9,6 +9,11 @@ namespace Rubicon.Core.Meta;
 [GlobalClass] public partial class SongMeta : Resource
 {
     /// <summary>
+    /// The icon that's associated with this song.
+    /// </summary>
+    [Export] public Texture2D Icon;
+    
+    /// <summary>
     /// The name of the song.
     /// </summary>
     [Export] public string Name = "Test";
@@ -17,7 +22,7 @@ namespace Rubicon.Core.Meta;
     /// The raw name of the song used to load it.
     /// Should be PascalCased and not contain any spaces or symbols.
     /// </summary>
-    [Export] public string RawName = "Test";
+    [Export] public string InternalName = "Test";
 
     /// <summary>
     /// The artist who made the song.
@@ -27,12 +32,47 @@ namespace Rubicon.Core.Meta;
     /// <summary>
     /// The instrumental for this song.
     /// </summary>
-    [Export] public AudioStream Music;
+    [Export] public AudioStream Instrumental;
+    
+    /// <summary>
+    /// The vocals for this song.
+    /// </summary>
+    [Export] public AudioStream Vocals;
+    
+    /// <summary>
+    /// A list of BPM changes.
+    /// </summary>
+    [Export] public BpmInfo[] BpmInfo = [];
+    
+    /// <summary>
+    /// The UI style to use for this song.
+    /// </summary>
+    [ExportGroup("Style"), Export] public string UiStyle = ProjectSettings.GetSetting("rubicon/general/default_ui_style").AsString();
 
     /// <summary>
-    /// The chart offset.
+    /// The Note Skin to use for this song.
     /// </summary>
-    [Export] public float Offset = 0f;
+    [Export] public string NoteSkin = ProjectSettings.GetSetting("rubicon/rulesets/mania/default_note_skin").AsString();
+    
+    /// <summary>
+    /// Determines what type of backend the engine will use when loading into a song.
+    /// </summary>
+    [ExportGroup("Environment"), Export] public GameEnvironment Environment = GameEnvironment.None;
+    
+    /// <summary>
+    /// The stage to spawn in for this song.
+    /// </summary>
+    [Export] public string Stage = "stage";
+    
+    /// <summary>
+    /// The characters to spawn in the song.
+    /// </summary>
+    [Export] public CharacterMeta[] Characters = [];
+
+    /// <summary>
+    /// Offsets the position of the notes, in milliseconds.s
+    /// </summary>
+    [ExportGroup("Options"), Export] public float Offset = 0f;
     
     /// <summary>
     /// The default ruleset for this chart.
@@ -40,29 +80,9 @@ namespace Rubicon.Core.Meta;
     [Export] public string DefaultRuleset = ProjectSettings.GetSetting("rubicon/rulesets/default_ruleset").AsString();
 
     /// <summary>
-    /// The icon that's associated with this song.
-    /// </summary>
-    [Export] public Texture2D Icon;
-
-    /// <summary>
-    /// The UI style to use for this song.
-    /// </summary>
-    [Export] public string UiStyle = ProjectSettings.GetSetting("rubicon/general/default_ui_style").AsString();
-
-    /// <summary>
-    /// The Note Skin to use for this song.
-    /// </summary>
-    [Export] public string NoteSkin = ProjectSettings.GetSetting("rubicon/rulesets/mania/default_note_skin").AsString();
-
-    /// <summary>
     /// Marks the playable charts in this song.
     /// </summary>
     [Export] public StringName[] PlayableCharts = ["Player"];
-    
-    /// <summary>
-    /// A list of BPM changes.
-    /// </summary>
-    [Export] public BpmInfo[] BpmInfo = [];
 
     /// <summary>
     /// Converts everything in this chart to millisecond format.

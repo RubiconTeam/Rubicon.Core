@@ -2,6 +2,7 @@ using System.Linq;
 using Rubicon.Core;
 using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
+using Rubicon.Core.Settings;
 using Array = System.Array;
 
 namespace Rubicon.Core.Rulesets.Mania;
@@ -199,14 +200,14 @@ namespace Rubicon.Core.Rulesets.Mania;
 			}
 
 			float songPos = Conductor.Time * 1000f;
+			float hitTime = GetCurrentNoteDistance(true);
 			while (notes[NoteHitIndex].MsTime - songPos <= -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle())
 			{
 				// Miss every note thats too late first
 				ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle() - 1f, holding: false));
 				NoteHitIndex++;
 			}
-
-			float hitTime = notes[NoteHitIndex].MsTime - songPos;
+			
 			if (Mathf.Abs(hitTime) <= ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle()) // Literally any other rating
 			{
 				ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: hitTime, holding: notes[NoteHitIndex].Length > 0));
@@ -214,6 +215,9 @@ namespace Rubicon.Core.Rulesets.Mania;
 			}
 			else
 			{
+				if (UserSettings.Gameplay.GhostTapping)
+					InvokeGhostTap();
+				
 				if (LaneObject.Animation != $"{Direction}LanePress")
 					LaneObject.Play($"{Direction}LanePress");
 			}

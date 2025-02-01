@@ -191,7 +191,7 @@ namespace Rubicon.Core.Rulesets;
             if (indChart.Name == TargetBarLine)
             {
                 TargetIndex = i;
-                curBarLine.SetAutoPlay(false);   
+                curBarLine.SetAutoPlay(UserSettings.Gameplay.Autoplay);   
             }
             
             AddChild(curBarLine);
@@ -371,6 +371,16 @@ namespace Rubicon.Core.Rulesets;
         }
         
         EmitSignalNoteHit(name, result);
+    }
+
+    public void HandleGhostTap(StringName barLineName, int index)
+    {
+        ScoreTracker.Combo = 0;
+        ScoreTracker.ComboBreaks++;
+        UpdateHealth(HitType.Miss);
+        
+        UpdateStatistics();
+        EmitSignalStatisticsUpdated(ScoreTracker.Combo, HitType.None, ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle() + 1f);
     }
 
     public void InitializeGodotScript(Node node)

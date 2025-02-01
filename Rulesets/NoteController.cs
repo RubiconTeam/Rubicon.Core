@@ -3,6 +3,7 @@ using Godot.Collections;
 using Rubicon.Core;
 using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
+using Rubicon.Core.Settings;
 
 namespace Rubicon.Core.Rulesets;
 
@@ -145,6 +146,28 @@ namespace Rubicon.Core.Rulesets;
 			OnNoteHit(ProcessQueue[i]);
 			
 		ProcessQueue.Clear();
+	}
+
+	public void InvokeGhostTap()
+	{
+		ParentBarLine.InvokeGhostTap(Lane);
+	}
+	
+	/// <summary>
+	/// Gets the current note's distance from <see cref="Conductor.Time"/>.
+	/// </summary>
+	/// <param name="includeOffset">Whether to include the offset set by the player in <see cref="UserSettings"/>.</param>
+	/// <returns>The current note's distance, 0 if there is none.</returns>
+	protected float GetCurrentNoteDistance(bool includeOffset = false)
+	{
+		if (NoteHitIndex >= Notes.Length)
+			return 0;
+		
+		float distance = Notes[NoteHitIndex].MsTime - Conductor.Time * 1000f;
+		if (includeOffset)
+			distance -= (float)UserSettings.Gameplay.Offset;
+
+		return distance;
 	}
 	
 	protected abstract void AssignData(Note note, NoteData noteData);

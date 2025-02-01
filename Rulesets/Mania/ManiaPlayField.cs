@@ -56,11 +56,23 @@ namespace Rubicon.Core.Rulesets.Mania;
 
         for (int i = 0; i < BarLines.Length; i++)
         {
-            if (BarLines[i] is ManiaBarLine maniaBarLine)
-                maniaBarLine.SetDirectionAngle(!UserSettings.Gameplay.DownScroll ? Mathf.Pi / 2f : -Mathf.Pi / 2f);
+            //barLine.AnchorLeft = barLine.AnchorRight = ((index * 0.5f) - (Chart.Charts.Length - 1) * 0.5f / 2f) + 0.5f;
+            if (BarLines[i] is not ManiaBarLine maniaBarLine)
+                continue;
+                
+            maniaBarLine.SetDirectionAngle(!UserSettings.Gameplay.DownScroll ? Mathf.Pi / 2f : -Mathf.Pi / 2f);
+            maniaBarLine.AnchorTop = BarLines[i].AnchorBottom = UserSettings.Gameplay.DownScroll ? 1f : 0f;
+            maniaBarLine.OffsetTop = BarLines[i].OffsetBottom = UserSettings.Gameplay.DownScroll ? -140f : 140f;
 
-            BarLines[i].AnchorTop = BarLines[i].AnchorBottom = UserSettings.Gameplay.DownScroll ? 1f : 0f;
-            BarLines[i].OffsetTop = BarLines[i].OffsetBottom = UserSettings.Gameplay.DownScroll ? -140f : 140f;
+            if (UserSettings.Gameplay.CenterBarLine)
+            {
+                maniaBarLine.AnchorLeft = maniaBarLine.AnchorRight = 0.5f;
+                maniaBarLine.Visible = TargetIndex == i;
+                
+                continue;
+            }
+                
+            maniaBarLine.AnchorLeft = maniaBarLine.AnchorRight = ((i * 0.5f) - (Chart.Charts.Length - 1) * 0.5f / 2f) + 0.5f;
             //BarLines[i].SetAnchorsPreset(barLinePreset, true);
         }
     }
@@ -156,10 +168,7 @@ namespace Rubicon.Core.Rulesets.Mania;
         ManiaBarLine barLine = new ManiaBarLine();
         barLine.Setup(chart, NoteSkin, Chart.ScrollSpeed);
         barLine.Name = "Mania Bar Line " + index;
-            
-        // Using Council positioning for now, sorry :/
-        //curBarLine.Position = new Vector2(i * 720f - (chart.Charts.Length - 1) * 720f / 2f, 0f);
-        barLine.AnchorLeft = barLine.AnchorRight = ((index * 0.5f) - (Chart.Charts.Length - 1) * 0.5f / 2f) + 0.5f;
+        
         return barLine;
     }
 }

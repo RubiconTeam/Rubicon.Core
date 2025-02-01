@@ -66,6 +66,11 @@ namespace Rubicon.Core.Rulesets;
 	/// <param name="result">The input element received</param>
 	public abstract void OnNoteHit(NoteResult result);
 
+	public void InvokeGhostTap(int index)
+	{
+		PlayField.HandleGhostTap(Name, index);
+	}
+	
 	public void SetAutoPlay(bool autoplay)
 	{
 		foreach (NoteController noteManager in Managers)

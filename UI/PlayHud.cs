@@ -1,6 +1,8 @@
 using System.Linq;
 using Rubicon.Core.Data;
 using Godot.Collections;
+using Rubicon.Core.Rulesets;
+using Node = Godot.Node;
 
 namespace Rubicon.Core.UI;
 
@@ -15,6 +17,11 @@ namespace Rubicon.Core.UI;
     [Export] public Node[] UpdateExceptions = [];
 
     private bool _inDownScrollPositions = false;
+
+    public void Setup(PlayField playField)
+    {
+        InitializeChildren(GetChildren(), playField);
+    }
 
     /// <summary>
     /// Updates the children's anchors depending on if the game is in down scroll or not.
@@ -49,5 +56,16 @@ namespace Rubicon.Core.UI;
         }
 
         _inDownScrollPositions = downScroll;
+    }
+
+    private void InitializeChildren(Array<Node> children, PlayField playField)
+    {
+        for (int i = 0; i < children.Count; i++)
+        {
+            Node curChild = children[i];
+            
+            InitializeChildren(curChild.GetChildren(), playField);
+            playField.InitializeGodotScript(curChild);
+        }
     }
 }

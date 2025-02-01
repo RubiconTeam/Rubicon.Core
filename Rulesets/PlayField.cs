@@ -1,8 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Rubicon.Core.API;
+using Rubicon.Core.Audio;
 using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
+using Rubicon.Core.Events;
 using Rubicon.Core.Meta;
 using Rubicon.Core.Settings;
 using Rubicon.Core.UI;
@@ -14,7 +17,10 @@ namespace Rubicon.Core.Rulesets;
 /// </summary>
 [GlobalClass] public abstract partial class PlayField : CanvasLayer
 {
-    public static PlayField Instance;
+    /// <summary>
+    /// Contains valid 
+    /// </summary>
+    public static readonly string[] VALID_GDSCRIPT_NAMES = [];
     
     /// <summary>
     /// The current health the player has.
@@ -27,6 +33,11 @@ namespace Rubicon.Core.Rulesets;
     [Export] public int MaxHealth = 100;
 
     /// <summary>
+    /// Keeps track of if the play field is paused or not.
+    /// </summary>
+    [Export] public bool Paused = false;
+
+    /// <summary>
     /// Keeps track of the player's combos and score.
     /// </summary>
     [Export] public ScoreTracker ScoreTracker = new();
@@ -37,9 +48,14 @@ namespace Rubicon.Core.Rulesets;
     [Export] public RubiChart Chart;
 
     /// <summary>
-    /// The Song meta for this PlayField
+    /// The Song meta for this PlayField.
     /// </summary>
     [Export] public SongMeta Metadata;
+
+    /// <summary>
+    /// The events for this song.
+    /// </summary>
+    [Export] public EventMeta Events;
 
     /// <summary>
     /// The UiStyle currently being used
@@ -70,6 +86,16 @@ namespace Rubicon.Core.Rulesets;
     /// Creates notes for bar lines to use.
     /// </summary>
     [Export] public NoteFactory Factory;
+
+    /// <summary>
+    /// The music player for this play field.
+    /// </summary>
+    [Export] public AudioStreamPlayer Music;
+
+    /// <summary>
+    /// Controls events that can happen throughout the song.
+    /// </summary>
+    [Export] public SongEventController EventController;
     
     /// <summary>
     /// Triggers upon the statistics updating.
@@ -87,14 +113,14 @@ namespace Rubicon.Core.Rulesets;
     [Signal] public delegate void InitializeNoteEventHandler(NoteData[] notes, StringName noteType);
     
     /// <summary>
-    /// A signal that is emitted in case other note types need to modify the note result. Always is called.
+    /// A signal that is emitted in case other note types need to modify the note result.
     /// </summary>
-    [Signal] public delegate void NoteHitEventHandler(StringName barLineName, NoteResult element);
+    [Signal] public delegate void ModifyResultEventHandler(StringName barLineName, NoteResult element);
     
     /// <summary>
-    /// A signal that is emitted when calling for a sing animation.
+    /// Emitted after every note type processes through the result.
     /// </summary>
-    [Signal] public delegate void SingCalledEventHandler(StringName barLineName, NoteResult element);
+    [Signal] public delegate void NoteHitEventHandler(StringName barLineName, NoteResult element);
 
     /// <summary>
     /// Readies the PlayField for gameplay!
@@ -102,19 +128,13 @@ namespace Rubicon.Core.Rulesets;
     /// <param name="meta">The song meta</param>
     /// <param name="chart">The chart loaded</param>
     /// <param name="targetIndex">The index to play in <see cref="SongMeta.PlayableCharts"/>.</param>
-    public virtual void Setup(SongMeta meta, RubiChart chart, int targetIndex)
+    public virtual void Setup(SongMeta meta, RubiChart chart, int targetIndex, EventMeta events = null)
     {
-        if (Instance != null)
-        {
-            QueueFree();
-            return;
-        }
-
-        Instance = this;
-        
         Name = "Base PlayField";
         Metadata = meta;
         Chart = chart;
+        Events = events;
+        
         Input.UseAccumulatedInput = false;
 
         Chart.ConvertData(meta.BpmInfo).Format();
@@ -131,18 +151,24 @@ namespace Rubicon.Core.Rulesets;
         
         UiStyle = ResourceLoader.LoadThreadedGet(PathUtility.GetResourcePath(uiStylePath)) as UiStyle;
         if (UiStyle.HitDistance != null && UiStyle.HitDistance.CanInstantiate())
-            AddChild(UiStyle.HitDistance.Instantiate());
-        if (UiStyle.Judgment != null && UiStyle.Judgment.CanInstantiate())
-            AddChild(UiStyle.Judgment.Instantiate());
-        if (UiStyle.Combo != null && UiStyle.Combo.CanInstantiate())
-            AddChild(UiStyle.Combo.Instantiate());
-
-        if (UiStyle.PlayHud != null && UiStyle.PlayHud.CanInstantiate())
         {
-            Hud = UiStyle.PlayHud.Instantiate<PlayHud>();
-            AddChild(Hud);
-            
-            Hud.UpdatePosition(UserSettings.Gameplay.DownScroll);
+            Node hitDistance = UiStyle.HitDistance.Instantiate();
+            InitializeGodotScript(hitDistance);
+            AddChild(hitDistance);
+        }
+
+        if (UiStyle.Judgment != null && UiStyle.Judgment.CanInstantiate())
+        {
+            Node judgment = UiStyle.Judgment.Instantiate();
+            InitializeGodotScript(judgment);
+            AddChild(judgment);
+        }
+
+        if (UiStyle.Combo != null && UiStyle.Combo.CanInstantiate())
+        {
+            Node combo = UiStyle.Combo.Instantiate();
+            InitializeGodotScript(combo);
+            AddChild(combo);   
         }
         
         BarLines = new BarLine[chart.Charts.Length];
@@ -175,16 +201,44 @@ namespace Rubicon.Core.Rulesets;
             BarLines[i] = curBarLine;
             curBarLine.NoteHit += BarLineHit;
         }
+        
+        ScoreTracker.Initialize(chart, TargetBarLine);
+        UpdateOptions();
+        
+        Conductor.Reset();
+        Conductor.ChartOffset = Metadata.Offset;
+        Conductor.BpmList = Metadata.BpmInfo;
 
+        Music = AudioManager.Music.Player;
+        AudioManager.Music.Player.Stream = Metadata.Music; 
+        
+        // TODO: LOAD AUTOLOADS AND NOTE TYPES!!!!
+        
+        if (Events != null)
+        {
+            for (int i = 0; i < Events.Events.Length; i++)
+                Events.Events[i].ConvertData(Metadata.BpmInfo);
+            
+            EventController = new SongEventController();
+            EventController.Setup(events, this);
+            AddChild(EventController);
+        }
+        
+        if (UiStyle.PlayHud != null && UiStyle.PlayHud.CanInstantiate())
+        {
+            Hud = UiStyle.PlayHud.Instantiate<PlayHud>();
+            AddChild(Hud);
+            
+            Hud.Setup(this);
+            Hud.UpdatePosition(UserSettings.Gameplay.DownScroll);
+        }
+        
         foreach (var pair in noteTypeMap)
         {
             EmitSignalInitializeNote(pair.Value.ToArray(), pair.Key);
             pair.Value.Clear();
         }
         noteTypeMap.Clear();
-        
-        ScoreTracker.Initialize(chart, TargetBarLine);
-        UpdateOptions();
     }
 
     public override void _Process(double delta)
@@ -193,6 +247,28 @@ namespace Rubicon.Core.Rulesets;
         
         if (GetFailCondition())
             Fail();
+    }
+
+    public void Start()
+    {
+        Conductor.Play();
+        Music.Play();
+    }
+
+    public void Pause()
+    {
+        ProcessMode = ProcessModeEnum.Disabled;
+        Conductor.Pause();
+        Music.Stop();
+    }
+
+    public void Resume()
+    {
+        ProcessMode = ProcessModeEnum.Inherit;
+        Conductor.Resume();
+        
+        float time = Conductor.RawTime;
+        Music.Play(time);
     }
 
     /// <summary>
@@ -242,61 +318,97 @@ namespace Rubicon.Core.Rulesets;
     /// <param name="result">Info about the input received</param>
     private void BarLineHit(StringName name, NoteResult result)
     {
+        EmitSignalModifyResult(name, result);
+
+        bool isPlayer = TargetBarLine == name;
+        if (isPlayer)
+        {
+            if (!result.Flags.HasFlag(NoteResultFlags.Health))
+                UpdateHealth(result.Hit);
+        
+            if (!result.Flags.HasFlag(NoteResultFlags.Score))
+            {
+                HitType hit = result.Hit;
+                switch (hit)
+                {
+                    case HitType.Perfect:
+                        ScoreTracker.PerfectHits++;
+                        ScoreTracker.Combo++;
+                        break;
+                    case HitType.Great:
+                        ScoreTracker.GreatHits++;
+                        ScoreTracker.Combo++;
+                        break;
+                    case HitType.Good:
+                        ScoreTracker.GoodHits++;
+                        ScoreTracker.Combo++;
+                        break;
+                    case HitType.Okay:
+                        ScoreTracker.OkayHits++;
+                        ScoreTracker.ComboBreaks++;
+                        ScoreTracker.Combo = 0;
+                        break;
+                    case HitType.Bad:
+                        ScoreTracker.BadHits++;
+                        ScoreTracker.ComboBreaks++;
+                        ScoreTracker.Combo = 0;
+                        break;
+                    case HitType.Miss:
+                        ScoreTracker.Misses++;
+                        ScoreTracker.ComboBreaks++;
+                        ScoreTracker.Combo = 0;
+                        break;
+                }
+            
+                if (ScoreTracker.Combo > ScoreTracker.HighestCombo)
+                    ScoreTracker.HighestCombo = ScoreTracker.Combo;
+
+                if (hit == HitType.Miss)
+                    ScoreTracker.MissStreak++;
+                else
+                    ScoreTracker.MissStreak = 0;
+            
+                UpdateStatistics();
+                EmitSignalStatisticsUpdated(ScoreTracker.Combo, result.Hit, result.Distance);
+            }
+        }
+        
         EmitSignalNoteHit(name, result);
+    }
+
+    public void InitializeGodotScript(Node node)
+    {
+        if (node is IPlayElement element)
+        {
+            element.PlayField = this;
+            element.Initialize();
+            return;
+        }
         
-        if (!result.Flags.HasFlag(NoteResultFlags.Animation))
-            EmitSignalSingCalled(name, result);
-        
-        if (TargetBarLine != name)
+        Script currentScript = node.GetScript().As<Script>();
+        bool isValidScript = false;
+        while (currentScript is not null)
+        {
+            string[] validScriptNames = ApiConstants.ValidGodotScriptNames;
+            for (int i = 0; i < validScriptNames.Length; i++)
+            {
+                if (currentScript.GetGlobalName() == validScriptNames[i])
+                {
+                    isValidScript = true;
+                    break;
+                }
+            }
+
+            if (isValidScript)
+                break;
+
+            currentScript = currentScript.GetBaseScript();
+        }
+
+        if (!isValidScript)
             return;
         
-        if (!result.Flags.HasFlag(NoteResultFlags.Health))
-            UpdateHealth(result.Hit);
-        
-        if (!result.Flags.HasFlag(NoteResultFlags.Score))
-        {
-            HitType hit = result.Hit;
-            switch (hit)
-            {
-                case HitType.Perfect:
-                    ScoreTracker.PerfectHits++;
-                    ScoreTracker.Combo++;
-                    break;
-                case HitType.Great:
-                    ScoreTracker.GreatHits++;
-                    ScoreTracker.Combo++;
-                    break;
-                case HitType.Good:
-                    ScoreTracker.GoodHits++;
-                    ScoreTracker.Combo++;
-                    break;
-                case HitType.Okay:
-                    ScoreTracker.OkayHits++;
-                    ScoreTracker.ComboBreaks++;
-                    ScoreTracker.Combo = 0;
-                    break;
-                case HitType.Bad:
-                    ScoreTracker.BadHits++;
-                    ScoreTracker.ComboBreaks++;
-                    ScoreTracker.Combo = 0;
-                    break;
-                case HitType.Miss:
-                    ScoreTracker.Misses++;
-                    ScoreTracker.ComboBreaks++;
-                    ScoreTracker.Combo = 0;
-                    break;
-            }
-            
-            if (ScoreTracker.Combo > ScoreTracker.HighestCombo)
-                ScoreTracker.HighestCombo = ScoreTracker.Combo;
-
-            if (hit == HitType.Miss)
-                ScoreTracker.MissStreak++;
-            else
-                ScoreTracker.MissStreak = 0;
-            
-            UpdateStatistics();
-            EmitSignalStatisticsUpdated(ScoreTracker.Combo, result.Hit, result.Distance);
-        }
+        node.Set("play_field", this);
+        node.Call("initialize");
     }
 }

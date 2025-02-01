@@ -6,8 +6,7 @@ namespace Rubicon.Core.Meta;
 /// <summary>
 /// Used to hold important information about a song.
 /// </summary>
-[GlobalClass]
-public partial class SongMeta : Resource
+[GlobalClass] public partial class SongMeta : Resource
 {
     /// <summary>
     /// The name of the song.
@@ -24,6 +23,11 @@ public partial class SongMeta : Resource
     /// The artist who made the song.
     /// </summary>
     [Export] public string Artist = "Hideo Kojima";
+
+    /// <summary>
+    /// The instrumental for this song.
+    /// </summary>
+    [Export] public AudioStream Music;
 
     /// <summary>
     /// The chart offset.
@@ -54,26 +58,11 @@ public partial class SongMeta : Resource
     /// Marks the playable charts in this song.
     /// </summary>
     [Export] public StringName[] PlayableCharts = ["Player"];
-
-    /// <summary>
-    /// The characters to spawn in the song.
-    /// </summary>
-    [Export] public CharacterMeta[] Characters = [];
     
     /// <summary>
     /// A list of BPM changes.
     /// </summary>
     [Export] public BpmInfo[] BpmInfo = [];
-
-    /// <summary>
-    /// Determines what type of backend the engine will use when loading into a song.
-    /// </summary>
-    [Export] public GameEnvironment Environment = GameEnvironment.CanvasItem;
-
-    /// <summary>
-    /// The stage to spawn in for this song.
-    /// </summary>
-    [Export] public string Stage = "stage";
 
     /// <summary>
     /// Converts everything in this chart to millisecond format.

@@ -1,4 +1,4 @@
-namespace Rubicon.Core;
+namespace Rubicon.Core.UI;
 
 [GlobalClass]
 public partial class UiStyle : Resource

@@ -15,13 +15,8 @@ namespace Rubicon.Core.Rulesets;
 /// <summary>
 /// A control node with all general ruleset gameplay-related functions.
 /// </summary>
-[GlobalClass] public abstract partial class PlayField : CanvasLayer
+[GlobalClass] public abstract partial class PlayField : Control
 {
-    /// <summary>
-    /// Contains valid 
-    /// </summary>
-    public static readonly string[] VALID_GDSCRIPT_NAMES = [];
-    
     /// <summary>
     /// The current health the player has.
     /// </summary>
@@ -130,6 +125,8 @@ namespace Rubicon.Core.Rulesets;
     /// <param name="targetIndex">The index to play in <see cref="SongMeta.PlayableCharts"/>.</param>
     public virtual void Setup(SongMeta meta, RubiChart chart, int targetIndex, EventMeta events = null)
     {
+        SetAnchorsPreset(LayoutPreset.FullRect);
+        
         Name = "Base PlayField";
         Metadata = meta;
         Chart = chart;

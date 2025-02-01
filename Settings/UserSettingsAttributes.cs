@@ -4,14 +4,13 @@ namespace Rubicon.Core.Settings;
 /// An attribute to automatically populate a field with a value from a Godot project setting.
 /// </summary>
 /// <remarks>
-/// This attribute binds a field to a specific Godot project setting path, provided via the <paramref name="name"/> parameter.
-/// Note: Enum fields will be serialized as ints due to constraints with ConfigFile (it sucks).
+/// Note: Enum fields will be serialized as longs due to constraints with ConfigFile.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Field)]
 public class ProjectSettingAttribute : Attribute
 {
     /// <summary>
-    /// Gets or sets the path to the Godot project setting.
+    /// The reference to the key in <see cref="ProjectSettings"/>.
     /// </summary>
     public string Name { get; set; }
 

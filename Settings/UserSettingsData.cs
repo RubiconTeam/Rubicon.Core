@@ -36,6 +36,19 @@ public partial class UserSettingsData
     /// <param name="key">The key (case-sensitive)</param>
     /// <param name="val">The variant value to set this setting to</param>
     public partial void SetSetting(string key, Variant val);
+
+    /// <summary>
+    /// Gets all the sections present.
+    /// </summary>
+    /// <returns>All sections</returns>
+    public partial string[] GetSections();
+    
+    /// <summary>
+    /// Gets all present keys in the section provided.
+    /// </summary>
+    /// <param name="section">The section</param>
+    /// <returns>An array of keys if section is found, empty array if not.</returns>
+    public partial string[] GetSectionKeys(string section);
 }
 
 public class GameplaySection

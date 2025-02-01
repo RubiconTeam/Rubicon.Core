@@ -73,7 +73,9 @@ namespace Rubicon.Core.Rulesets;
     {
         SvChange[] svChangeList = ParentController.ParentBarLine.Chart.SvChanges;
         float offset = ParentController.Autoplay ? (float)UserSettings.Gameplay.VisualOffset : 0f;
-        return svChangeList[Info.StartingScrollVelocity].Position + ((Info.MsTime - svChangeList[Info.StartingScrollVelocity].MsTime) * svChangeList[Info.StartingScrollVelocity].Multiplier) + offset;
+        return svChangeList[Info.StartingScrollVelocity].Position +
+                ((Info.MsTime - svChangeList[Info.StartingScrollVelocity].MsTime) *
+                 svChangeList[Info.StartingScrollVelocity].Multiplier) + offset;
     }
 
     /// <summary>
@@ -85,6 +87,7 @@ namespace Rubicon.Core.Rulesets;
         SvChange[] svChangeList = ParentController.ParentBarLine.Chart.SvChanges;
         float offset = ParentController.Autoplay ? (float)UserSettings.Gameplay.VisualOffset : 0f;
         return svChangeList[Info.EndingScrollVelocity].Position +
-            ((Info.MsTime + Info.MsLength - svChangeList[Info.EndingScrollVelocity].MsTime) * svChangeList[Info.EndingScrollVelocity].Multiplier) + offset;
+                ((Info.MsTime + Info.MsLength - svChangeList[Info.EndingScrollVelocity].MsTime) *
+                 svChangeList[Info.EndingScrollVelocity].Multiplier) + offset;
     }
 }

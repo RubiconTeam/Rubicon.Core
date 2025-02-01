@@ -1,5 +1,6 @@
 using Rubicon.Core;
 using Rubicon.Core.Chart;
+using Rubicon.Core.Settings;
 
 namespace Rubicon.Core.Rulesets.Mania;
 
@@ -154,7 +155,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 		SvChange svChange = ParentController.ParentBarLine.Chart.SvChanges[Info.StartingScrollVelocity];
 		float distance = (svChange.Position + Info.MsTime - svChange.MsTime - _tailOffset) * ParentController.ScrollSpeed;
 		Vector2 posMult = new Vector2(Mathf.Cos(maniaNoteManager.DirectionAngle), Mathf.Sin(maniaNoteManager.DirectionAngle));
-		Position = maniaNoteManager.NoteHeld != Info ? (startingPos + distance) * posMult : Vector2.Zero;
+		Position = maniaNoteManager.NoteHeld != Info ? (startingPos + distance) * posMult * (float)UserSettings.Gameplay.SpeedMultiplier : Vector2.Zero;
 	}
 
 	/// <summary>
@@ -205,7 +206,8 @@ namespace Rubicon.Core.Rulesets.Mania;
 		string direction = maniaNoteManager.Direction;
 		int tailTexWidth = Tail.SpriteFrames.GetFrameTexture($"{direction}NoteTail", Tail.GetFrame()).GetWidth();
 
-		float holdWidth = GetOnScreenHoldLength(Info.MsLength) * ParentController.ScrollSpeed;
+		float holdWidth = GetOnScreenHoldLength(Info.MsLength) * ParentController.ScrollSpeed *
+		                  (float)UserSettings.Gameplay.SpeedMultiplier;
 		Hold.Size = new Vector2((holdWidth - tailTexWidth) / HoldContainer.Scale.X, Hold.Size.Y);
 		
 		if (maniaNoteManager.NoteHeld != Info)
@@ -222,8 +224,9 @@ namespace Rubicon.Core.Rulesets.Mania;
 		
 		// Rough code, might clean up later if possible
 		string direction = maniaNoteManager.Direction;
-		float initialHoldWidth = GetOnScreenHoldLength(Info.MsLength) * ParentController.ScrollSpeed;
-		float holdWidth = GetOnScreenHoldLength(length) * ParentController.ScrollSpeed;
+		float initialHoldWidth = GetOnScreenHoldLength(Info.MsLength) * ParentController.ScrollSpeed *
+		                         (float)UserSettings.Gameplay.SpeedMultiplier;
+		float holdWidth = GetOnScreenHoldLength(length) * ParentController.ScrollSpeed * (float)UserSettings.Gameplay.SpeedMultiplier;
 
 		Vector2 holdContainerScale = HoldContainer.Scale;
 		Vector2 holdContainerSize = HoldContainer.Size;

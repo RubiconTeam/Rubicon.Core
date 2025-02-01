@@ -60,7 +60,7 @@ public class GameplaySection
     public bool GhostTapping = false;
     public bool FlashingLights = true;
     public bool Autoplay = false;
-    [StepValue(0.01f, 1f, 1f)] public double NoteSpeed = 1d;
+    [StepValue(0.01f, 1f, 1f)] public double SpeedMultiplier = 1d;
 }
 
 public class VideoSection

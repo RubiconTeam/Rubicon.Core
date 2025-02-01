@@ -77,19 +77,6 @@ public partial class RubiconEngineInstance : Node
 		_mainWindow.ContentScaleSize = new Vector2I(Mathf.FloorToInt(_viewportSize.Y * aspectRatio), _viewportSize.Y);
 	}
 
-	/// <summary>
-	/// Tests whether this instance of Rubicon is in a Funkin' engine or not.
-	/// </summary>
-	/// <returns>True if in Funkin' mode, false if not.</returns>
-	public bool IsFunkinEngine()
-	{
-		#if FUNKIN
-		return true;
-		#else
-		return false;
-		#endif
-	}
-
 	/// <inheritdoc cref="Version"/>
 	public VersionInfo GetVersion() => Version;
 }

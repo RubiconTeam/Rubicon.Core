@@ -17,7 +17,7 @@ namespace Rubicon.Core.API;
     /// <summary>
     /// Used to initialize this event for the first time.
     /// </summary>
-    public void Initialize()
+    public virtual void Initialize()
     {
         base._Ready();
 

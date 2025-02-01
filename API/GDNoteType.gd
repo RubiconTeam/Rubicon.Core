@@ -17,6 +17,8 @@ func initialize(): ## If it hasn't been initialized already, link itself to the 
 	factory.SpawnNote.connect(spawn_note)
 	play_field.InitializeNote.connect(initialize_note) 
 	play_field.NoteHit.connect(note_hit)
+	
+	_initialized = true
  
 func initialize_note(_notes : Array[NoteData], _note_type : StringName) -> void: ## Used to set up note data initially for every note type.
 	pass

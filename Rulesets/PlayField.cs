@@ -327,7 +327,7 @@ namespace Rubicon.Core.Rulesets;
             if (!result.Flags.HasFlag(NoteResultFlags.Score))
             {
                 HitType hit = result.Hit;
-                bool isInitialTap = result.Note.Length == 0f || result.Note.Length > 0f && result.Holding;
+                bool isInitialTap = result.Note.Length == 0f || result.Note.Length > 0f && result.Holding && result.Tapped;
                 if (isInitialTap) // Tap note or initial tap of hold note
                 {
                     switch (hit)
@@ -367,7 +367,7 @@ namespace Rubicon.Core.Rulesets;
                     if (ScoreTracker.Combo > ScoreTracker.HighestCombo)
                         ScoreTracker.HighestCombo = ScoreTracker.Combo;   
                 }
-                else // Hold note
+                else // Hold note end
                 {
                     switch (hit)
                     {

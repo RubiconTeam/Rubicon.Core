@@ -66,6 +66,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 		ParentBarLine = parent;
 		Lane = lane;
 		Direction = noteSkin.GetDirection(lane, parent.Chart.Lanes);
+		Action = $"play_mania_{ParentBarLine.Managers.Length}k_{Lane}";
 		ChangeNoteSkin(noteSkin);
 		
 		Notes = parent.Chart.Notes.Where(x => x.Lane == Lane).ToArray();
@@ -179,61 +180,53 @@ namespace Rubicon.Core.Rulesets.Mania;
 		result.Note.WasHit = true;
 		ParentBarLine.OnNoteHit(result);
 	}
-	
-	public override void _Input(InputEvent @event)
+
+	protected override void PressedEvent()
 	{
-		base._Input(@event);
-
-		string actionName = $"play_mania_{ParentBarLine.Managers.Length}k_{Lane}";
-		if (Autoplay || !InputsEnabled || !InputMap.HasAction(actionName) || !@event.IsAction(actionName) || @event.IsEcho())
+		NoteData[] notes = Notes;
+		if (NoteHitIndex >= notes.Length)
+		{
+			if (LaneObject.Animation != $"{Direction}LanePress")
+				LaneObject.Play($"{Direction}LanePress");
+				
 			return;
+		}
 
-		if (@event.IsPressed())
+		float songPos = Conductor.Time * 1000f;
+		float hitTime = GetCurrentNoteDistance(true);
+		while (notes[NoteHitIndex].MsTime - songPos <= -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle())
 		{
-			NoteData[] notes = Notes;
-			if (NoteHitIndex >= notes.Length)
-			{
-				if (LaneObject.Animation != $"{Direction}LanePress")
-					LaneObject.Play($"{Direction}LanePress");
-				
-				return;
-			}
-
-			float songPos = Conductor.Time * 1000f;
-			float hitTime = GetCurrentNoteDistance(true);
-			while (notes[NoteHitIndex].MsTime - songPos <= -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle())
-			{
-				// Miss every note thats too late first
-				ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle() - 1f, holding: false));
-				NoteHitIndex++;
-			}
+			// Miss every note thats too late first
+			ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle() - 1f, holding: false));
+			NoteHitIndex++;
+		}
 			
-			if (Mathf.Abs(hitTime) <= ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle()) // Literally any other rating
-			{
-				ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: hitTime, holding: notes[NoteHitIndex].Length > 0));
-				NoteHitIndex++;
-			}
-			else
-			{
-				if (UserSettings.Gameplay.GhostTapping)
-					InvokeGhostTap();
-				
-				if (LaneObject.Animation != $"{Direction}LanePress")
-					LaneObject.Play($"{Direction}LanePress");
-			}
-		}
-		else if (@event.IsReleased())
+		if (Mathf.Abs(hitTime) <= ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle()) // Literally any other rating
 		{
-			if (NoteHeld != null)
-			{
-				float length = NoteHeld.MsTime + NoteHeld.MsLength - (Conductor.Time * 1000f);
-				bool holding = length <= ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle();
-				ProcessQueue.Add(GetResult(noteIndex: HoldingIndex, distance: length, holding: !holding));
-			}
-
-			if (LaneObject.Animation != $"{Direction}LaneNeutral")
-				LaneObject.Play($"{Direction}LaneNeutral", 1f, true);
+			ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: hitTime, holding: notes[NoteHitIndex].Length > 0));
+			NoteHitIndex++;
 		}
+		else
+		{
+			if (UserSettings.Gameplay.GhostTapping)
+				InvokeGhostTap();
+				
+			if (LaneObject.Animation != $"{Direction}LanePress")
+				LaneObject.Play($"{Direction}LanePress");
+		}
+	}
+
+	protected override void ReleasedEvent()
+	{
+		if (NoteHeld != null)
+		{
+			float length = NoteHeld.MsTime + NoteHeld.MsLength - (Conductor.Time * 1000f);
+			bool holding = length <= ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle();
+			ProcessQueue.Add(GetResult(noteIndex: HoldingIndex, distance: length, holding: !holding));
+		}
+
+		if (LaneObject.Animation != $"{Direction}LaneNeutral")
+			LaneObject.Play($"{Direction}LaneNeutral", 1f, true);
 	}
 
 	/// <summary>

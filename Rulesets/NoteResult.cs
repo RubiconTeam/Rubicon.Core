@@ -24,7 +24,12 @@ namespace Rubicon.Core.Rulesets;
     [Export] public float Distance;
 
     /// <summary>
-    /// Indicates whether the NoteManager was holding this note or not, if this note is a hold note.
+    /// Whether the note was actually hit once before.
+    /// </summary>
+    [Export] public bool Tapped = false;
+    
+    /// <summary>
+    /// Whether this note is being held by the <see cref="NoteController"/> controlling it.
     /// </summary>
     [Export] public bool Holding = false;
 

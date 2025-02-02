@@ -86,6 +86,11 @@ namespace Rubicon.Core.Rulesets;
 	/// </summary>
 	[Export] public Array<NoteResult> ProcessQueue = new();
 
+	/// <summary>
+	/// The <see cref="InputEvent"/> name for this controller.
+	/// </summary>
+	[Export] public string Action;
+
 	private NoteData[] _notes = [];
 	private NoteResult _result = new();
 
@@ -185,6 +190,7 @@ namespace Rubicon.Core.Rulesets;
 		{
 			float holdLengthWindow = ProjectSettings.GetSetting("rubicon/judgments/hold_length_window").AsSingle();
 			result.Hit = Mathf.Abs(result.Distance) <= holdLengthWindow ? HitType.Perfect : HitType.Miss;
+			result.Tapped = true;
 		}
 		else
 		{
@@ -206,6 +212,7 @@ namespace Rubicon.Core.Rulesets;
 			}
 
 			result.Hit = (HitType)hit;
+			result.Tapped = result.Hit != HitType.Miss;
 		}
 		
 		return result;
@@ -214,15 +221,20 @@ namespace Rubicon.Core.Rulesets;
 	public override void _Input(InputEvent @event)
 	{
 		base._Input(@event);
-		/*
 		
-		string actionName = $"MANIA_{ParentBarLine.Managers.Length}K_{Lane}";
-		if (Autoplay || !InputsEnabled || !InputMap.HasAction(actionName) || !@event.IsAction(actionName) || @event.IsEcho())
+		if (Autoplay || !InputsEnabled || !InputMap.HasAction(Action) || !@event.IsAction(Action) || @event.IsEcho())
 			return;
-
-		if (!@event.IsEcho())
-			ParentBarLine.EmitSignal("BindPressed", ParentBarLine);*/
+		
+		if (@event.IsPressed())
+			PressedEvent();
+		
+		if (@event.IsReleased())
+			ReleasedEvent();
 	}
+
+	protected abstract void PressedEvent();
+	
+	protected abstract void ReleasedEvent();
 
 	/// <summary>
 	/// Triggers upon this note manager hitting/missing a note.

@@ -91,26 +91,26 @@ namespace Rubicon.Core.Rulesets.Mania;
         }
         
         // Accuracy
-        long hitNotes = ScoreTracker.PerfectHits + ScoreTracker.GreatHits + ScoreTracker.GoodHits + ScoreTracker.OkayHits + ScoreTracker.BadHits + ScoreTracker.Misses;
+        int hitNotes = ScoreTracker.PerfectHits + ScoreTracker.GreatHits + ScoreTracker.GoodHits + ScoreTracker.OkayHits + ScoreTracker.BadHits + ScoreTracker.Misses;
         ScoreTracker.Accuracy = ScoreTracker.PerfectHits == ScoreTracker.NoteCount
             ? 100f
-            : ((ScoreTracker.PerfectHits + (ScoreTracker.GreatHits * 0.95f) + (ScoreTracker.GoodHits * 0.65f) + (ScoreTracker.OkayHits * 0.3f) + (ScoreTracker.BadHits + 0.15f)) /
-               hitNotes) * 100f;
-        
+            : (ScoreTracker.PerfectHits + (ScoreTracker.GreatHits * 0.95f) + (ScoreTracker.GoodHits * 0.65f) +
+               (ScoreTracker.OkayHits * 0.3f) + (ScoreTracker.BadHits * 0.15f)) / hitNotes * 100f;
+
         // Rank
         if (ScoreTracker.Score >= MaxScore)
             ScoreTracker.Rank = ScoreRank.P;
-        else if (ScoreTracker.Score >= 975000)
+        else if (ScoreTracker.Score >= Mathf.FloorToInt(MaxScore * 0.975f))
             ScoreTracker.Rank = ScoreRank.Sss;
-        else if (ScoreTracker.Score >= 950000)
+        else if (ScoreTracker.Score >= Mathf.FloorToInt(MaxScore * 0.95f))
             ScoreTracker.Rank = ScoreRank.Ss;
-        else if (ScoreTracker.Score >= 900000)
+        else if (ScoreTracker.Score >= Mathf.FloorToInt(MaxScore * 0.9f))
             ScoreTracker.Rank = ScoreRank.S;
-        else if (ScoreTracker.Score >= 800000)
+        else if (ScoreTracker.Score >= Mathf.FloorToInt(MaxScore * 0.8f))
             ScoreTracker.Rank = ScoreRank.A;
-        else if (ScoreTracker.Score >= 700000)
+        else if (ScoreTracker.Score >= Mathf.FloorToInt(MaxScore * 0.7f))
             ScoreTracker.Rank = ScoreRank.B;
-        else if (ScoreTracker.Score >= 600000)
+        else if (ScoreTracker.Score >= Mathf.FloorToInt(MaxScore * 0.6f))
             ScoreTracker.Rank = ScoreRank.C;
         else
             ScoreTracker.Rank = ScoreRank.D;

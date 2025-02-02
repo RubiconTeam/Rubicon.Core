@@ -199,7 +199,6 @@ namespace Rubicon.Core.Rulesets;
             curBarLine.NoteHit += BarLineHit;
         }
         
-        ScoreTracker.Initialize(chart, TargetBarLine);
         UpdateOptions();
         
         Conductor.Reset();
@@ -235,7 +234,9 @@ namespace Rubicon.Core.Rulesets;
             EmitSignalInitializeNote(pair.Value.ToArray(), pair.Key);
             pair.Value.Clear();
         }
+        
         noteTypeMap.Clear();
+        ScoreTracker.Initialize(chart, TargetBarLine);
     }
 
     public override void _Process(double delta)
@@ -326,39 +327,58 @@ namespace Rubicon.Core.Rulesets;
             if (!result.Flags.HasFlag(NoteResultFlags.Score))
             {
                 HitType hit = result.Hit;
-                switch (hit)
+                bool isInitialTap = result.Note.Length == 0f || result.Note.Length > 0f && result.Holding;
+                if (isInitialTap) // Tap note or initial tap of hold note
                 {
-                    case HitType.Perfect:
-                        ScoreTracker.PerfectHits++;
-                        ScoreTracker.Combo++;
-                        break;
-                    case HitType.Great:
-                        ScoreTracker.GreatHits++;
-                        ScoreTracker.Combo++;
-                        break;
-                    case HitType.Good:
-                        ScoreTracker.GoodHits++;
-                        ScoreTracker.Combo++;
-                        break;
-                    case HitType.Okay:
-                        ScoreTracker.OkayHits++;
+                    switch (hit)
+                    {
+                        case HitType.Perfect:
+                            ScoreTracker.PerfectHits++;
+                            break;
+                        case HitType.Great:
+                            ScoreTracker.GreatHits++;
+                            break;
+                        case HitType.Good:
+                            ScoreTracker.GoodHits++;
+                            break;
+                        case HitType.Okay:
+                            ScoreTracker.OkayHits++;
+                            break;
+                        case HitType.Bad:
+                            ScoreTracker.BadHits++;
+                            break;
+                        case HitType.Miss:
+                            ScoreTracker.Misses++;
+                            break;
+                    }
+
+                    if (hit >= HitType.Okay)
+                    {
                         ScoreTracker.ComboBreaks++;
                         ScoreTracker.Combo = 0;
-                        break;
-                    case HitType.Bad:
-                        ScoreTracker.BadHits++;
-                        ScoreTracker.ComboBreaks++;
-                        ScoreTracker.Combo = 0;
-                        break;
-                    case HitType.Miss:
-                        ScoreTracker.Misses++;
-                        ScoreTracker.ComboBreaks++;
-                        ScoreTracker.Combo = 0;
-                        break;
-                }
+                    }
+                    else
+                    {
+                        ScoreTracker.Combo++;
+                    }
             
-                if (ScoreTracker.Combo > ScoreTracker.HighestCombo)
-                    ScoreTracker.HighestCombo = ScoreTracker.Combo;
+                    if (ScoreTracker.Combo > ScoreTracker.HighestCombo)
+                        ScoreTracker.HighestCombo = ScoreTracker.Combo;   
+                }
+                else // Hold note
+                {
+                    switch (hit)
+                    {
+                        case HitType.Perfect:
+                            ScoreTracker.PerfectHits++;
+                            break;
+                        case HitType.Miss:
+                            ScoreTracker.Misses++;
+                            ScoreTracker.Combo = 0;
+                            ScoreTracker.ComboBreaks++;
+                            break;
+                    }
+                }
 
                 if (hit == HitType.Miss)
                     ScoreTracker.MissStreak++;
@@ -366,7 +386,9 @@ namespace Rubicon.Core.Rulesets;
                     ScoreTracker.MissStreak = 0;
             
                 UpdateStatistics();
-                EmitSignalStatisticsUpdated(ScoreTracker.Combo, result.Hit, result.Distance);
+                
+                if (isInitialTap)
+                    EmitSignalStatisticsUpdated(ScoreTracker.Combo, result.Hit, result.Distance);
             }
         }
         

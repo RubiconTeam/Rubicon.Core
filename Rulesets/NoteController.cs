@@ -181,24 +181,32 @@ namespace Rubicon.Core.Rulesets;
 		result.Index = noteIndex;
 		
 		// Auto detect hit based on distance
-		float[] hitWindows = [ 
-			ProjectSettings.GetSetting("rubicon/judgments/perfect_hit_window").AsSingle(),
-			ProjectSettings.GetSetting("rubicon/judgments/great_hit_window").AsSingle(),
-			ProjectSettings.GetSetting("rubicon/judgments/good_hit_window").AsSingle(),
-			ProjectSettings.GetSetting("rubicon/judgments/okay_hit_window").AsSingle(),
-			ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle()
-		]; 
-		int hit = hitWindows.Length;
-		for (int i = 0; i < hitWindows.Length; i++)
+		if (result.Note.Length > 0 && !holding) // If hold note was let go
 		{
-			if (Mathf.Abs(result.Distance) <= hitWindows[i])
-			{
-				hit = i;
-				break;
-			}
+			float holdLengthWindow = ProjectSettings.GetSetting("rubicon/judgments/hold_length_window").AsSingle();
+			result.Hit = Mathf.Abs(result.Distance) <= holdLengthWindow ? HitType.Perfect : HitType.Miss;
 		}
+		else
+		{
+			float[] hitWindows = [ 
+				ProjectSettings.GetSetting("rubicon/judgments/perfect_hit_window").AsSingle(),
+				ProjectSettings.GetSetting("rubicon/judgments/great_hit_window").AsSingle(),
+				ProjectSettings.GetSetting("rubicon/judgments/good_hit_window").AsSingle(),
+				ProjectSettings.GetSetting("rubicon/judgments/okay_hit_window").AsSingle(),
+				ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle()
+			]; 
+			int hit = hitWindows.Length;
+			for (int i = 0; i < hitWindows.Length; i++)
+			{
+				if (Mathf.Abs(result.Distance) <= hitWindows[i])
+				{
+					hit = i;
+					break;
+				}
+			}
 
-		result.Hit = (HitType)hit;
+			result.Hit = (HitType)hit;
+		}
 		
 		return result;
 	}

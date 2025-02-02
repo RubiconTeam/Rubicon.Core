@@ -59,7 +59,7 @@ public partial class NoteData : Resource
     /// <summary>
     /// Basically tells the autoplay whether to miss this note or not. Should be ignored when serialized.
     /// </summary>
-    [Export] public bool ShouldMiss = false;
+    public bool ShouldMiss = false;
     
     /// <summary>
     /// True if the note has already been hit.
@@ -71,36 +71,18 @@ public partial class NoteData : Resource
     /// </summary>
     public bool WasSpawned = false;
 
-    public byte GetSerializedType()
+    /// <summary>
+    /// Whether this note should count in the score tracker or not.
+    /// </summary>
+    /// <returns>If the note is counted or not.</returns>
+    public bool IsMine() => ShouldMiss;
+    
+    /// <summary>
+    /// Marks this note as a mine if it isn't, and unmarks it if it is.
+    /// </summary>
+    public void MarkAsMine()
     {
-        if (Length > 0.0)
-        {
-            if (Type != "normal")
-            {
-                if (Parameters.Count > 0)
-                    return 7; // Typed hold note with params
-
-                return 5; // Typed hold note
-            }
-
-            if (Parameters.Count  > 0)
-                return 6; // Normal hold note with params
-            
-            return 4; // Normal hold note
-        }
-        
-        if (Type != "normal")
-        {
-            if (Parameters.Count > 0)
-                return 3; // Typed tap note with params
-
-            return 1; // Typed tap note
-        }
-
-        if (Parameters.Count > 0)
-            return 2; // Tap note with params
-        
-        return 0; // Normal tap note
+        ShouldMiss = !ShouldMiss;
     }
     
     /// <summary>

@@ -16,43 +16,40 @@ namespace Rubicon.Core.Rulesets;
 
     [Export] public float Accuracy = 100f;
 
-    [Export] public long PerfectHits = 0;
+    [Export] public int PerfectHits = 0;
     
-    [Export] public long GreatHits = 0;
+    [Export] public int GreatHits = 0;
     
-    [Export] public long GoodHits = 0;
+    [Export] public int GoodHits = 0;
 
-    [Export] public long OkayHits = 0;
+    [Export] public int OkayHits = 0;
     
-    [Export] public long BadHits = 0;
+    [Export] public int BadHits = 0;
     
-    [Export] public long Misses = 0;
+    [Export] public int Misses = 0;
 
-    [Export] public long MissStreak = 0;
+    [Export] public int MissStreak = 0;
 
-    [Export] public long Combo = 0;
+    [Export] public int Combo = 0;
 
-    [Export] public long ComboBreaks = 0;
+    [Export] public int ComboBreaks = 0;
 
-    [Export] public long HighestCombo = 0;
+    [Export] public int HighestCombo = 0;
 
-    [Export] public long NoteCount = 0;
+    [Export] public int NoteCount = 0;
 
     [ExportGroup("References"), Export] public RubiChart Chart;
-
-    private NoteData[] _playableNotes;
     
     public void Initialize(RubiChart chart, StringName target)
     {
         Chart = chart;
         
-        IndividualChart firstChart = chart.Charts.FirstOrDefault(x => x.Name == target);
-        if (firstChart == null)
+        IndividualChart playerChart = chart.Charts.FirstOrDefault(x => x.Name == target);
+        if (playerChart == null)
             return;
         
         float startTime = 0;
-        List<NoteData> notes = new List<NoteData>();
-        List<TargetSwitch> switches = new List<TargetSwitch>(firstChart.Switches);
+        List<TargetSwitch> switches = new List<TargetSwitch>(playerChart.Switches);
         switches.Insert(0, new TargetSwitch{ Time = 0f, MsTime = 0f, Name = target });
         for (int i = 0; i < switches.Count; i++)
         {
@@ -62,45 +59,32 @@ namespace Rubicon.Core.Rulesets;
             
             if (i < switches.Count - 1)
             {
-                notes.AddRange(GetNotesInRange(curChart.Notes, startTime, switches[i + 1].Time));
+                NoteCount += GetNoteCountInRange(curChart.Notes, startTime, switches[i + 1].MsTime) + GetHoldNoteCountInRange(curChart.Notes, startTime, switches[i + 1].MsTime);
                 startTime = switches[i + 1].Time;
                 continue;
             }
             
-            notes.AddRange(GetNotesInRange(curChart.Notes, startTime));
+            NoteCount += GetNoteCountInRange(curChart.Notes, startTime) + GetHoldNoteCountInRange(curChart.Notes, startTime);
         }
-        
-        _playableNotes = notes.ToArray();
-        
-        long totalNotes = _playableNotes.LongLength;
-        for (int i = 0; i < _playableNotes.Length; i++)
-            if (_playableNotes[i].Length > 0)
-                totalNotes++;
-
-        NoteCount = totalNotes;
     }
 
-    public NoteData[] GetPlayableNotes() => _playableNotes;
-
-    public void MarkNoteAsMine(NoteData note)
+    private int GetNoteCountInRange(NoteData[] notes, double start)
     {
-        if (!_playableNotes.Contains(note))
-            return;
-
-        note.ShouldMiss = true;
-        NoteCount--;
-
-        if (note.Length > 0)
-            NoteCount--;
-    }
-
-    private NoteData[] GetNotesInRange(NoteData[] notes, double start)
-    {
-        return notes.Where(x => x.Time >= start).ToArray();
+        return notes.Count(x => x.Time >= start && !x.IsMine());
     }
     
-    private NoteData[] GetNotesInRange(NoteData[] notes, double start, double end)
+    private int GetNoteCountInRange(NoteData[] notes, double start, double end)
     {
-        return notes.Where(x => x.Time >= start && x.Time <= end).ToArray();
+        return notes.Count(x => x.Time >= start && x.Time <= end && !x.IsMine());
+    }
+    
+    private int GetHoldNoteCountInRange(NoteData[] notes, double start)
+    {
+        return notes.Count(x => x.Time >= start && !x.IsMine() && x.Length > 0);
+    }
+    
+    private int GetHoldNoteCountInRange(NoteData[] notes, double start, double end)
+    {
+        return notes.Count(x => x.Time >= start && x.Time <= end && !x.IsMine() && x.Length > 0);
     }
 }

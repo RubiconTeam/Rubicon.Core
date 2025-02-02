@@ -349,6 +349,8 @@ namespace Rubicon.Core.Rulesets;
                             break;
                         case HitType.Miss:
                             ScoreTracker.Misses++;
+                            if (result.Note.Length > 0)
+                                ScoreTracker.Misses++;
                             break;
                     }
 

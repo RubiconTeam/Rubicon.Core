@@ -10,9 +10,9 @@ namespace Rubicon.Core.Rulesets;
 {
     [Export] public int Score = 0;
 
-    [Export] public ScoreRank Rank = ScoreRank.D;
+    [Export] public ScoreRank Rank = ScoreRank.P;
 
-    [Export] public ClearRank Clear = ClearRank.Clear;
+    [Export] public ClearRank Clear = ClearRank.Perfect;
 
     [Export] public float Accuracy = 100f;
 
@@ -38,6 +38,12 @@ namespace Rubicon.Core.Rulesets;
 
     [Export] public int NoteCount = 0;
 
+    [Export] public int MaxCombo = 0;
+
+    [Export] public int TapsHit = 0;
+
+    [Export] public int TotalHit = 0;
+
     [ExportGroup("References"), Export] public RubiChart Chart;
     
     public void Initialize(RubiChart chart, StringName target)
@@ -59,12 +65,16 @@ namespace Rubicon.Core.Rulesets;
             
             if (i < switches.Count - 1)
             {
-                NoteCount += GetNoteCountInRange(curChart.Notes, startTime, switches[i + 1].MsTime) + GetHoldNoteCountInRange(curChart.Notes, startTime, switches[i + 1].MsTime);
+                int tapNoteCount = GetNoteCountInRange(curChart.Notes, startTime, switches[i + 1].MsTime);
+                MaxCombo += tapNoteCount;
+                NoteCount += tapNoteCount + GetHoldNoteCountInRange(curChart.Notes, startTime, switches[i + 1].MsTime);
                 startTime = switches[i + 1].Time;
                 continue;
             }
-            
-            NoteCount += GetNoteCountInRange(curChart.Notes, startTime) + GetHoldNoteCountInRange(curChart.Notes, startTime);
+
+            int tapNotes = GetNoteCountInRange(curChart.Notes, startTime);
+            MaxCombo += tapNotes;
+            NoteCount += tapNotes + GetHoldNoteCountInRange(curChart.Notes, startTime);
         }
     }
 

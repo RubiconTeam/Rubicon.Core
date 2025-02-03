@@ -330,6 +330,8 @@ namespace Rubicon.Core.Rulesets;
                 bool isInitialTap = result.Note.Length == 0f || result.Note.Length > 0f && result.Holding && result.Tapped;
                 if (isInitialTap) // Tap note or initial tap of hold note
                 {
+                    ScoreTracker.TapsHit++;
+                    
                     switch (hit)
                     {
                         case HitType.Perfect:
@@ -386,6 +388,8 @@ namespace Rubicon.Core.Rulesets;
                     ScoreTracker.MissStreak++;
                 else
                     ScoreTracker.MissStreak = 0;
+
+                ScoreTracker.TotalHit++;
             
                 UpdateStatistics();
                 

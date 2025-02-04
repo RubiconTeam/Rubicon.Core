@@ -86,7 +86,7 @@ public static class ConductorUtility
     /// <returns>The measure, in steps.</returns>
     public static float MeasureToSteps(float measure, float timeSignatureNumerator = 4f, float timeSignatureDenominator = 4f)
     {
-        return measure * timeSignatureNumerator * timeSignatureDenominator;
+        return BeatsToSteps(MeasureToBeats(measure, timeSignatureNumerator), timeSignatureDenominator);
     }
 
     /// <summary>
@@ -98,6 +98,17 @@ public static class ConductorUtility
     public static float BeatsToSteps(float beats, float timeSignatureDenominator = 4f)
     {
         return beats * timeSignatureDenominator;
+    }
+
+    /// <summary>
+    /// Converts beats to measures.
+    /// </summary>
+    /// <param name="beats">The beats</param>
+    /// <param name="timeSignatureNumerator">The number of beats in a measure.</param>
+    /// <returns>The beats, in measures.</returns>
+    public static float BeatsToMeasures(float beats, float timeSignatureNumerator = 4f)
+    {
+        return beats / timeSignatureNumerator;
     }
 
     /// <summary>

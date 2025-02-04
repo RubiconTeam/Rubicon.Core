@@ -123,7 +123,7 @@ namespace Rubicon.Core.Rulesets.Mania;
         // Clear Rank
         if (ScoreTracker.Misses > 0)
             ScoreTracker.Clear = ClearRank.Clear;
-        else if (ScoreTracker.GoodHits + ScoreTracker.OkayHits + ScoreTracker.BadHits > 0)
+        else if (ScoreTracker.GoodHits > 0)
             ScoreTracker.Clear = ClearRank.FullCombo;
         else if (ScoreTracker.GreatHits > 0)
             ScoreTracker.Clear = ClearRank.GreatFullCombo;

@@ -121,7 +121,7 @@ namespace Rubicon.Core.Rulesets.Mania;
             ScoreTracker.Rank = ScoreRank.D;
         
         // Clear Rank
-        if (ScoreTracker.Misses > 0)
+        if (ScoreTracker.Misses + ScoreTracker.BadHits + ScoreTracker.OkayHits > 0)
             ScoreTracker.Clear = ClearRank.Clear;
         else if (ScoreTracker.GoodHits > 0)
             ScoreTracker.Clear = ClearRank.FullCombo;

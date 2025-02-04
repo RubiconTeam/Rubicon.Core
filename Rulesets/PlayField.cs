@@ -134,6 +134,7 @@ namespace Rubicon.Core.Rulesets;
         
         Input.UseAccumulatedInput = false;
 
+        Metadata.ConvertData();
         Chart.ConvertData(meta.BpmInfo).Format();
         
         // Handle UI Style

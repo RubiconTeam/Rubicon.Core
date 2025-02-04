@@ -18,7 +18,7 @@ public partial class RubiChart : Resource
     /// <summary>
     /// The current chart version.
     /// </summary>
-    public readonly static VersionInfo ChartVersion = new(1, 1, 0, 0);
+    public readonly static VersionInfo ChartVersion = new(1, 1, 1, 0);
     
     #region Public Variables
     /// <summary>

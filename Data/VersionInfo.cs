@@ -96,9 +96,16 @@ public partial class VersionInfo : Resource // Would be super useful if custom s
     /// <param name="tag">The tag added on</param>
     public VersionInfo(byte major, byte minor, byte patch, byte build, string tag = null)
     {
+        SetVersion(major, minor, patch, build, tag);
+    }
+
+    public void SetVersion(byte major, byte minor, byte patch, byte build, string tag = null)
+    {
         Raw = ((uint)major << 24) | ((uint)minor << 16) | ((uint)patch << 8) | build;
         Tag = tag ?? string.Empty;
     }
+
+    public uint GetRaw() => Raw;
 
     public override string ToString() => $"{Major}.{Minor}.{Patch}.{Build}{Tag}";
 }

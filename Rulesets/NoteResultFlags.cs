@@ -28,5 +28,10 @@ namespace Rubicon.Core.Rulesets;
     /// <summary>
     /// Will prevent the sing animation from being played if raised.
     /// </summary>
-    Animation = 0b00001000
+    Animation = 0b00001000,
+    
+    /// <summary>
+    /// Will prevent anything from happening to the vocals if raised.
+    /// </summary>
+    Vocals = 0b00010000
 }

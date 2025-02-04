@@ -248,7 +248,7 @@ public partial class ConductorInstance : Node
 	/// <returns>The raw time + the chart offset, in seconds</returns>
 	public float GetUncorrectedTime()
 	{
-		return RawTime + ChartOffset / 1000f;
+		return RawTime + ChartOffset;
 	}
 
 	/// <summary>

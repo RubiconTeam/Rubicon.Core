@@ -95,7 +95,7 @@ namespace Rubicon.Core.Rulesets;
     /// <summary>
     /// Triggers upon the statistics updating.
     /// </summary>
-    [Signal] public delegate void StatisticsUpdatedEventHandler(long combo, HitType hit, float distance);
+    [Signal] public delegate void StatisticsUpdatedEventHandler(long combo, Judgment hit, float distance);
     
     /// <summary>
     /// A signal that is emitted upon failure.
@@ -294,7 +294,7 @@ namespace Rubicon.Core.Rulesets;
     /// <summary>
     /// Triggers every time the player hits a note to update their health.
     /// </summary>
-    public abstract void UpdateHealth(HitType hit);
+    public abstract void UpdateHealth(Judgment hit);
     
     /// <summary>
     /// The fail condition for this play field.
@@ -323,41 +323,41 @@ namespace Rubicon.Core.Rulesets;
         if (isPlayer)
         {
             if (!result.Flags.HasFlag(NoteResultFlags.Health))
-                UpdateHealth(result.Hit);
+                UpdateHealth(result.Rating);
         
             if (!result.Flags.HasFlag(NoteResultFlags.Score))
             {
-                HitType hit = result.Hit;
-                bool isInitialTap = result.Note.Length == 0f || result.Note.Length > 0f && result.Holding && result.Tapped;
-                if (isInitialTap) // Tap note or initial tap of hold note
+                Judgment rating = result.Rating;
+                //GD.Print(result.Hit.ToString());
+                if (result.Hit == Hit.Tap || result.Hit == Hit.Hold) // Tap note or initial tap of hold note
                 {
                     ScoreTracker.TapsHit++;
                     
-                    switch (hit)
+                    switch (rating)
                     {
-                        case HitType.Perfect:
+                        case Judgment.Perfect:
                             ScoreTracker.PerfectHits++;
                             break;
-                        case HitType.Great:
+                        case Judgment.Great:
                             ScoreTracker.GreatHits++;
                             break;
-                        case HitType.Good:
+                        case Judgment.Good:
                             ScoreTracker.GoodHits++;
                             break;
-                        case HitType.Okay:
+                        case Judgment.Okay:
                             ScoreTracker.OkayHits++;
                             break;
-                        case HitType.Bad:
+                        case Judgment.Bad:
                             ScoreTracker.BadHits++;
                             break;
-                        case HitType.Miss:
+                        case Judgment.Miss:
                             ScoreTracker.Misses++;
                             if (result.Note.Length > 0)
                                 ScoreTracker.Misses++;
                             break;
                     }
 
-                    if (hit >= HitType.Okay)
+                    if (rating >= Judgment.Okay)
                     {
                         ScoreTracker.ComboBreaks++;
                         ScoreTracker.Combo = 0;
@@ -372,12 +372,12 @@ namespace Rubicon.Core.Rulesets;
                 }
                 else // Hold note end
                 {
-                    switch (hit)
+                    switch (rating)
                     {
-                        case HitType.Perfect:
+                        case Judgment.Perfect:
                             ScoreTracker.PerfectHits++;
                             break;
-                        case HitType.Miss:
+                        case Judgment.Miss:
                             ScoreTracker.Misses++;
                             ScoreTracker.Combo = 0;
                             ScoreTracker.ComboBreaks++;
@@ -385,7 +385,7 @@ namespace Rubicon.Core.Rulesets;
                     }
                 }
 
-                if (hit == HitType.Miss)
+                if (rating == Judgment.Miss)
                     ScoreTracker.MissStreak++;
                 else
                     ScoreTracker.MissStreak = 0;
@@ -394,8 +394,8 @@ namespace Rubicon.Core.Rulesets;
             
                 UpdateStatistics();
                 
-                if (isInitialTap)
-                    EmitSignalStatisticsUpdated(ScoreTracker.Combo, result.Hit, result.Distance);
+                if (result.Hit != Hit.Tail)
+                    EmitSignalStatisticsUpdated(ScoreTracker.Combo, result.Rating, result.Distance);
             }
         }
         
@@ -406,10 +406,10 @@ namespace Rubicon.Core.Rulesets;
     {
         ScoreTracker.Combo = 0;
         ScoreTracker.ComboBreaks++;
-        UpdateHealth(HitType.Miss);
+        UpdateHealth(Judgment.Miss);
         
         UpdateStatistics();
-        EmitSignalStatisticsUpdated(ScoreTracker.Combo, HitType.None, ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle() + 1f);
+        EmitSignalStatisticsUpdated(ScoreTracker.Combo, Judgment.None, ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle() + 1f);
     }
 
     public void InitializeGodotScript(Node node)

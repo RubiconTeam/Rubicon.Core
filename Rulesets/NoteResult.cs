@@ -24,19 +24,14 @@ namespace Rubicon.Core.Rulesets;
     [Export] public float Distance;
 
     /// <summary>
-    /// Whether the note was actually hit once before.
-    /// </summary>
-    [Export] public bool Tapped = false;
-    
-    /// <summary>
-    /// Whether this note is being held by the <see cref="NoteController"/> controlling it.
-    /// </summary>
-    [Export] public bool Holding = false;
-
-    /// <summary>
     /// The type of hit that was retrieved.
     /// </summary>
-    [Export] public HitType Hit;
+    [Export] public Judgment Rating;
+
+    /// <summary>
+    /// The type of hit this is.
+    /// </summary>
+    [Export] public Hit Hit;
 
     /// <summary>
     /// The direction to call upon singing.

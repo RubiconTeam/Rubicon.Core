@@ -182,14 +182,13 @@ namespace Rubicon.Core.Rulesets;
 		NoteResult result = _result;
 		result.Note = Notes[noteIndex];
 		result.Distance = distance;
-		result.Holding = holding;
 		result.Index = noteIndex;
 		
 		// Auto detect hit based on distance
-		if (result.Note.Length > 0 && !holding) // If hold note was let go
+		if (result.Note.Length > 0 && !holding && HoldingIndex == noteIndex) // If hold note was let go
 		{
-			result.Hit = Mathf.Abs(Conductor.CurrentMeasure - result.Note.Time - result.Note.Length) < 1f ? HitType.Perfect : HitType.Miss;
-			result.Tapped = true;
+			result.Rating = Mathf.Abs(Conductor.CurrentMeasure - result.Note.Time - result.Note.Length) < 1f ? Judgment.Perfect : Judgment.Miss;
+			result.Hit = Hit.Tail;
 		}
 		else
 		{
@@ -210,8 +209,8 @@ namespace Rubicon.Core.Rulesets;
 				}
 			}
 
-			result.Hit = (HitType)hit;
-			result.Tapped = result.Hit != HitType.Miss;
+			result.Rating = (Judgment)hit;
+			result.Hit = result.Note.Length > 0 && result.Rating != Judgment.Miss ? Hit.Hold : Hit.Tap;
 		}
 		
 		return result;

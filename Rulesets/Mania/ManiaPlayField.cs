@@ -131,27 +131,27 @@ namespace Rubicon.Core.Rulesets.Mania;
             ScoreTracker.Clear = ClearRank.Perfect;
     }
 
-    public override void UpdateHealth(HitType hit)
+    public override void UpdateHealth(Judgment hit)
     {
         int healthAddition = 0;
         switch (hit)
         {
-            case HitType.Perfect:
+            case Judgment.Perfect:
                 healthAddition = 3;
                 break;
-            case HitType.Great:
+            case Judgment.Great:
                 healthAddition = 2;
                 break;
-            case HitType.Good:
+            case Judgment.Good:
                 healthAddition = 1;
                 break;
-            case HitType.Okay:
+            case Judgment.Okay:
                 healthAddition = -1;
                 break;
-            case HitType.Bad:
+            case Judgment.Bad:
                 healthAddition = -2;
                 break;
-            case HitType.Miss:
+            case Judgment.Miss:
                 healthAddition = -5 - (int)ScoreTracker.MissStreak * 4;
                 break;
         }

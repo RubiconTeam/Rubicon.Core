@@ -138,9 +138,9 @@ namespace Rubicon.Core.Rulesets.Mania;
 	/// <inheritdoc/>
 	protected override void OnNoteHit(NoteResult result)
 	{
-		if (result.Hit != HitType.Miss)
+		if (result.Rating != Judgment.Miss)
 		{
-			if (!result.Holding)
+			if (result.Hit != Hit.Hold)
 			{
 				if (NoteHeld == null || NoteHeld != null && (Autoplay || !Autoplay && Input.IsActionPressed($"play_mania_{ParentBarLine.Managers.Length}k_{Lane}")))
 					LaneObject.Animation = $"{Direction}LaneConfirm";

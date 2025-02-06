@@ -122,12 +122,14 @@ public partial class DebugInfo : CanvasLayer
 	{
 		ConductorSB.Clear();
 
-		ConductorSB.AppendLine($"BPM: {Conductor.Bpm}, Audio Position: {Conductor.RawTime}\n");
-		foreach (BpmInfo bpm in Conductor.BpmList)
-			ConductorSB.AppendLine($"Time: {bpm.Time}, Exact Time (ms): {bpm.MsTime}, BPM: {bpm.Bpm}, Time Signature: {bpm.TimeSignatureNumerator}/{bpm.TimeSignatureDenominator}\n")
+		ConductorSB.AppendLine($"BPM: {Conductor.Bpm}, Audio Position: {Conductor.RawTime}")
 			.AppendLine($"Step: {Conductor.CurrentStep}")
 			.AppendLine($"Beat: {Conductor.CurrentBeat}")
-			.AppendLine($"Measure: {Conductor.CurrentMeasure}");
+			.AppendLine($"Measure: {Conductor.CurrentMeasure}");;
+
+		foreach (BpmInfo bpm in Conductor.BpmList)
+			ConductorSB.AppendLine(
+				$"Time: {bpm.Time}, Exact Time (ms): {bpm.MsTime}, BPM: {bpm.Bpm}, Time Signature: {bpm.TimeSignatureNumerator}/{bpm.TimeSignatureDenominator}");
 
 		ConductorInfo.Text = ConductorSB.ToString();
 	}

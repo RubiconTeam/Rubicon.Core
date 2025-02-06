@@ -188,8 +188,7 @@ namespace Rubicon.Core.Rulesets;
 		// Auto detect hit based on distance
 		if (result.Note.Length > 0 && !holding) // If hold note was let go
 		{
-			float holdLengthWindow = ProjectSettings.GetSetting("rubicon/judgments/hold_length_window").AsSingle();
-			result.Hit = Mathf.Abs(result.Distance) <= holdLengthWindow ? HitType.Perfect : HitType.Miss;
+			result.Hit = Mathf.Abs(Conductor.CurrentMeasure - result.Note.Time - result.Note.Length) < 1f ? HitType.Perfect : HitType.Miss;
 			result.Tapped = true;
 		}
 		else

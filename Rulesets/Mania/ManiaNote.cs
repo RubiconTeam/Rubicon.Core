@@ -85,6 +85,8 @@ namespace Rubicon.Core.Rulesets.Mania;
 		{
 			direction = NoteSkin.GetDirection(noteData.Lane, ParentController.ParentBarLine.Chart.Lanes).ToLower();
 			Note.Play($"{direction}NoteNeutral");
+			Note.TextureFilter = NoteSkin.Filter;
+			HoldContainer.TextureFilter = NoteSkin.Filter;
 			Note.Visible = true;
 		}
 		
@@ -171,10 +173,12 @@ namespace Rubicon.Core.Rulesets.Mania;
 		
 		// Do actual note skin graphic setting
 		Note.SpriteFrames = noteSkin.NoteAtlas;
+		Note.TextureFilter = NoteSkin.Filter;
 		Note.Scale = Vector2.One * NoteSkin.Scale;
 		
 		Tail.Centered = false;
 		Tail.SpriteFrames = noteSkin.HoldAtlas;
+		Tail.TextureFilter = NoteSkin.Filter;
 
 		if (Info == null || ParentController == null)
 			return;
@@ -182,6 +186,8 @@ namespace Rubicon.Core.Rulesets.Mania;
 		string direction = NoteSkin.GetDirection(Info.Lane, ParentController.ParentBarLine.Chart.Lanes).ToLower();
 		Texture2D holdTexture = NoteSkin.HoldAtlas.GetFrameTexture($"{direction}NoteHold", 0);
 		Hold.Texture = holdTexture;
+		Hold.TextureFilter = NoteSkin.Filter;
+		HoldContainer.TextureFilter = NoteSkin.Filter;
 		HoldContainer.Modulate = new Color(1f, 1f, 1f, 0.5f);
 		HoldContainer.Size = new Vector2(0f, holdTexture.GetHeight());
 		HoldContainer.Scale = NoteSkin.Scale;
@@ -204,7 +210,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 		
 		// Rough code, might clean up later if possible
 		string direction = maniaNoteManager.Direction;
-		int tailTexWidth = Tail.SpriteFrames.GetFrameTexture($"{direction}NoteTail", Tail.GetFrame()).GetWidth();
+		int tailTexWidth = Mathf.FloorToInt(Tail.SpriteFrames.GetFrameTexture($"{direction}NoteTail", Tail.GetFrame()).GetWidth() * NoteSkin.Scale.X);
 
 		float holdWidth = GetOnScreenHoldLength(Info.MsLength) * ParentController.ScrollSpeed *
 		                  (float)UserSettings.Gameplay.SpeedMultiplier;
@@ -237,8 +243,8 @@ namespace Rubicon.Core.Rulesets.Mania;
 		Hold.Position = holdPos;
 		
 		Texture2D tailFrame = Tail.SpriteFrames.GetFrameTexture($"{direction}NoteTail", Tail.GetFrame());
-		Vector2 tailTexSize = tailFrame.GetSize();
-		Tail.Position = new Vector2((initialHoldWidth - tailTexSize.X) / holdContainerScale.X + holdPos.X, Hold.Texture.GetHeight() - tailTexSize.Y);
+		Vector2 tailTexSize = tailFrame.GetSize() * NoteSkin.Scale;
+		Tail.Position = new Vector2((initialHoldWidth - tailTexSize.X) / holdContainerScale.X + holdPos.X, (Hold.Texture.GetHeight() * NoteSkin.Scale.Y) - tailTexSize.Y);
 	}
 
 	public ManiaNoteController GetParentManiaNoteManager()

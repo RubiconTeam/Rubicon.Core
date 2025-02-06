@@ -108,6 +108,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 		LaneObject.Name = "Lane Graphic";
 		LaneObject.Scale = Vector2.One * NoteSkin.Scale;
 		LaneObject.SpriteFrames = NoteSkin.LaneAtlas;
+		LaneObject.TextureFilter = NoteSkin.Filter;
 		LaneObject.Play($"{Direction}LaneNeutral", 1f, true);
 		LaneObject.AnimationFinished += OnAnimationFinish;
 		AddChild(LaneObject);

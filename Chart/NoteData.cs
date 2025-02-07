@@ -1,4 +1,7 @@
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using Array = Godot.Collections.Array;
 
 namespace Rubicon.Core.Chart;
 
@@ -16,7 +19,7 @@ public partial class NoteData : Resource
     /// <summary>
     /// The note's type.
     /// </summary>
-    [Export] public StringName Type = "normal";
+    [Export] public StringName Type = "Normal";
 
     /// <summary>
     /// Starting point of the note. Stored on disk in measures.

@@ -1,4 +1,6 @@
+using System.Linq;
 using Godot.Collections;
+using Rubicon.Core;
 using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
 using Rubicon.Core.Settings;
@@ -178,6 +180,7 @@ namespace Rubicon.Core.Rulesets;
 	protected virtual NoteResult GetResult(int noteIndex, float distance, bool holding)
 	{
 		NoteResult result = _result;
+		result.Reset();
 		result.Note = Notes[noteIndex];
 		result.Distance = distance;
 		result.Index = noteIndex;

@@ -16,6 +16,8 @@
 
 global using Godot;
 global using System;
+using System.Collections.Generic;
+using System.IO;
 using Godot.Collections;
 using Rubicon.Core;
 using Rubicon.Core.Data;
@@ -43,8 +45,10 @@ public partial class RubiconEngineInstance : Node
 	/// The minimum aspect ratio the viewport can scale up to.
 	/// </summary>
 	[Export] public float MaximumAspectRatio = ProjectSettings.GetSetting("rubicon/general/maximum_aspect_ratio").AsSingle();
+
+	[Export] public Godot.Collections.Dictionary<StringName, string> NoteTypePaths = new();
 	
-	[Export] public Dictionary<string, Array<InputEvent>> DefaultInputMap = new();
+	[Export] public Godot.Collections.Dictionary<string, Array<InputEvent>> DefaultInputMap = new();
 
 	private Window _mainWindow;
 
@@ -62,6 +66,19 @@ public partial class RubiconEngineInstance : Node
 		Array<StringName> actionNames = InputMap.GetActions();
 		foreach (string actionName in actionNames) 
 			DefaultInputMap[actionName] = InputMap.ActionGetEvents(actionName);
+		
+		List<string> noteTypePaths = [];
+		noteTypePaths.AddRange(PathUtility.GetAbsoluteFilePathsAt("res://Resources/Game/Notetypes/", true));
+		for (int i = 0; i < noteTypePaths.Count; i++)
+		{
+			string path = noteTypePaths[i];
+			string noteType = Path.GetFileNameWithoutExtension(path.GetFile());
+			string ext = path.GetExtension().ToLower();
+			if (NoteTypePaths.ContainsKey(noteType) || noteType.ToLower() == "normal" || (ext != "tscn" && ext != "scn" && ext != "cs" && ext != "gd"))
+				continue;
+			
+			NoteTypePaths.Add(noteType, path);
+		}
 	}
 
 	public override void _Process(double delta)

@@ -1,4 +1,6 @@
+using System.Linq;
 using Rubicon.Core.Chart;
+using Rubicon.Core.Data;
 
 namespace Rubicon.Core.Meta;
 
@@ -18,12 +20,6 @@ namespace Rubicon.Core.Meta;
     [Export] public string Name = "Test";
 
     /// <summary>
-    /// The raw name of the song used to load it.
-    /// Should be PascalCased and not contain any spaces or symbols.
-    /// </summary>
-    [Export] public string InternalName = "Test";
-
-    /// <summary>
     /// The artist who made the song.
     /// </summary>
     [Export] public string Artist = "Hideo Kojima";
@@ -37,6 +33,8 @@ namespace Rubicon.Core.Meta;
     /// The vocals for this song.
     /// </summary>
     [Export] public AudioStream Vocals;
+
+    [Export] public SongDifficulty[] Difficulties = [];
     
     /// <summary>
     /// A list of BPM changes.
@@ -93,5 +91,65 @@ namespace Rubicon.Core.Meta;
             BpmInfo[i].MsTime = BpmInfo[i - 1].MsTime + ConductorUtility.MeasureToMs(BpmInfo[i].Time - BpmInfo[i - 1].Time, BpmInfo[i - 1].Bpm, BpmInfo[i].TimeSignatureNumerator);
 
         return this;
+    }
+
+    /// <summary>
+    /// Gets a difficulty by direct index.
+    /// </summary>
+    /// <param name="index">The index to search for</param>
+    /// <returns>A difficulty if found, null if not.</returns>
+    public SongDifficulty GetDifficultyByIndex(int index)
+    {
+        if (index >= Difficulties.Length)
+            return null;
+        
+        return Difficulties[index];
+    }
+
+    /// <summary>
+    /// Gets a difficulty by name and ruleset.
+    /// </summary>
+    /// <param name="name">The name to search for.</param>
+    /// <param name="ruleSet">The ruleset the difficulty is associated with.</param>
+    /// <returns>A difficulty if found, null if not.</returns>
+    public SongDifficulty GetDifficultyByName(string name, string ruleSet)
+    {
+        int index = FindDifficulty(name, ruleSet);
+        if (index == -1)
+            return null;
+
+        return GetDifficultyByIndex(index);
+    }
+
+    /// <summary>
+    /// Gets the first difficulty for the ruleset provided.
+    /// </summary>
+    /// <param name="ruleSet">A ruleset name.</param>
+    /// <returns>A difficulty if found, null if not.</returns>
+    public SongDifficulty GetFirstDifficultyOfRuleSet(string ruleSet)
+    {
+        return Difficulties.FirstOrDefault(x => x.RuleSet == ruleSet);
+    }
+
+    /// <summary>
+    /// Finds the index of a difficulty with the name provided.
+    /// </summary>
+    /// <param name="name">The name to search for.</param>
+    /// <param name="ruleSet">The ruleset the difficulty is associated with.</param>
+    /// <returns>Its index if found, -1 if not.</returns>
+    public int FindDifficulty(string name, string ruleSet)
+    {
+        return Array.FindIndex(Difficulties, x => x.Name == name && x.RuleSet == ruleSet);
+    }
+
+    /// <summary>
+    /// Checks if this song meta has any difficulty with the name provided.
+    /// </summary>
+    /// <param name="name">The name to search for</param>
+    /// <param name="ruleSet">The reulset the difficulty is associated with.</param>
+    /// <returns>True if found, false if not.</returns>
+    public bool HasDifficulty(string name, string ruleSet)
+    {
+        return Difficulties.Any(x => x.Name == name && x.RuleSet == ruleSet);
     }
 }

@@ -1,4 +1,5 @@
-using System.Collections.Generic;
+using System.Linq;
+using Godot.Collections;
 using Rubicon.Core.API;
 using Rubicon.Core.Audio;
 using Rubicon.Core.Chart;
@@ -103,7 +104,7 @@ namespace Rubicon.Core.Rulesets;
     /// <summary>
     /// Emitted for every note type to set everything up initially.
     /// </summary>
-    [Signal] public delegate void InitializeNoteEventHandler(NoteData[] notes, StringName noteType);
+    [Signal] public delegate void InitializeNoteEventHandler(Array<NoteData> notes, StringName noteType);
     
     /// <summary>
     /// A signal that is emitted in case other note types need to modify the note result.
@@ -169,7 +170,7 @@ namespace Rubicon.Core.Rulesets;
         
         BarLines = new BarLine[chart.Charts.Length];
         TargetBarLine = meta.PlayableCharts[targetIndex];
-        Dictionary<StringName, List<NoteData>> noteTypeMap = new Dictionary<StringName, List<NoteData>>();
+        Dictionary<StringName, Array<NoteData>> noteTypeMap = new Dictionary<StringName, Array<NoteData>>();
         for (int i = 0; i < chart.Charts.Length; i++)
         {
             IndividualChart indChart = chart.Charts[i];
@@ -227,10 +228,40 @@ namespace Rubicon.Core.Rulesets;
             Hud.Setup(this);
             Hud.UpdatePosition(UserSettings.Gameplay.DownScroll);
         }
+
+        // TODO: BAD CODE, CHANGE LATER
+        foreach (StringName noteType in noteTypeMap.Keys)
+        {
+            if (!RubiconEngine.NoteTypePaths.ContainsKey(noteType))
+                continue;
+            
+            string noteTypePath = RubiconEngine.NoteTypePaths[noteType];
+            Resource noteTypeResource = ResourceLoader.LoadThreadedGet(noteTypePath);
+            if (noteTypeResource is PackedScene packedScene)
+            {
+                Node node = packedScene.Instantiate();
+                InitializeGodotScript(node);
+                AddChild(node);
+            }
+
+            if (noteTypeResource is GDScript gdScript)
+            {
+                Node node = gdScript.New().As<Node>();
+                InitializeGodotScript(node);
+                AddChild(node);
+            }
+
+            if (noteTypeResource is CSharpScript csScript)
+            {
+                Node node = csScript.New().As<Node>();
+                InitializeGodotScript(node);
+                AddChild(node);
+            }
+        }
         
         foreach (var pair in noteTypeMap)
         {
-            EmitSignalInitializeNote(pair.Value.ToArray(), pair.Key);
+            EmitSignalInitializeNote(pair.Value, pair.Key);
             pair.Value.Clear();
         }
         

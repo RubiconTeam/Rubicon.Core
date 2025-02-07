@@ -42,4 +42,11 @@ namespace Rubicon.Core.Rulesets;
     /// Flags that prevent one action or multiple actions from being executed, if raised.
     /// </summary>
     [Export] public NoteResultFlags Flags = NoteResultFlags.None;
+
+    public void Reset()
+    {
+        Hit = Hit.Tap;
+        Rating = Judgment.None;
+        Flags = NoteResultFlags.None;
+    }
 }

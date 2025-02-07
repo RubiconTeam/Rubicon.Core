@@ -1,6 +1,11 @@
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
+using System.Text;
+using Godot.Collections;
 using Rubicon.Core.Data;
+using Array = Godot.Collections.Array;
+using Range = System.Range;
 
 namespace Rubicon.Core.Chart;
 

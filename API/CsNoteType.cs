@@ -1,3 +1,4 @@
+using Godot.Collections;
 using Rubicon.Core.Chart;
 using Rubicon.Core.Rulesets;
 using Rubicon.Game;
@@ -25,7 +26,7 @@ namespace Rubicon.Core.API;
         PlayField playField = RubiconGame.Singleton.PlayField;
         playField.Factory.SpawnNote += SpawnNote;
         playField.InitializeNote += InitializeNote;
-        playField.NoteHit += NoteHit;
+        playField.ModifyResult += NoteHit;
 
         _initialized = true;
     }
@@ -35,7 +36,7 @@ namespace Rubicon.Core.API;
     /// </summary>
     /// <param name="notes">An array of notes</param>
     /// <param name="noteType">The note type</param>
-    protected abstract void InitializeNote(NoteData[] notes, StringName noteType);
+    protected abstract void InitializeNote(Array<NoteData> notes, StringName noteType);
 
     /// <summary>
     /// Triggers when the factory spawns a note of this type. Use this to set up your note.

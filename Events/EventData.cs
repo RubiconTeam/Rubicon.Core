@@ -1,6 +1,7 @@
 using System.Linq;
 using Godot.Collections;
 using Rubicon.Core.Chart;
+using Array = Godot.Collections.Array;
 
 namespace Rubicon.Core.Events;
 
@@ -11,11 +12,11 @@ public partial class EventData : Resource
     /// The time to trigger this event. Stored on disk in measures.
     /// </summary>
     [Export] public float Time = 0f;
-        
+
     /// <summary>
     /// The event's name.
     /// </summary>
-    [Export] public StringName Name = "normal";
+    [Export] public StringName Name;
 
     /// <summary>
     /// The event's arguments.

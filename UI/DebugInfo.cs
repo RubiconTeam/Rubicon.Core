@@ -48,14 +48,13 @@ public partial class DebugInfo : CanvasLayer
 	
 	private static string ConvertToMemoryFormat(ulong mem)
 	{
-		if (mem >= 0x40000000)
-			return (float)Math.Round(mem / 1024f / 1024f / 1024f, 2) + " GB";
-		if (mem >= 0x100000)
-			return (float)Math.Round(mem / 1024f / 1024f, 2) + " MB";
-		if (mem >= 0x400)
-			return (float)Math.Round(mem / 1024f, 2) + " KB";
-
-		return mem + " B";
+		return mem switch
+		{
+			>= 0x40000000 => (float)Math.Round(mem / 1024f / 1024f / 1024f, 2) + " GB",
+			>= 0x100000 => (float)Math.Round(mem / 1024f / 1024f, 2) + " MB",
+			>= 0x400 => (float)Math.Round(mem / 1024f, 2) + " KB",
+			_ => mem + " B"
+		};
 	}
 	
 	public override void _PhysicsProcess(double delta)
@@ -97,7 +96,7 @@ public partial class DebugInfo : CanvasLayer
 	private void UpdateStaticLabels()
 	{
 		GameVersion.Text = $"{ProjectSettings.GetSetting("application/config/name").AsString()} {ProjectSettings.GetSetting("application/config/version").AsString()} {(OS.IsDebugBuild() ? "[Debug]" : "[Release]")}";
-		RubiconVersion.Text = $"Rubicon Engine Idk"; // TODO: FIX THIS
+		RubiconVersion.Text = $"Rubicon Engine {ProjectSettings.GetSetting("rubicon/general/engine_version").AsString()}";
 		GodotVersion.Text = $"Godot Engine {Engine.GetVersionInfo()["major"]}.{Engine.GetVersionInfo()["minor"]}.{Engine.GetVersionInfo()["patch"]} [{Engine.GetVersionInfo()["status"]}]";
 	}
 
@@ -128,8 +127,7 @@ public partial class DebugInfo : CanvasLayer
 			.AppendLine($"Measure: {Conductor.CurrentMeasure}");;
 
 		foreach (BpmInfo bpm in Conductor.BpmList)
-			ConductorSB.AppendLine(
-				$"Time: {bpm.Time}, Exact Time (ms): {bpm.MsTime}, BPM: {bpm.Bpm}, Time Signature: {bpm.TimeSignatureNumerator}/{bpm.TimeSignatureDenominator}");
+			ConductorSB.AppendLine($"Time: {bpm.Time}, Exact Time (ms): {bpm.MsTime}, BPM: {bpm.Bpm}, Time Signature: {bpm.TimeSignatureNumerator}/{bpm.TimeSignatureDenominator}");
 
 		ConductorInfo.Text = ConductorSB.ToString();
 	}

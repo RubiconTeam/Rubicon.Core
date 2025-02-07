@@ -59,8 +59,7 @@ public partial class UserSettingsData
     public partial AttributeData[] GetAttributesForSetting(string key);
 }
 
-// now i closed it lol
-[RubiconSettingsGroup("Gameplay")]
+[RubiconSettingsSection(name: "Gameplay", generateInMenu: true, iconPath: "res://Assets/UI/Menus/Settings/Gameplay.png", sectionName: "Gameplay")]
 public class GameplaySection
 {
     [StepValue(0.01f, 1f, 1f)] 
@@ -107,7 +106,7 @@ public class VideoSection
     }
 }
 
-[RubiconSettingsSection(name: "Video", generateInMenu: true, iconPath: "res://Assets/UI/Menus/Settings/Video.png", sectionName: "Video")]
+[RubiconSettingsSection(name: "Audio", generateInMenu: true, iconPath: "res://Assets/UI/Menus/Settings/Audio.png", sectionName: "Audio")]
 public class AudioSection
 {
     [StepValue(1, 0f, 100f)] 
@@ -120,13 +119,13 @@ public class AudioSection
     public double SfxVolume = 1.0;
 }
 
-[RubiconSettingsGroup("Miscellaneous")]
+[RubiconSettingsSection(name: "Miscellaneous", generateInMenu: true, iconPath: "res://Assets/UI/Menus/Settings/Miscellaneous.png", sectionName: "Miscellaneous")]
 public class MiscSection
 {
     public bool PrintErrorsOnScreen = false;
 }
 
-[RubiconSettingsGroup("Keybinds")]
+[RubiconSettingsSection(name: "Keybinds", generateInMenu: true, iconPath: "res://Assets/UI/Menus/Settings/Keybinds.png", sectionName: "Keybinds")]
 public class InputMapSection
 {
     public Dictionary<string, Array<InputEvent>> Map;

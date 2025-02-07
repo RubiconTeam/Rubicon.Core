@@ -9,7 +9,7 @@ public static class PathUtility
         if (!DirAccess.DirExistsAbsolute(path))
             return [];
         
-        List<string> pathList = new();
+        List<string> pathList = [];
         if (recursive)
         {
             string[] directories = DirAccess.GetDirectoriesAt(path);

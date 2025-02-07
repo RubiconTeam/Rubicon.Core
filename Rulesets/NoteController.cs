@@ -84,7 +84,7 @@ namespace Rubicon.Core.Rulesets;
 	/// <summary>
 	/// The queue list for notes to be processed next frame.
 	/// </summary>
-	[Export] public Array<NoteResult> ProcessQueue = new();
+	[Export] public Array<NoteResult> ProcessQueue = [];
 
 	/// <summary>
 	/// The <see cref="InputEvent"/> name for this controller.

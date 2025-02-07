@@ -24,7 +24,7 @@ namespace Rubicon.Core.Rulesets;
     public Note GetNote(StringName type)
     {
         if (!HitObjects.ContainsKey(type))
-            HitObjects.Add(type, new Array<Note>());
+            HitObjects.Add(type, []);
 
         Note result = HitObjects[type].FirstOrDefault(x => !x.Active);
         if (result != null)

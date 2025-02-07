@@ -28,7 +28,7 @@ namespace Rubicon.Core.Audio;
         Player.Bus = bus;
         AddChild(Player);
         
-        SubPlayers = new Array<AudioStreamPlayer>();
+        SubPlayers = [];
         _autoDestroyMap = new Dictionary<AudioStreamPlayer, bool>();
     }
 

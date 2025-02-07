@@ -181,7 +181,7 @@ namespace Rubicon.Core.Rulesets;
                 StringName noteType = curNote.Type;
                 
                 if (!noteTypeMap.ContainsKey(noteType))
-                    noteTypeMap[noteType] = new List<NoteData>();
+                    noteTypeMap[noteType] = [];
                 
                 noteTypeMap[noteType].Add(curNote);
             }

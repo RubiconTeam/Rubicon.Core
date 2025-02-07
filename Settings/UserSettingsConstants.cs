@@ -2,8 +2,8 @@ namespace Rubicon.Core.Settings;
 
 public static class UserSettingsConstants
 {
-	public static readonly string[] InputActionExclusionList = new string[]
-	{
+	public static readonly string[] InputActionExclusionList =
+	[
 		"ui_accept", 
 		"ui_select", 
 		"ui_cancel", 
@@ -79,6 +79,6 @@ public static class UserSettingsConstants
 		"ui_filedialog_up_one_level",
 		"ui_filedialog_refresh",
 		"ui_filedialog_show_hidden",
-		"ui_swap_input_direction"	
-	};    
+		"ui_swap_input_direction"
+	];    
 }

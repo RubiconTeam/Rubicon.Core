@@ -82,7 +82,7 @@ public partial class RubiChart : Resource
     {
         for (int c = 0; c < Charts.Length; c++)
         {
-            List<NoteData> notes = new List<NoteData>();
+            List<NoteData> notes = [];
 
             for (int l = 0; l < Charts[c].Lanes; l++)
             {

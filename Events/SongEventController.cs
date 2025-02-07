@@ -15,7 +15,7 @@ namespace Rubicon.Core.Events;
     public void Setup(EventMeta eventMeta, PlayField playField)
     {
         _events = eventMeta.Events;
-        List<StringName> eventsInitialized = new List<StringName>();
+        List<StringName> eventsInitialized = [];
         for (int i = 0; i < _events.Length; i++)
         {
             if (eventsInitialized.Contains(_events[i].Name))

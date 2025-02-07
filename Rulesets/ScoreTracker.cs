@@ -55,7 +55,7 @@ namespace Rubicon.Core.Rulesets;
             return;
         
         float startTime = 0;
-        List<TargetSwitch> switches = new List<TargetSwitch>(playerChart.Switches);
+        List<TargetSwitch> switches = [..playerChart.Switches];
         switches.Insert(0, new TargetSwitch{ Time = 0f, MsTime = 0f, Name = target });
         for (int i = 0; i < switches.Count; i++)
         {

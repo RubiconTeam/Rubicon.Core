@@ -59,6 +59,8 @@ public partial class UserSettingsData
     public partial AttributeData[] GetAttributesForSetting(string key);
 }
 
+// now i closed it lol
+[RubiconSettingsGroup("Gameplay")]
 public class GameplaySection
 {
     [StepValue(0.01f, 1f, 1f)] 
@@ -77,6 +79,7 @@ public class GameplaySection
     public bool Autoplay = false;
 }
 
+[RubiconSettingsSection(name: "Video", generateInMenu: true, iconPath: "res://Assets/UI/Menus/Settings/Video.png", sectionName: "Video")]
 public class VideoSection
 {
     [ProjectSetting("display/window/size/mode")] 
@@ -92,6 +95,8 @@ public class VideoSection
     public int MaxFps;
 
     public Settings3DSection Settings3D;
+    
+    [RubiconSettingsGroup("3D Settings")]
     public class Settings3DSection
     {
         [ProjectSetting("rendering/scaling_3d/scale")] 
@@ -102,6 +107,7 @@ public class VideoSection
     }
 }
 
+[RubiconSettingsSection(name: "Video", generateInMenu: true, iconPath: "res://Assets/UI/Menus/Settings/Video.png", sectionName: "Video")]
 public class AudioSection
 {
     [StepValue(1, 0f, 100f)] 
@@ -114,11 +120,13 @@ public class AudioSection
     public double SfxVolume = 1.0;
 }
 
+[RubiconSettingsGroup("Miscellaneous")]
 public class MiscSection
 {
     public bool PrintErrorsOnScreen = false;
 }
 
+[RubiconSettingsGroup("Keybinds")]
 public class InputMapSection
 {
     public Dictionary<string, Array<InputEvent>> Map;

@@ -8,6 +8,7 @@ public partial class UserSettingsInstance : Node
 {
 	private UserSettingsData _data;
 	
+	// i need to store this somewhere
 	public static readonly string[] InputActionExclusionList =
 	[
 		"ui_accept", 
@@ -117,15 +118,12 @@ public partial class UserSettingsInstance : Node
 
 	public void UpdateBinds()
 	{
-		foreach (var bind in Bindings.Map)
+		foreach (var (curAction, events) in Bindings.Map)
 		{
-			string curAction = bind.Key;
-			Array<InputEvent> events = bind.Value;
-
 			InputMap.ActionEraseEvents(curAction);
 
-			for (int i = 0; i < events.Count; i++)
-				InputMap.ActionAddEvent(curAction, events[i]);
+			foreach (var t in events)
+				InputMap.ActionAddEvent(curAction, t);
 		}
 	}
 
@@ -169,15 +167,17 @@ public partial class UserSettingsInstance : Node
 	/// </summary>
 	public void Reset()
 	{
-		_data = new UserSettingsData();
-		_data.Bindings.Map = RubiconEngine.DefaultInputMap.Duplicate();
+		_data = new UserSettingsData
+		{
+			Bindings =
+			{
+				Map = RubiconEngine.DefaultInputMap.Duplicate()
+			}
+		};
 	}
-
+	
 	/// <inheritdoc cref="UserSettingsData.GetSetting"/>
-	public Variant GetSetting(string key)
-	{
-		return _data.GetSetting(key);
-	}
+	public Variant GetSetting(string key) => _data.GetSetting(key);
 
 	/// <inheritdoc cref="UserSettingsData.SetSetting"/>
 	public void SetSetting(string key, Variant value)
@@ -186,20 +186,11 @@ public partial class UserSettingsInstance : Node
 	}
 
 	/// <inheritdoc cref="UserSettingsData.GetSections"/>
-	public string[] GetSections()
-	{
-		return _data.GetSections();
-	}
+	public string[] GetSections() => _data.GetSections();
 
 	/// <inheritdoc cref="UserSettingsData.GetSectionKeys"/>
-	public string[] GetSectionKeys(string section)
-	{
-		return _data.GetSectionKeys(section);
-	}
+	public string[] GetSectionKeys(string section) => _data.GetSectionKeys(section);
 
 	/// <inheritdoc cref="UserSettingsData.GetAttributesForSetting"/>
-	public AttributeData[] GetAttributesForSetting(string key)
-	{
-		return _data.GetAttributesForSetting(key);
-	}
+	public AttributeData[] GetAttributesForSetting(string key) => _data.GetAttributesForSetting(key);
 }

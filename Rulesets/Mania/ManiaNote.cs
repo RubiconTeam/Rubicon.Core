@@ -31,6 +31,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 	/// </summary>
 	public AnimatedSprite2D Tail;
 
+	private Color _missedModulate = new Color(0.6f,0.6f,0.6f,0.6f);
 	private float _tailOffset = 0f;
 
 	public override void Initialize()
@@ -118,9 +119,8 @@ namespace Rubicon.Core.Rulesets.Mania;
 		if (!Active || parent == null || !Visible || Info == null)
 			return;
 
-		Color modulate = Modulate;
-		modulate.A = Missed ? 0.5f : 1f;
-		Modulate = modulate;
+		if (Missed)
+			Modulate = _missedModulate;
 		
 		// Updating position and all that, whatever the base class does.
 		base._Process(delta);
@@ -270,6 +270,9 @@ namespace Rubicon.Core.Rulesets.Mania;
 		base.Reset();
 		Note.Visible = true;
 		_tailOffset = 0f;
+		
+		// New modulate in case a missed note gets reset
+		Modulate = Colors.White;
 	}
 	
 	/// <summary>

@@ -212,6 +212,8 @@ namespace Rubicon.Core.Rulesets;
 			result.Rating = (Judgment)hit;
 			result.Hit = result.Note.Length > 0 && result.Rating != Judgment.Miss ? Hit.Hold : Hit.Tap;
 		}
+
+		HitObjects[noteIndex].Missed = result.Rating == Judgment.Miss;
 		
 		return result;
 	}

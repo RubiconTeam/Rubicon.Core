@@ -1,6 +1,3 @@
-using Rubicon.Core;
-using Rubicon.Game;
-
 namespace Rubicon.Core.API;
 
 [GlobalClass] public abstract partial class CsTimerBar : CsHudElement

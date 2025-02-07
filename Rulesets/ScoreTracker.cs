@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
-using Range = System.Range;
 
 namespace Rubicon.Core.Rulesets;
 

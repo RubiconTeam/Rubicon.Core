@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Rubicon.Core.API;
 using Rubicon.Core.Audio;
 using Rubicon.Core.Chart;

@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Array = Godot.Collections.Array;
 
 namespace Rubicon.Core.Chart;
 

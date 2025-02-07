@@ -1,6 +1,5 @@
 using System.Linq;
 using Godot.Collections;
-using Rubicon.Core.Chart;
 
 namespace Rubicon.Core.Rulesets;
 

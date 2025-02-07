@@ -1,5 +1,3 @@
-using Rubicon.Core.Chart;
-
 namespace Rubicon.Core.Rulesets.Mania;
 
 [GlobalClass] public partial class ManiaNoteFactory : NoteFactory

@@ -1,7 +1,6 @@
 using System.Linq;
 using Godot.Collections;
 using Rubicon.Core.Chart;
-using Array = Godot.Collections.Array;
 
 namespace Rubicon.Core.Events;
 

@@ -61,36 +61,57 @@ public partial class UserSettingsData
 
 public class GameplaySection
 {
-    [StepValue(0.01f, 1f, 1f)] public double Offset = 0d;
-    [StepValue(0.01f, 1f, 1f)] public double VisualOffset = 0d;
+    [StepValue(0.01f, 1f, 1f)] 
+    public double Offset = 0d;
+    
+    [StepValue(0.01f, 1f, 1f)] 
+    public double VisualOffset = 0d;
+    
+    [StepValue(0.01f, 1f, 1f)] 
+    public double SpeedMultiplier = 1d;
+    
     public bool DownScroll = false;
     public bool CenterBarLine = false;
     public bool GhostTapping = false;
     public bool FlashingLights = true;
     public bool Autoplay = false;
-    [StepValue(0.01f, 1f, 1f)] public double SpeedMultiplier = 1d;
 }
 
 public class VideoSection
 {
-    [ProjectSetting("display/window/size/mode")] public Window.ModeEnum Fullscreen;
-    [ProjectSetting("rubicon/general/starting_window_size")] public Vector2I Resolution;
-    [ProjectSetting("display/window/vsync/vsync_mode")] public DisplayServer.VSyncMode VSync;
-    [ProjectSetting("application/run/max_fps")] public int MaxFps;
+    [ProjectSetting("display/window/size/mode")] 
+    public Window.ModeEnum Fullscreen;
+    
+    [ProjectSetting("rubicon/general/starting_window_size")] 
+    public Vector2I Resolution;
+    
+    [ProjectSetting("display/window/vsync/vsync_mode")] 
+    public DisplayServer.VSyncMode VSync;
+    
+    [ProjectSetting("application/run/max_fps")] 
+    public int MaxFps;
 
     public Settings3DSection Settings3D;
     public class Settings3DSection
     {
-        [ProjectSetting("rendering/scaling_3d/scale")] public Viewport.Scaling3DModeEnum Scaling3DMode;
-        [ProjectSetting("rendering/scaling_3d/fsr_sharpness")] public float FsrSharpness;
+        [ProjectSetting("rendering/scaling_3d/scale")] 
+        public Viewport.Scaling3DModeEnum Scaling3DMode;
+        
+        [ProjectSetting("rendering/scaling_3d/fsr_sharpness")] 
+        public float FsrSharpness;
     }
 }
 
 public class AudioSection
 {
-    [StepValue(1, 0f, 100f)] public double MasterVolume = 1.0;
-    [StepValue(1, 0f, 100f)] public double MusicVolume = 1.0;
-    [StepValue(1, 0f, 100f)] public double SfxVolume = 1.0;
+    [StepValue(1, 0f, 100f)] 
+    public double MasterVolume = 1.0;
+    
+    [StepValue(1, 0f, 100f)] 
+    public double MusicVolume = 1.0;
+    
+    [StepValue(1, 0f, 100f)] 
+    public double SfxVolume = 1.0;
 }
 
 public class MiscSection

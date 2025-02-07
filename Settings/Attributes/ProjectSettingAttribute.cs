@@ -1,4 +1,4 @@
-namespace Rubicon.Core.Settings;
+namespace Rubicon.Core.Settings.Attributes;
 
 /// <summary>
 /// An attribute to automatically populate a field with a value from a Godot project setting.

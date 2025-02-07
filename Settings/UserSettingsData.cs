@@ -1,4 +1,5 @@
 using Godot.Collections;
+using Rubicon.Core.Data;
 using Rubicon.Core.Settings.Attributes;
 
 namespace Rubicon.Core.Settings;
@@ -49,6 +50,13 @@ public partial class UserSettingsData
     /// <param name="section">The section</param>
     /// <returns>An array of keys if section is found, empty array if not.</returns>
     public partial string[] GetSectionKeys(string section);
+    
+    /// <summary>
+    /// Gets all attributes for a setting.
+    /// </summary>
+    /// <param name="key">The setting</param>
+    /// <returns>An array of one or multiple attribute data.</returns>
+    public partial AttributeData[] GetAttributesForSetting(string key);
 }
 
 public class GameplaySection

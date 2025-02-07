@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Godot.Collections;
+using Rubicon.Core.Data;
 using Rubicon.Core.Settings.Attributes;
 using Array = Godot.Collections.Array;
 
@@ -119,5 +120,11 @@ public partial class UserSettingsInstance : Node
 	public string[] GetSectionKeys(string section)
 	{
 		return _data.GetSectionKeys(section);
+	}
+
+	/// <inheritdoc cref="UserSettingsData.GetAttributesForSetting"/>
+	public AttributeData[] GetAttributesForSetting(string key)
+	{
+		return _data.GetAttributesForSetting(key);
 	}
 }

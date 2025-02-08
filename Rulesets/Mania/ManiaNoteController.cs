@@ -159,8 +159,8 @@ namespace Rubicon.Core.Rulesets.Mania;
 				HoldingIndex = -1;
 				LaneObject.Play();
 				
-				if (result.Rating <= Judgment.Great)
-					GenerateSplashSprite();
+				if (result.Rating <= Judgment.Great && result.Hit == Hit.Tap)
+					GenerateTapSplash();
 				
 				RemoveChild(HitObjects[result.Index]);
 				HitObjects[result.Index].PrepareRecycle();
@@ -242,7 +242,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 			LaneObject.Play($"{Direction}LaneNeutral", 1f, true);
 	}
 
-	private void GenerateSplashSprite()
+	private void GenerateTapSplash()
 	{
 		if (_splashCount == 0)
 			return;

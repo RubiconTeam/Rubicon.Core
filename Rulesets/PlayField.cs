@@ -367,18 +367,25 @@ namespace Rubicon.Core.Rulesets;
                         {
                             case Judgment.Perfect:
                                 ScoreTracker.PerfectHits++;
+                                ScoreTracker.Combo++;
                                 break;
                             case Judgment.Great:
                                 ScoreTracker.GreatHits++;
+                                ScoreTracker.Combo++;
                                 break;
                             case Judgment.Good:
                                 ScoreTracker.GoodHits++;
+                                ScoreTracker.Combo++;
                                 break;
                             case Judgment.Okay:
                                 ScoreTracker.OkayHits++;
+                                ScoreTracker.ComboBreaks++;
+                                ScoreTracker.Combo = 0;
                                 break;
                             case Judgment.Bad:
                                 ScoreTracker.BadHits++;
+                                ScoreTracker.ComboBreaks++;
+                                ScoreTracker.Combo = 0;
                                 break;
                             case Judgment.Miss:
                                 ScoreTracker.Misses++;
@@ -386,19 +393,6 @@ namespace Rubicon.Core.Rulesets;
                                     ScoreTracker.Misses++;
                                 break;
                         }
-
-                        if (rating >= Judgment.Okay)
-                        {
-                            ScoreTracker.ComboBreaks++;
-                            ScoreTracker.Combo = 0;
-                        }
-                        else
-                        {
-                            ScoreTracker.Combo++;
-                        }
-                
-                        if (ScoreTracker.Combo > ScoreTracker.HighestCombo)
-                            ScoreTracker.HighestCombo = ScoreTracker.Combo;   
                     }
                     else // Hold note end
                     {
@@ -409,8 +403,6 @@ namespace Rubicon.Core.Rulesets;
                                 break;
                             case Judgment.Miss:
                                 ScoreTracker.Misses++;
-                                ScoreTracker.Combo = 0;
-                                ScoreTracker.ComboBreaks++;
                                 break;
                         }
                     }   
@@ -419,9 +411,18 @@ namespace Rubicon.Core.Rulesets;
                 }
 
                 if (rating == Judgment.Miss)
+                {
                     ScoreTracker.MissStreak++;
+                    ScoreTracker.Combo = 0;
+                    ScoreTracker.ComboBreaks++;
+                }
                 else if (rating != Judgment.None)
-                    ScoreTracker.MissStreak = 0;
+                {
+                    ScoreTracker.MissStreak = 0;   
+                }
+                
+                if (ScoreTracker.Combo > ScoreTracker.HighestCombo)
+                    ScoreTracker.HighestCombo = ScoreTracker.Combo;   
             
                 UpdateStatistics();
                 

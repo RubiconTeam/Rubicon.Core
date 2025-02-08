@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Rubicon.Core;
 using Rubicon.Core.Chart;
@@ -54,6 +55,9 @@ namespace Rubicon.Core.Rulesets.Mania;
 	/// The lane graphic for this manager.
 	/// </summary>
 	[Export] public AnimatedSprite2D LaneObject;
+	
+	private List<AnimatedSprite2D> _splashSprites = new();
+	private int _splashCount = 0;
 
 	/// <summary>
 	/// Sets up this manager for Mania gameplay.
@@ -86,6 +90,10 @@ namespace Rubicon.Core.Rulesets.Mania;
 		if (NoteHeld != null && NoteHeld.MsTime + NoteHeld.MsLength < Conductor.Time * 1000f)
 			ProcessQueue.Add(GetResult(noteIndex: HoldingIndex, distance: 0f, holding: false));
 		
+		for (int i = 0; i < _splashSprites.Count; i++)
+			if (!_splashSprites[i].IsPlaying())
+				_splashSprites[i].Modulate = Colors.Transparent;
+		
 		base._Process(delta);
 	}
 
@@ -103,6 +111,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 	public void ChangeNoteSkin(ManiaNoteSkin noteSkin)
 	{
 		NoteSkin = noteSkin;
+		_splashCount = NoteSkin.GetSplashCountForDirection(Direction);
 
 		LaneObject = new AnimatedSprite2D();
 		LaneObject.Name = "Lane Graphic";
@@ -149,6 +158,9 @@ namespace Rubicon.Core.Rulesets.Mania;
 				NoteHeld = null;
 				HoldingIndex = -1;
 				LaneObject.Play();
+				
+				if (result.Rating <= Judgment.Great)
+					GenerateSplashSprite();
 				
 				RemoveChild(HitObjects[result.Index]);
 				HitObjects[result.Index].PrepareRecycle();
@@ -228,6 +240,34 @@ namespace Rubicon.Core.Rulesets.Mania;
 
 		if (LaneObject.Animation != $"{Direction}LaneNeutral")
 			LaneObject.Play($"{Direction}LaneNeutral", 1f, true);
+	}
+
+	private void GenerateSplashSprite()
+	{
+		if (_splashCount == 0)
+			return;
+		
+		string anim = Direction + "LaneSplash" + GD.RandRange(0, _splashCount - 1);
+		AnimatedSprite2D splash = _splashSprites.FirstOrDefault(x => !x.IsPlaying());
+		if (splash != null)
+		{
+			splash.SpriteFrames = NoteSkin.SplashAtlas;
+			splash.Frame = 0;
+			splash.Scale = NoteSkin.Scale;
+			splash.TextureFilter = NoteSkin.Filter;
+			splash.Modulate = Colors.White;
+			splash.Play(anim);
+			return;
+		}
+		
+		splash = new AnimatedSprite2D();
+		splash.SpriteFrames = NoteSkin.SplashAtlas;
+		splash.Scale = NoteSkin.Scale;
+		splash.TextureFilter = NoteSkin.Filter;
+		splash.Modulate = Colors.White;
+		_splashSprites.Add(splash);
+		AddChild(splash);
+		splash.Play(anim);
 	}
 
 	/// <summary>

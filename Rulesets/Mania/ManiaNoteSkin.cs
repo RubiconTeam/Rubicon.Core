@@ -1,3 +1,4 @@
+using System.Linq;
 using Godot.Collections;
 using CollectionExtensions = System.Collections.Generic.CollectionExtensions;
 
@@ -22,6 +23,11 @@ namespace Rubicon.Core.Rulesets.Mania;
 	/// The SpriteFrames resource to grab hold and tail textures from.
 	/// </summary>
 	[Export] public SpriteFrames HoldAtlas;
+	
+	/// <summary>
+	/// The SpriteFrames resource to grab splash textures from.
+	/// </summary>
+	[Export] public SpriteFrames SplashAtlas;
 	
 	/// <summary>
 	/// The scale used when generating notes and lanes.
@@ -71,5 +77,15 @@ namespace Rubicon.Core.Rulesets.Mania;
 	public string[] GetDirections(int laneCount = 4)
 	{
 		return CollectionExtensions.GetValueOrDefault(Directions, laneCount);
+	}
+
+	/// <summary>
+	/// Gets the amount of splashes in the <see cref="SplashAtlas"/>.
+	/// </summary>
+	/// <param name="direction">The direction to search for</param>
+	/// <returns>The amount of lane splashes, if any.</returns>
+	public int GetSplashCountForDirection(string direction)
+	{
+		return SplashAtlas.GetAnimationNames().Count(x => x.StartsWith($"{direction}LaneSplash"));
 	}
 }

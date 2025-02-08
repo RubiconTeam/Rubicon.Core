@@ -104,7 +104,7 @@ namespace Rubicon.Core.Rulesets;
 		{
 			while (NoteSpawnIndex < Notes.Length && Notes[NoteSpawnIndex].MsTime - time <= 2000f)
 			{
-				if (Notes[NoteSpawnIndex].MsTime - time < 0f || Notes[NoteSpawnIndex].WasSpawned)
+				if (Notes[NoteSpawnIndex].MsTime - time < 0f || Notes[NoteSpawnIndex].Spawned)
 				{
 					NoteSpawnIndex++;
 					continue;
@@ -117,36 +117,27 @@ namespace Rubicon.Core.Rulesets;
 				HitObjects[NoteSpawnIndex] = note;
 				note.Name = $"Note {NoteSpawnIndex}";
 				AssignData(note, Notes[NoteSpawnIndex]);
-				Notes[NoteSpawnIndex].WasSpawned = true;
+				Notes[NoteSpawnIndex].Spawned = true;
 				NoteSpawnIndex++;
 			}
 		}
-		
-		if (!IsComplete)
+
+		while (Autoplay && InputsEnabled && !IsComplete && Notes[NoteHitIndex].MsTime - time <= 0f)
 		{
-			NoteData curNoteData = Notes[NoteHitIndex];
-			if (Autoplay && InputsEnabled)
-			{
-				while (curNoteData.MsTime - time <= 0f)
-				{
-					if (!curNoteData.ShouldMiss)
-						ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: 0f, holding: curNoteData.Length > 0f));
-				
-					NoteHitIndex++;
-					if (NoteHitIndex >= Notes.Length)
-						break;
-				
-					curNoteData = Notes[NoteHitIndex];
-				}
-			}
-
-			if (curNoteData.MsTime - time <= -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsDouble())
-			{
-				ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle() - 1f, holding: false));
-				NoteHitIndex++;
-			}	
+			if (Notes[NoteHitIndex].ShouldMiss)
+				break;
+			
+			ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: 0f, holding: Notes[NoteHitIndex].Length > 0f));
+			NoteHitIndex++;
 		}
-
+		
+		float badHitWindow = -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle();
+		while (!IsComplete && Notes[NoteHitIndex].MsTime - time <= badHitWindow)
+		{
+			ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: badHitWindow - 1f, holding: false));
+			NoteHitIndex++;
+		}
+		
 		for (int i = 0; i < ProcessQueue.Count; i++)
 			OnNoteHit(ProcessQueue[i]);
 			
@@ -214,7 +205,8 @@ namespace Rubicon.Core.Rulesets;
 			result.Hit = result.Note.Length > 0 && result.Rating != Judgment.Miss ? Hit.Hold : Hit.Tap;
 		}
 
-		HitObjects[noteIndex].Missed = result.Rating == Judgment.Miss;
+		if (HitObjects[noteIndex] != null)
+			HitObjects[noteIndex].Missed = result.Rating == Judgment.Miss;
 		
 		return result;
 	}

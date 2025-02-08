@@ -80,21 +80,21 @@ namespace Rubicon.Core.Rulesets;
 
     private int GetNoteCountInRange(NoteData[] notes, double start)
     {
-        return notes.Count(x => x.Time >= start && !x.IsMine());
+        return notes.Count(x => x.Time >= start && x.CountsTowardScore);
     }
     
     private int GetNoteCountInRange(NoteData[] notes, double start, double end)
     {
-        return notes.Count(x => x.Time >= start && x.Time <= end && !x.IsMine());
+        return notes.Count(x => x.Time >= start && x.Time <= end && x.CountsTowardScore);
     }
     
     private int GetHoldNoteCountInRange(NoteData[] notes, double start)
     {
-        return notes.Count(x => x.Time >= start && !x.IsMine() && x.Length > 0);
+        return notes.Count(x => x.Time >= start && x.CountsTowardScore && x.Length > 0);
     }
     
     private int GetHoldNoteCountInRange(NoteData[] notes, double start, double end)
     {
-        return notes.Count(x => x.Time >= start && x.Time <= end && !x.IsMine() && x.Length > 0);
+        return notes.Count(x => x.Time >= start && x.Time <= end && x.CountsTowardScore && x.Length > 0);
     }
 }

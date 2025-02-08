@@ -10,6 +10,16 @@ namespace Rubicon.Core.API;
 /// </summary>
 [GlobalClass] public abstract partial class CsNoteType : Node, IPlayElement
 {
+    /// <summary>
+    /// Whether the autoplay should miss this note type or not.
+    /// </summary>
+    [Export] public bool ShouldMiss = false;
+
+    /// <summary>
+    /// Whether this note type should count towards the score.
+    /// </summary>
+    [Export] public bool CountsTowardScore = false;
+    
     /// <inheritdoc/>
     public PlayField PlayField { get; set; }
     
@@ -36,7 +46,18 @@ namespace Rubicon.Core.API;
     /// </summary>
     /// <param name="notes">An array of notes</param>
     /// <param name="noteType">The note type</param>
-    protected abstract void InitializeNote(Array<NoteData> notes, StringName noteType);
+    protected virtual void InitializeNote(Array<NoteData> notes, StringName noteType)
+    {
+        if (noteType != Name)
+            return;
+
+        for (int i = 0; i < notes.Count; i++)
+        {
+            NoteData note = notes[i];
+            note.ShouldMiss = ShouldMiss;
+            note.CountsTowardScore = CountsTowardScore;
+        }
+    }
 
     /// <summary>
     /// Triggers when the factory spawns a note of this type. Use this to set up your note.

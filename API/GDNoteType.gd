@@ -4,6 +4,9 @@ extends Node
 
 ## A template for a note type in GDScript. Must be inherited.
 
+@export var should_miss : bool = false
+@export var counts_toward_score : bool = true
+
 var play_field : PlayField
 
 var _initialized : bool = false
@@ -21,7 +24,12 @@ func initialize(): ## If it hasn't been initialized already, link itself to the 
 	_initialized = true
  
 func initialize_note(_notes : Array[NoteData], _note_type : StringName) -> void: ## Used to set up note data initially for every note type.
-	pass
+	if (_note_type != name):
+		return
+		
+	for note in _notes:
+		note.ShouldMiss = should_miss
+		note.CountsTowardScore = counts_toward_score
 
 func spawn_note(_note : Note, _note_type : StringName) -> void: ## Triggers when the factory spawns a note of this type. Use this to set up your note.
 	pass

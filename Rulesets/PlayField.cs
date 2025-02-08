@@ -277,10 +277,10 @@ namespace Rubicon.Core.Rulesets;
             Fail();
     }
 
-    public void Start()
+    public void Start(float time = 0f)
     {
-        Conductor.Play();
-        Music.Play();
+        Conductor.Play(time);
+        Music.Play(time);
     }
 
     public void Pause()
@@ -357,73 +357,75 @@ namespace Rubicon.Core.Rulesets;
             if (!result.Flags.HasFlag(NoteResultFlags.Score))
             {
                 Judgment rating = result.Rating;
-                //GD.Print(result.Hit.ToString());
-                if (result.Hit == Hit.Tap || result.Hit == Hit.Hold) // Tap note or initial tap of hold note
+                if (result.Note.CountsTowardScore)
                 {
-                    ScoreTracker.TapsHit++;
-                    
-                    switch (rating)
+                    if (result.Hit == Hit.Tap || result.Hit == Hit.Hold) // Tap note or initial tap of hold note
                     {
-                        case Judgment.Perfect:
-                            ScoreTracker.PerfectHits++;
-                            break;
-                        case Judgment.Great:
-                            ScoreTracker.GreatHits++;
-                            break;
-                        case Judgment.Good:
-                            ScoreTracker.GoodHits++;
-                            break;
-                        case Judgment.Okay:
-                            ScoreTracker.OkayHits++;
-                            break;
-                        case Judgment.Bad:
-                            ScoreTracker.BadHits++;
-                            break;
-                        case Judgment.Miss:
-                            ScoreTracker.Misses++;
-                            if (result.Note.Length > 0)
+                        ScoreTracker.TapsHit++;
+                        
+                        switch (rating)
+                        {
+                            case Judgment.Perfect:
+                                ScoreTracker.PerfectHits++;
+                                break;
+                            case Judgment.Great:
+                                ScoreTracker.GreatHits++;
+                                break;
+                            case Judgment.Good:
+                                ScoreTracker.GoodHits++;
+                                break;
+                            case Judgment.Okay:
+                                ScoreTracker.OkayHits++;
+                                break;
+                            case Judgment.Bad:
+                                ScoreTracker.BadHits++;
+                                break;
+                            case Judgment.Miss:
                                 ScoreTracker.Misses++;
-                            break;
-                    }
+                                if (result.Note.Length > 0)
+                                    ScoreTracker.Misses++;
+                                break;
+                        }
 
-                    if (rating >= Judgment.Okay)
-                    {
-                        ScoreTracker.ComboBreaks++;
-                        ScoreTracker.Combo = 0;
-                    }
-                    else
-                    {
-                        ScoreTracker.Combo++;
-                    }
-            
-                    if (ScoreTracker.Combo > ScoreTracker.HighestCombo)
-                        ScoreTracker.HighestCombo = ScoreTracker.Combo;   
-                }
-                else // Hold note end
-                {
-                    switch (rating)
-                    {
-                        case Judgment.Perfect:
-                            ScoreTracker.PerfectHits++;
-                            break;
-                        case Judgment.Miss:
-                            ScoreTracker.Misses++;
-                            ScoreTracker.Combo = 0;
+                        if (rating >= Judgment.Okay)
+                        {
                             ScoreTracker.ComboBreaks++;
-                            break;
+                            ScoreTracker.Combo = 0;
+                        }
+                        else
+                        {
+                            ScoreTracker.Combo++;
+                        }
+                
+                        if (ScoreTracker.Combo > ScoreTracker.HighestCombo)
+                            ScoreTracker.HighestCombo = ScoreTracker.Combo;   
                     }
+                    else // Hold note end
+                    {
+                        switch (rating)
+                        {
+                            case Judgment.Perfect:
+                                ScoreTracker.PerfectHits++;
+                                break;
+                            case Judgment.Miss:
+                                ScoreTracker.Misses++;
+                                ScoreTracker.Combo = 0;
+                                ScoreTracker.ComboBreaks++;
+                                break;
+                        }
+                    }   
+                    
+                    ScoreTracker.TotalHit++;
                 }
 
                 if (rating == Judgment.Miss)
                     ScoreTracker.MissStreak++;
-                else
+                else if (rating != Judgment.None)
                     ScoreTracker.MissStreak = 0;
-
-                ScoreTracker.TotalHit++;
             
                 UpdateStatistics();
                 
-                if (result.Hit != Hit.Tail)
+                if (result.Rating != Judgment.None && result.Hit != Hit.Tail)
                     EmitSignalStatisticsUpdated(ScoreTracker.Combo, result.Rating, result.Distance);
             }
         }

@@ -39,51 +39,42 @@ public partial class NoteData : Resource
     /// <summary>
     /// Length of the note converted to milliseconds. Should be ignored when serialized.
     /// </summary>
-    public float MsTime;
+    [ExportGroup("Internals"), Export] public float MsTime;
         
     /// <summary>
     /// Length of the note converted to milliseconds. Should be ignored when serialized.
     /// </summary>
-    public float MsLength;
+    [Export] public float MsLength;
 
     /// <summary>
     /// The starting scroll velocity this note is associated with.
     /// </summary>
-    public int StartingScrollVelocity = 0;
+    [Export] public int StartingScrollVelocity = 0;
 
     /// <summary>
     /// The ending scroll velocity for this note, if its length is more than 0.
     /// </summary>
-    public int EndingScrollVelocity = 0;
+    [Export] public int EndingScrollVelocity = 0;
 
     /// <summary>
     /// Basically tells the autoplay whether to miss this note or not. Should be ignored when serialized.
     /// </summary>
-    public bool ShouldMiss = false;
+    [Export] public bool ShouldMiss = false;
     
     /// <summary>
     /// True if the note has already been hit.
     /// </summary>
-    public bool WasHit = false;
+    [Export] public bool Hit = false;
 
     /// <summary>
     /// True if the note was spawned.
     /// </summary>
-    public bool WasSpawned = false;
+    [Export] public bool Spawned = false;
 
     /// <summary>
     /// Whether this note should count in the score tracker or not.
     /// </summary>
-    /// <returns>If the note is counted or not.</returns>
-    public bool IsMine() => ShouldMiss;
-    
-    /// <summary>
-    /// Marks this note as a mine if it isn't, and unmarks it if it is.
-    /// </summary>
-    public void MarkAsMine()
-    {
-        ShouldMiss = !ShouldMiss;
-    }
+    [Export] public bool CountsTowardScore = true;
     
     /// <summary>
     /// Converts data into time used by the game and also scroll velocity changes.

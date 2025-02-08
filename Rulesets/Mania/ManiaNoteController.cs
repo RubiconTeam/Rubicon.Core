@@ -178,7 +178,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 			}
 		}
 
-		result.Note.WasHit = true;
+		result.Note.Hit = true;
 		ParentBarLine.OnNoteHit(result);
 	}
 

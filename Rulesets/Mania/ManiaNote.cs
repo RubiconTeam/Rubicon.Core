@@ -95,7 +95,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 		if (Info.MsLength <= 0 || direction == null)
 			return;
 		
-		Texture2D holdTexture = NoteSkin.HoldAtlas.GetFrameTexture($"{direction}NoteHold", 0);
+		Texture2D holdTexture = NoteSkin.Holds.GetFrameTexture($"{direction}NoteHold", 0);
 		Hold.Texture = holdTexture;
 		HoldContainer.Modulate = new Color(1f, 1f, 1f, 0.5f);
 		HoldContainer.Size = new Vector2(0f, holdTexture.GetHeight());
@@ -172,19 +172,19 @@ namespace Rubicon.Core.Rulesets.Mania;
 		NoteSkin = noteSkin;
 		
 		// Do actual note skin graphic setting
-		Note.SpriteFrames = noteSkin.NoteAtlas;
+		Note.SpriteFrames = noteSkin.Notes;
 		Note.TextureFilter = NoteSkin.Filter;
 		Note.Scale = Vector2.One * NoteSkin.Scale;
 		
 		Tail.Centered = false;
-		Tail.SpriteFrames = noteSkin.HoldAtlas;
+		Tail.SpriteFrames = noteSkin.Holds;
 		Tail.TextureFilter = NoteSkin.Filter;
 
 		if (Info == null || ParentController == null)
 			return;
 		
 		string direction = NoteSkin.GetDirection(Info.Lane, ParentController.ParentBarLine.Chart.Lanes).ToLower();
-		Texture2D holdTexture = NoteSkin.HoldAtlas.GetFrameTexture($"{direction}NoteHold", 0);
+		Texture2D holdTexture = NoteSkin.Holds.GetFrameTexture($"{direction}NoteHold", 0);
 		Hold.Texture = holdTexture;
 		Hold.TextureFilter = NoteSkin.Filter;
 		HoldContainer.TextureFilter = NoteSkin.Filter;

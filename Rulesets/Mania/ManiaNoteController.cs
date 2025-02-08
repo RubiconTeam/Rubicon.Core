@@ -58,6 +58,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 	
 	private List<AnimatedSprite2D> _splashSprites = new();
 	private int _splashCount = 0;
+	private AnimatedSprite2D _holdCover;
 
 	/// <summary>
 	/// Sets up this manager for Mania gameplay.
@@ -71,6 +72,14 @@ namespace Rubicon.Core.Rulesets.Mania;
 		Lane = lane;
 		Direction = noteSkin.GetDirection(lane, parent.Chart.Lanes);
 		Action = $"play_mania_{ParentBarLine.Managers.Length}k_{Lane}";
+		
+		_holdCover = new AnimatedSprite2D();
+		_holdCover.Name = "Hold Cover";
+		_holdCover.ZIndex = 1;
+		_holdCover.Visible = false;
+		_holdCover.AnimationFinished += OnHoldCoverAnimationFinished;
+		AddChild(_holdCover);
+		
 		ChangeNoteSkin(noteSkin);
 		
 		Notes = parent.Chart.Notes.Where(x => x.Lane == Lane).ToArray();
@@ -93,6 +102,10 @@ namespace Rubicon.Core.Rulesets.Mania;
 		for (int i = 0; i < _splashSprites.Count; i++)
 			if (!_splashSprites[i].IsPlaying())
 				_splashSprites[i].Modulate = Colors.Transparent;
+
+		string holdCoverAnim = $"{Direction}LaneCoverHold";
+		if (_holdCover.IsVisible() && _holdCover.Animation == holdCoverAnim)
+			_holdCover.Rotation = DirectionAngle;
 		
 		base._Process(delta);
 	}
@@ -112,30 +125,20 @@ namespace Rubicon.Core.Rulesets.Mania;
 	{
 		NoteSkin = noteSkin;
 		_splashCount = NoteSkin.GetSplashCountForDirection(Direction);
+		
+		if (noteSkin.HoldCovers != null)
+			_holdCover.SpriteFrames = noteSkin.HoldCovers;
 
 		LaneObject = new AnimatedSprite2D();
 		LaneObject.Name = "Lane Graphic";
 		LaneObject.Scale = Vector2.One * NoteSkin.Scale;
-		LaneObject.SpriteFrames = NoteSkin.LaneAtlas;
+		LaneObject.SpriteFrames = NoteSkin.Lanes;
 		LaneObject.TextureFilter = NoteSkin.Filter;
 		LaneObject.Play($"{Direction}LaneNeutral", 1f, true);
 		LaneObject.AnimationFinished += OnAnimationFinish;
 		AddChild(LaneObject);
 		MoveChild(LaneObject, 0);
 	}
-	
-	/*
-	/// <inheritdoc/>
-	protected override Note CreateNote() => new ManiaNote();
-
-	/// <inheritdoc/>
-	protected override void SetupNote(Note note, NoteData data)
-	{
-		if (note is not ManiaNote maniaNote)
-			return;
-		
-		maniaNote.Setup(data, this, NoteSkin);
-	}*/
 
 	protected override void AssignData(Note note, NoteData noteData)
 	{
@@ -158,9 +161,23 @@ namespace Rubicon.Core.Rulesets.Mania;
 				NoteHeld = null;
 				HoldingIndex = -1;
 				LaneObject.Play();
-				
-				if (result.Rating <= Judgment.Great && result.Hit == Hit.Tap)
-					GenerateTapSplash();
+
+				if (result.Rating <= Judgment.Great)
+				{
+					switch (result.Hit)
+					{
+						case Hit.Tap:
+							GenerateTapSplash();
+							break;
+						case Hit.Tail:
+							if (NoteSkin.HoldCovers == null)
+								break;
+							
+							_holdCover.Rotation = 0f;
+							_holdCover.Play($"{Direction}LaneCoverEnd");
+							break;
+					}
+				}
 				
 				RemoveChild(HitObjects[result.Index]);
 				HitObjects[result.Index].PrepareRecycle();
@@ -170,7 +187,14 @@ namespace Rubicon.Core.Rulesets.Mania;
 				NoteHeld = result.Note;
 				HoldingIndex = result.Index;
 				LaneObject.Animation = $"{Direction}LaneConfirm";
-				LaneObject.Pause();   
+				LaneObject.Pause();
+
+				if (NoteSkin.HoldCovers != null)
+				{
+					_holdCover.Visible = true;
+					_holdCover.Rotation = 0f;
+					_holdCover.Play($"{Direction}LaneCoverStart");
+				}
 			}	
 		}
 		else
@@ -181,6 +205,8 @@ namespace Rubicon.Core.Rulesets.Mania;
 					maniaNote.UnsetHold();
 			
 				NoteHeld = null;
+				if (NoteSkin.HoldCovers != null)
+					_holdCover.Visible = false;
 			}
 
 			if (result.Note.MsLength <= 0f)
@@ -251,7 +277,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 		AnimatedSprite2D splash = _splashSprites.FirstOrDefault(x => !x.IsPlaying());
 		if (splash != null)
 		{
-			splash.SpriteFrames = NoteSkin.SplashAtlas;
+			splash.SpriteFrames = NoteSkin.Splashes;
 			splash.Frame = 0;
 			splash.Scale = NoteSkin.Scale;
 			splash.TextureFilter = NoteSkin.Filter;
@@ -261,7 +287,8 @@ namespace Rubicon.Core.Rulesets.Mania;
 		}
 		
 		splash = new AnimatedSprite2D();
-		splash.SpriteFrames = NoteSkin.SplashAtlas;
+		splash.Name = "Tap Splash " + _splashSprites.Count;
+		splash.SpriteFrames = NoteSkin.Splashes;
 		splash.Scale = NoteSkin.Scale;
 		splash.TextureFilter = NoteSkin.Filter;
 		splash.Modulate = Colors.White;
@@ -280,5 +307,26 @@ namespace Rubicon.Core.Rulesets.Mania;
 
 		if (LaneObject.Animation != $"{Direction}LaneNeutral")
 			LaneObject.Play($"{Direction}LaneNeutral");
+	}
+
+	private void OnHoldCoverAnimationFinished()
+	{
+		if (NoteSkin.HoldCovers == null)
+			return;
+		
+		bool isStartAnim = _holdCover.Animation == $"{Direction}LaneCoverStart";
+		if (isStartAnim)
+		{
+			if (HoldingIndex != -1)
+				_holdCover.Play($"{Direction}LaneCoverHold");
+			else
+				_holdCover.Play($"{Direction}LaneCoverEnd");
+		}
+		
+		bool isEndAnim = _holdCover.Animation == $"{Direction}LaneCoverEnd";
+		if (!isEndAnim)
+			return;
+
+		_holdCover.Visible = false;
 	}
 }

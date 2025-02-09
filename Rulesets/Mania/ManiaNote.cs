@@ -40,6 +40,8 @@ namespace Rubicon.Core.Rulesets.Mania;
 		{
 			Note = new AnimatedSprite2D();
 			Note.Name = "Note Graphic";
+			// keeping the notes on top of the holds
+			Note.ZIndex = 1;
 			AddChild(Note);
 		}
 		

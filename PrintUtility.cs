@@ -5,7 +5,10 @@ namespace Rubicon.Core;
 /// Lets you add an identifier to each print and determine
 /// if its a verbose print or not.
 /// </summary>
-[Tool] public static class PrintUtility
+#if TOOLS
+[Tool]
+#endif
+public static class PrintUtility
 {
     private static readonly bool Verbose = ProjectSettings.GetSetting("rubicon/general/verbose").AsBool();
 

@@ -101,7 +101,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 
         // Rank
         float maxBaseScore = noteValue * hitNotes;
-        float maxBonusScore = Mathf.Sqrt((float)ScoreTracker.TapsHit / ScoreTracker.MaxCombo * 100f) * MaxScore * 0.065f;
+        float maxBonusScore = Mathf.Sqrt((float)ScoreTracker.NotesHit / ScoreTracker.MaxCombo * 100f) * MaxScore * 0.065f;
         int maxScore = Mathf.FloorToInt(maxBaseScore + maxBonusScore);
         if (ScoreTracker.Score >= maxScore)
             ScoreTracker.Rank = ScoreRank.P;

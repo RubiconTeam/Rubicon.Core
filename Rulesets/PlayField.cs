@@ -207,6 +207,7 @@ namespace Rubicon.Core.Rulesets;
 
         Music = AudioManager.Music.Player;
         AudioManager.Music.Player.Stream = Metadata.Instrumental;
+        PrintUtility.Print("PlayField", "Instrumental loaded", true);
         
         // TODO: LOAD AUTOLOADS AND NOTE TYPES!!!!
         
@@ -361,7 +362,7 @@ namespace Rubicon.Core.Rulesets;
                 {
                     if (result.Hit == Hit.Tap || result.Hit == Hit.Hold) // Tap note or initial tap of hold note
                     {
-                        ScoreTracker.TapsHit++;
+                        ScoreTracker.NotesHit++;
                         
                         switch (rating)
                         {
@@ -396,6 +397,8 @@ namespace Rubicon.Core.Rulesets;
                     }
                     else // Hold note end
                     {
+                        ScoreTracker.TailsHit++;
+                        
                         switch (rating)
                         {
                             case Judgment.Perfect:
@@ -406,8 +409,6 @@ namespace Rubicon.Core.Rulesets;
                                 break;
                         }
                     }   
-                    
-                    ScoreTracker.TotalHit++;
                 }
 
                 if (rating == Judgment.Miss)

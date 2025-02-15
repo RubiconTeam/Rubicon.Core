@@ -4,14 +4,31 @@ using Rubicon.Core.Rulesets;
 
 namespace Rubicon.Core.Events;
 
+/// <summary>
+/// A class that helps to load, track and execute any song event.
+/// </summary>
 [GlobalClass] public partial class SongEventController : Node
 {
+    /// <summary>
+    /// The index from the current event list.
+    /// </summary>
     [Export] public int Index = 0;
     
+    /// <summary>
+    /// A signal that gets called everytime an event is executed.
+    /// </summary>
+    /// <param name="eventName">The name of the event being executed.</param>
+    /// <param name="time">The time when the event has been executed.</param>
+    /// <param name="args">The arguments of the event.</param>
     [Signal] public delegate void EventCalledEventHandler(StringName eventName, float time, Godot.Collections.Dictionary<StringName, Variant> args);
 
     [Export] private EventData[] _events = [];
     
+    /// <summary>
+    /// Sets up every event in the <see cref="EventMeta"/> file of the song.
+    /// </summary>
+    /// <param name="eventMeta">The data of every event in the song.</param>
+    /// <param name="playField">The current <see cref="PlayField"/>.</param>
     public void Setup(EventMeta eventMeta, PlayField playField)
     {
         _events = eventMeta.Events;
@@ -57,6 +74,9 @@ namespace Rubicon.Core.Events;
         }
     }
 
+    /// <summary>
+    /// Resets the event list as well as its index.
+    /// </summary>
     public void Reset()
     {
         Index = 0;

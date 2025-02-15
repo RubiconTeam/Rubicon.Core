@@ -1,7 +1,6 @@
 using Godot.Collections;
 using Rubicon.Core.Chart;
 using Rubicon.Core.Rulesets;
-using Rubicon.Game;
 
 namespace Rubicon.Core.API;
 
@@ -33,10 +32,9 @@ namespace Rubicon.Core.API;
         if (_initialized)
             return;
 
-        PlayField playField = RubiconGame.Singleton.PlayField;
-        playField.Factory.SpawnNote += SpawnNote;
-        playField.InitializeNote += InitializeNote;
-        playField.ModifyResult += NoteHit;
+        PlayField.Factory.SpawnNote += SpawnNote;
+        PlayField.InitializeNote += InitializeNote;
+        PlayField.ModifyResult += NoteHit;
 
         _initialized = true;
     }

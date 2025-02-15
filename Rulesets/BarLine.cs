@@ -66,17 +66,29 @@ namespace Rubicon.Core.Rulesets;
 	/// <param name="result">The input element received</param>
 	public abstract void OnNoteHit(NoteResult result);
 
+	/// <summary>
+	/// Determines if the player should miss when hitting a blank space with a specified lane.
+	/// </summary>
+	/// <param name="index">The index of the lane that should ignore Ghost Tapping.</param>
 	public void InvokeGhostTap(int index)
 	{
 		PlayField.HandleGhostTap(Name, index);
 	}
 	
+	/// <summary>
+	/// Determines if every <see cref="NoteController"/> in the BarLine should be played automatically.
+	/// </summary>
+	/// <param name="autoplay">Bool that decides if the <see cref="BarLine"/> should be auto-played or not.</param>
 	public void SetAutoPlay(bool autoplay)
 	{
 		foreach (NoteController noteManager in Managers)
 			noteManager.Autoplay = autoplay;
 	}
 
+	/// <summary>
+	/// Sets a scroll speed for every <see cref="NoteController"/> in the BarLine
+	/// </summary>
+	/// <param name="scrollSpeed">The new speed to be applied.</param>
 	public void SetScrollSpeed(float scrollSpeed)
 	{
 		foreach (NoteController noteManager in Managers)

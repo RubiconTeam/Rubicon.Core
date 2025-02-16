@@ -8,7 +8,7 @@ namespace Rubicon.Core.Meta;
 
     [Export] public RubiChart Chart;
     
-    [Export] public string RuleSet = "Mania";
+    [Export] public string RuleSet = "mania";
 
     [Export] public Color Color = Colors.MediumPurple;
 }

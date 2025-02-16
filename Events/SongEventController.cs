@@ -40,7 +40,7 @@ namespace Rubicon.Core.Events;
             
             eventsInitialized.Add(_events[i].Name);
 
-            string eventPath = $"res://Resources/Game/Events/{_events[i].Name}";
+            string eventPath = $"res://resources/game/events/{_events[i].Name}";
             bool eventTscnExists = ResourceLoader.Exists(eventPath + ".tscn");
             bool eventScnExists = ResourceLoader.Exists(eventPath + ".scn");
             if (!eventTscnExists && !eventScnExists)

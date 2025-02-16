@@ -69,7 +69,7 @@ public partial class RubiconEngineInstance : Node
 			DefaultInputMap[actionName] = InputMap.ActionGetEvents(actionName);
 		
 		List<string> noteTypePaths = [];
-		noteTypePaths.AddRange(PathUtility.GetAbsoluteFilePathsAt("res://Resources/Game/Notetypes/", true));
+		noteTypePaths.AddRange(PathUtility.GetAbsoluteFilePathsAt("res://resources/game/notetypes/", true));
 		for (int i = 0; i < noteTypePaths.Count; i++)
 		{
 			string path = noteTypePaths[i];

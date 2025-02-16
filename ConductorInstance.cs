@@ -1,11 +1,12 @@
+using GodotSharp.Utilities;
 using Rubicon.Core.Chart;
 
-namespace Rubicon.Core.Autoload;
+namespace Rubicon.Core;
 
 /// <summary>
 /// A Node that keeps track of musical timing and what not.
 /// </summary>
-[GlobalClass, StaticAutoloadSingleton("Rubicon.Core", "Conductor")]
+[GlobalClass, Autoload("Conductor")]
 public partial class ConductorInstance : Node
 {
 	/// <summary>

@@ -19,6 +19,7 @@ global using System;
 using System.Collections.Generic;
 using System.IO;
 using Godot.Collections;
+using GodotSharp.Utilities;
 using Rubicon.Core;
 using Rubicon.Core.Data;
 
@@ -28,7 +29,7 @@ namespace Rubicon;
 /// A Node that contains basic engine info. Essentially the Main class.
 /// More useful in GDScript than it is in C#.
 /// </summary>
-[GlobalClass, StaticAutoloadSingleton("Rubicon.Core", "RubiconEngine")]
+[GlobalClass, Autoload("RubiconEngine")]
 public partial class RubiconEngineInstance : Node
 {
 	/// <summary>

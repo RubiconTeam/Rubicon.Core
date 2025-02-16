@@ -1,6 +1,8 @@
+using GodotSharp.Utilities;
+
 namespace Rubicon.Core.Audio;
 
-[GlobalClass, StaticAutoloadSingleton("Rubicon.Core.Audio", "AudioManager")] public partial class AudioManagerInstance : Node
+[GlobalClass, Autoload("AudioManager")] public partial class AudioManagerInstance : Node
 {
     [Export] public TrackList Music;
 

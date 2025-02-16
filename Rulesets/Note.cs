@@ -1,5 +1,5 @@
 using Rubicon.Core.Chart;
-using Rubicon.Core.Settings;
+using GodotSharp.Utilities;
 
 namespace Rubicon.Core.Rulesets;
 

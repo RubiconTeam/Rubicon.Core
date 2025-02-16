@@ -6,7 +6,7 @@ using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
 using Rubicon.Core.Events;
 using Rubicon.Core.Meta;
-using Rubicon.Core.Settings;
+using GodotSharp.Utilities;
 using Rubicon.Core.UI;
 
 namespace Rubicon.Core.Rulesets;

@@ -28,12 +28,12 @@ namespace Rubicon.Core.Rulesets.Mania;
     public override void Setup(SongMeta meta, RubiChart chart, int targetIndex, EventMeta events)
     {
         string noteSkinName = meta.NoteSkin;
-        string noteSkinPath = PathUtility.GetResourcePath($"res://resources/ui/styles/{noteSkinName}/mania");
+        string noteSkinPath = PathUtility.GetResourcePath($"res://resources/ui/styles/{noteSkinName}/Mania");
         if (string.IsNullOrWhiteSpace(noteSkinPath))
         {
             string defaultSkin = ProjectSettings.GetSetting("rubicon/rulesets/mania/default_note_skin").AsString();
-            GD.PrintErr($"Mania Note Skin Path: {noteSkinName} does not exist. Defaulting to {defaultSkin}");
-            noteSkinPath = PathUtility.GetResourcePath($"res://resources/ui/styles/{defaultSkin}/mania");
+            PrintUtility.PrintError("ManiaPlayField", $"Mania Note Skin Path: {noteSkinName} does not exist. Defaulting to {defaultSkin}");
+            noteSkinPath = PathUtility.GetResourcePath($"res://resources/ui/styles/{defaultSkin}/Mania");
         }
 
         NoteSkin = ResourceLoader.LoadThreadedGet(noteSkinPath) as ManiaNoteSkin;

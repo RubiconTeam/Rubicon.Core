@@ -137,11 +137,11 @@ namespace Rubicon.Core.Rulesets;
         Chart.ConvertData(meta.BpmInfo).Format();
         
         // Handle UI Style
-        string uiStylePath = $"res://resources/ui/styles/{Metadata.UiStyle}/style";
+        string uiStylePath = $"res://resources/ui/styles/{Metadata.UiStyle}/Style";
         if (!PathUtility.ResourceExists(uiStylePath))
         {
             string defaultUi = ProjectSettings.GetSetting("rubicon/general/default_ui_style").AsString();
-            string defaultUiPath = $"res://resources/ui/styles/{defaultUi}/style";
+            string defaultUiPath = $"res://resources/ui/styles/{defaultUi}/Style";
             GD.PrintErr($"[PlayField] UI Style {Metadata.UiStyle} does not exist. Defaulting to {defaultUi}");
             uiStylePath = defaultUiPath;
         }

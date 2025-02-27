@@ -3,7 +3,7 @@ using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
 using Rubicon.Core.Events;
 using Rubicon.Core.Meta;
-using GodotSharp.Utilities;
+using PukiTools.GodotSharp;
 
 namespace Rubicon.Core.Rulesets.Mania;
 

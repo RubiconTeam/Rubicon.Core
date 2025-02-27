@@ -3,7 +3,7 @@ using System.Linq;
 using Rubicon.Core;
 using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
-using GodotSharp.Utilities;
+using PukiTools.GodotSharp;
 using Array = System.Array;
 
 namespace Rubicon.Core.Rulesets.Mania;

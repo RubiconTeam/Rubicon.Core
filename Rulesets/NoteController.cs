@@ -69,7 +69,7 @@ namespace Rubicon.Core.Rulesets;
 	/// <summary>
 	/// The next note's index to be hit.
 	/// </summary>
-	[ExportGroup("Advanced"), Export] public int NoteHitIndex = 0; 
+	[ExportGroup("Internals"), Export] public int NoteHitIndex = 0; 
 	
 	/// <summary>
 	/// The next hit object's index to be spawned in.
@@ -80,6 +80,11 @@ namespace Rubicon.Core.Rulesets;
 	/// The index of the note that is currently being held.
 	/// </summary>
 	[Export] public int HoldingIndex = -1;
+
+	/// <summary>
+	/// Whether this lane is being pressed.
+	/// </summary>
+	[Export] public bool Pressing = false;
 
 	/// <summary>
 	/// The queue list for notes to be processed next frame.
@@ -217,12 +222,18 @@ namespace Rubicon.Core.Rulesets;
 		
 		if (Autoplay || !InputsEnabled || !InputMap.HasAction(Action) || !@event.IsAction(Action) || @event.IsEcho())
 			return;
-		
+
 		if (@event.IsPressed())
+		{
+			Pressing = true;
 			PressedEvent();
-		
+		}
+
 		if (@event.IsReleased())
+		{
+			Pressing = false;
 			ReleasedEvent();
+		}
 	}
 
 	protected abstract void PressedEvent();

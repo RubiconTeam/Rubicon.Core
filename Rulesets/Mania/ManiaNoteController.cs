@@ -103,6 +103,9 @@ namespace Rubicon.Core.Rulesets.Mania;
 			if (!_splashSprites[i].IsPlaying())
 				_splashSprites[i].Modulate = Colors.Transparent;
 
+		if (!Pressing && _holdCover.Visible)
+			_holdCover.Visible = false;
+		
 		string holdCoverAnim = $"{Direction}LaneCoverHold";
 		if (_holdCover.IsVisible() && _holdCover.Animation == holdCoverAnim)
 			_holdCover.Rotation = DirectionAngle;

@@ -45,6 +45,11 @@ namespace Rubicon.Core.Rulesets.Mania;
 	[Export] public float LaneSize = 160f;
 
 	/// <summary>
+	/// Enabling this will cause confirm animaions on lanes to play every step.
+	/// </summary>
+	[Export] public bool StrobeHold = false;
+
+	/// <summary>
 	/// The filtering used when generating notes and lanes.
 	/// </summary>
 	[Export] public CanvasItem.TextureFilterEnum Filter = CanvasItem.TextureFilterEnum.Linear;

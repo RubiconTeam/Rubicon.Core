@@ -59,6 +59,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 	private List<AnimatedSprite2D> _splashSprites = new();
 	private int _splashCount = 0;
 	private AnimatedSprite2D _holdCover;
+	private int _lastStep = -1;
 
 	/// <summary>
 	/// Sets up this manager for Mania gameplay.
@@ -98,6 +99,10 @@ namespace Rubicon.Core.Rulesets.Mania;
 	{
 		if (NoteHeld != null && NoteHeld.MsTime + NoteHeld.MsLength < Conductor.Time * 1000f)
 			ProcessQueue.Add(GetResult(noteIndex: HoldingIndex, distance: 0f, holding: false));
+
+		int curStep = Mathf.FloorToInt(Conductor.CurrentStep);
+		if (NoteSkin.StrobeHold && HoldingIndex != -1 && curStep != _lastStep)
+			LaneObject.Frame = 0;
 		
 		for (int i = 0; i < _splashSprites.Count; i++)
 			if (!_splashSprites[i].IsPlaying())
@@ -111,6 +116,8 @@ namespace Rubicon.Core.Rulesets.Mania;
 			_holdCover.Rotation = DirectionAngle;
 		
 		base._Process(delta);
+		
+		_lastStep = curStep;
 	}
 
 	protected override NoteResult GetResult(int noteIndex, float distance, bool holding)
@@ -190,7 +197,11 @@ namespace Rubicon.Core.Rulesets.Mania;
 				NoteHeld = result.Note;
 				HoldingIndex = result.Index;
 				LaneObject.Animation = $"{Direction}LaneConfirm";
-				LaneObject.Pause();
+				
+				if (!NoteSkin.StrobeHold)
+					LaneObject.Pause();
+				else
+					LaneObject.Play();
 
 				if (NoteSkin.HoldCovers != null)
 				{

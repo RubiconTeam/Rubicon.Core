@@ -166,7 +166,7 @@ namespace Rubicon.Core.Rulesets;
 		
 		float distance = Notes[NoteHitIndex].MsTime - Conductor.Time * 1000f;
 		if (includeOffset)
-			distance -= (float)UserSettings.Gameplay.Offset;
+			distance -= (float)UserSettings.Rubicon.Offset;
 
 		return distance;
 	}

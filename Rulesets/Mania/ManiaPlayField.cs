@@ -60,11 +60,11 @@ namespace Rubicon.Core.Rulesets.Mania;
             if (BarLines[i] is not ManiaBarLine maniaBarLine)
                 continue;
                 
-            maniaBarLine.SetDirectionAngle(!UserSettings.Gameplay.DownScroll ? Mathf.Pi / 2f : -Mathf.Pi / 2f);
-            maniaBarLine.AnchorTop = BarLines[i].AnchorBottom = UserSettings.Gameplay.DownScroll ? 1f : 0f;
-            maniaBarLine.OffsetTop = BarLines[i].OffsetBottom = UserSettings.Gameplay.DownScroll ? -140f : 140f;
+            maniaBarLine.SetDirectionAngle(!UserSettings.Rubicon.Mania.DownScroll ? Mathf.Pi / 2f : -Mathf.Pi / 2f);
+            maniaBarLine.AnchorTop = BarLines[i].AnchorBottom = UserSettings.Rubicon.Mania.DownScroll ? 1f : 0f;
+            maniaBarLine.OffsetTop = BarLines[i].OffsetBottom = UserSettings.Rubicon.Mania.DownScroll ? -140f : 140f;
 
-            if (UserSettings.Gameplay.CenterBarLine)
+            if (UserSettings.Rubicon.Mania.CenterBarLine)
             {
                 maniaBarLine.AnchorLeft = maniaBarLine.AnchorRight = 0.5f;
                 maniaBarLine.Visible = TargetIndex == i;

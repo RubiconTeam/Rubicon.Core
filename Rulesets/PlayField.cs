@@ -191,7 +191,7 @@ namespace Rubicon.Core.Rulesets;
             if (indChart.Name == TargetBarLine)
             {
                 TargetIndex = i;
-                curBarLine.SetAutoPlay(UserSettings.Gameplay.Autoplay);   
+                curBarLine.SetAutoPlay(UserSettings.Rubicon.Autoplay);   
             }
             
             AddChild(curBarLine);
@@ -227,7 +227,9 @@ namespace Rubicon.Core.Rulesets;
             AddChild(Hud);
             
             Hud.Setup(this);
-            Hud.UpdatePosition(UserSettings.Gameplay.DownScroll);
+            
+            // TODO: UPDATE THIS SO IT ISNT MANIA-DEPENDENT
+            Hud.UpdatePosition(UserSettings.Rubicon.Mania.DownScroll);
         }
 
         // TODO: BAD CODE, CHANGE LATER

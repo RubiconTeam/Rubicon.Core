@@ -159,7 +159,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 		SvChange svChange = ParentController.ParentBarLine.Chart.SvChanges[Info.StartingScrollVelocity];
 		float distance = (svChange.Position + Info.MsTime - svChange.MsTime - _tailOffset) * ParentController.ScrollSpeed;
 		Vector2 posMult = new Vector2(Mathf.Cos(maniaNoteManager.DirectionAngle), Mathf.Sin(maniaNoteManager.DirectionAngle));
-		Position = maniaNoteManager.NoteHeld != Info ? (startingPos + distance) * posMult * (float)UserSettings.Gameplay.SpeedMultiplier : Vector2.Zero;
+		Position = maniaNoteManager.NoteHeld != Info ? (startingPos + distance) * posMult * (float)UserSettings.Rubicon.Mania.SpeedMultiplier : Vector2.Zero;
 	}
 
 	/// <summary>
@@ -215,7 +215,7 @@ namespace Rubicon.Core.Rulesets.Mania;
 		int tailTexWidth = Mathf.FloorToInt(Tail.SpriteFrames.GetFrameTexture($"{direction}NoteTail", Tail.GetFrame()).GetWidth() * NoteSkin.Scale.X);
 
 		float holdWidth = GetOnScreenHoldLength(Info.MsLength) * ParentController.ScrollSpeed *
-		                  (float)UserSettings.Gameplay.SpeedMultiplier;
+		                  (float)UserSettings.Rubicon.Mania.SpeedMultiplier;
 		Hold.Size = new Vector2((holdWidth - tailTexWidth) / HoldContainer.Scale.X, Hold.Size.Y);
 		
 		if (maniaNoteManager.NoteHeld != Info)
@@ -233,8 +233,8 @@ namespace Rubicon.Core.Rulesets.Mania;
 		// Rough code, might clean up later if possible
 		string direction = maniaNoteManager.Direction;
 		float initialHoldWidth = GetOnScreenHoldLength(Info.MsLength) * ParentController.ScrollSpeed *
-		                         (float)UserSettings.Gameplay.SpeedMultiplier;
-		float holdWidth = GetOnScreenHoldLength(length) * ParentController.ScrollSpeed * (float)UserSettings.Gameplay.SpeedMultiplier;
+		                         (float)UserSettings.Rubicon.Mania.SpeedMultiplier;
+		float holdWidth = GetOnScreenHoldLength(length) * ParentController.ScrollSpeed * (float)UserSettings.Rubicon.Mania.SpeedMultiplier;
 
 		Vector2 holdContainerScale = HoldContainer.Scale;
 		Vector2 holdContainerSize = HoldContainer.Size;

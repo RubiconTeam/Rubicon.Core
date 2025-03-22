@@ -1,12 +1,12 @@
 using System.Linq;
 using Godot.Collections;
 using Rubicon.Core.API;
-using Rubicon.Core.Audio;
 using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
 using Rubicon.Core.Events;
 using Rubicon.Core.Meta;
 using PukiTools.GodotSharp;
+using PukiTools.GodotSharp.Audio;
 using Rubicon.Core.UI;
 
 namespace Rubicon.Core.Rulesets;
@@ -205,8 +205,7 @@ namespace Rubicon.Core.Rulesets;
         Conductor.ChartOffset = Metadata.Offset;
         Conductor.BpmList = Metadata.BpmInfo;
 
-        Music = AudioManager.Music.Player;
-        AudioManager.Music.Player.Stream = Metadata.Instrumental;
+        Music = AudioManager.GetGroup("Music").Play(Metadata.Instrumental, false);
         PrintUtility.Print("PlayField", "Instrumental loaded", true);
         
         // TODO: LOAD AUTOLOADS AND NOTE TYPES!!!!

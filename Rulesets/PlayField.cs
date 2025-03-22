@@ -235,10 +235,10 @@ namespace Rubicon.Core.Rulesets;
         // TODO: BAD CODE, CHANGE LATER
         foreach (StringName noteType in noteTypeMap.Keys)
         {
-            if (!RubiconEngine.NoteTypePaths.ContainsKey(noteType))
+            if (!RubiconCore.NoteTypePaths.ContainsKey(noteType))
                 continue;
             
-            string noteTypePath = RubiconEngine.NoteTypePaths[noteType];
+            string noteTypePath = RubiconCore.NoteTypePaths[noteType];
             Resource noteTypeResource = ResourceLoader.LoadThreadedGet(noteTypePath);
             if (noteTypeResource is PackedScene packedScene)
             {

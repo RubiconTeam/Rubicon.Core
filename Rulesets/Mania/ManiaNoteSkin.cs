@@ -50,6 +50,11 @@ namespace Rubicon.Core.Rulesets.Mania;
 	[Export] public bool StrobeHold = false;
 
 	/// <summary>
+	/// Setting this to true will put hold tails behind the receptors.
+	/// </summary>
+	[Export] public bool HoldsBehindLanes = false;
+
+	/// <summary>
 	/// The filtering used when generating notes and lanes.
 	/// </summary>
 	[Export] public CanvasItem.TextureFilterEnum Filter = CanvasItem.TextureFilterEnum.Linear;

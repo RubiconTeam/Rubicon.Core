@@ -6,6 +6,7 @@ public static class ApiConstants
     [
         "GDNoteType",
         "GDSongEvent",
-        "GDStatDisplay"
+        "GDStatDisplay",
+        "GDPlayElement"
     ];
 }

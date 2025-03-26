@@ -8,10 +8,10 @@ namespace Rubicon.Core.API;
 /// </summary>
 [GlobalClass] public abstract partial class CsStatDisplay : CsHudElement
 {
-	/// <summary>
-	/// A reference to the UI Style.
-	/// </summary>
-	public UiStyle UiStyle => PlayField.UiStyle;
+    /// <summary>
+    /// A reference to the element data.
+    /// </summary>
+    public BarLineElementData Data;
 
     private bool _initialized = false;
 
@@ -36,32 +36,6 @@ namespace Rubicon.Core.API;
     /// <param name="hit">The hit type</param>
     /// <param name="distance">The hit distance from the note</param>
     public abstract void UpdateStats(long combo, Judgment hit, float distance);
-
-    /// <summary>
-    /// A helper method to get the material based on the hit type.
-    /// </summary>
-    /// <param name="hit">The hit type / judgment</param>
-    /// <returns>The corresponding material</returns>
-    protected Material GetHitMaterial(Judgment hit)
-    {
-        switch (hit)
-        {
-            case Judgment.Perfect:
-                return UiStyle.PerfectMaterial;
-            case Judgment.Great:
-                return UiStyle.GreatMaterial;
-            case Judgment.Good:
-                return UiStyle.GoodMaterial;
-            case Judgment.Okay:
-                return UiStyle.OkayMaterial;
-            case Judgment.Bad:
-                return UiStyle.BadMaterial;
-            case Judgment.Miss:
-                return UiStyle.MissMaterial;
-        }
-
-        return null;
-    }
 
     /// <summary>
     /// A helper method to get the name based on the hit type.

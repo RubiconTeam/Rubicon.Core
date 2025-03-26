@@ -45,6 +45,11 @@ namespace Rubicon.Core.Rulesets;
     /// The Song meta for this PlayField.
     /// </summary>
     [Export] public SongMeta Metadata;
+    
+    /// <summary>
+    /// The ruleset data for this PlayField.
+    /// </summary>
+    [Export] public RuleSet RuleSet;
 
     /// <summary>
     /// The events for this song.
@@ -57,9 +62,14 @@ namespace Rubicon.Core.Rulesets;
     [Export] public UiStyle UiStyle;
 
     /// <summary>
-    /// A control node that displays cool things + potentially important statistics for the player.
+    /// A control node that's constantly on the screen.
     /// </summary>
-    [Export] public PlayHud Hud;
+    [Export] public GameHud GameHud;
+
+    /// <summary>
+    /// A control node that's attached to the player's <see cref="BarLine"/>.
+    /// </summary>
+    [Export] public BarLineHud PlayerHud;
     
     /// <summary>
     /// The bar lines associated with this play field.
@@ -115,6 +125,11 @@ namespace Rubicon.Core.Rulesets;
     /// Emitted after every note type processes through the result.
     /// </summary>
     [Signal] public delegate void NoteHitEventHandler(StringName barLineName, NoteResult element);
+    
+    /// <summary>
+    /// Emitted by <see cref="PlayField.UpdateOptions"/>, in case anything needs changing after options were changed.
+    /// </summary>
+    [Signal] public delegate void OptionsUpdatedEventHandler();
 
     /// <summary>
     /// Readies the PlayField for gameplay!
@@ -122,11 +137,12 @@ namespace Rubicon.Core.Rulesets;
     /// <param name="meta">The song meta</param>
     /// <param name="chart">The chart loaded</param>
     /// <param name="targetIndex">The index to play in <see cref="SongMeta.PlayableCharts"/>.</param>
-    public virtual void Setup(SongMeta meta, RubiChart chart, int targetIndex, EventMeta events = null)
+    public virtual void Setup(RuleSet ruleSetData, SongMeta meta, RubiChart chart, int targetIndex, EventMeta events = null)
     {
         SetAnchorsPreset(LayoutPreset.FullRect);
         
         Name = "Base PlayField";
+        RuleSet = ruleSetData;
         Metadata = meta;
         Chart = chart;
         Events = events;
@@ -147,26 +163,6 @@ namespace Rubicon.Core.Rulesets;
         }
         
         UiStyle = ResourceLoader.LoadThreadedGet(PathUtility.GetResourcePath(uiStylePath)) as UiStyle;
-        if (UiStyle.HitDistance != null && UiStyle.HitDistance.CanInstantiate())
-        {
-            Node hitDistance = UiStyle.HitDistance.Instantiate();
-            InitializeGodotScript(hitDistance);
-            AddChild(hitDistance);
-        }
-
-        if (UiStyle.Judgment != null && UiStyle.Judgment.CanInstantiate())
-        {
-            Node judgment = UiStyle.Judgment.Instantiate();
-            InitializeGodotScript(judgment);
-            AddChild(judgment);
-        }
-
-        if (UiStyle.Combo != null && UiStyle.Combo.CanInstantiate())
-        {
-            Node combo = UiStyle.Combo.Instantiate();
-            InitializeGodotScript(combo);
-            AddChild(combo);   
-        }
         
         BarLines = new BarLine[chart.Charts.Length];
         TargetBarLine = meta.PlayableCharts[targetIndex];
@@ -199,8 +195,6 @@ namespace Rubicon.Core.Rulesets;
             curBarLine.NoteHit += BarLineHit;
         }
         
-        UpdateOptions();
-        
         Conductor.Reset();
         Conductor.ChartOffset = Metadata.Offset;
         Conductor.BpmList = Metadata.BpmInfo;
@@ -219,17 +213,22 @@ namespace Rubicon.Core.Rulesets;
             EventController.Setup(events, this);
             AddChild(EventController);
         }
-        
-        if (UiStyle.PlayHud != null && UiStyle.PlayHud.CanInstantiate())
+
+        if (UiStyle.MainHud != null && UiStyle.MainHud.CanInstantiate())
         {
-            Hud = UiStyle.PlayHud.Instantiate<PlayHud>();
-            AddChild(Hud);
+            GameHud = UiStyle.MainHud.Instantiate<GameHud>();
+            AddChild(GameHud);
             
-            Hud.Setup(this);
-            
-            // TODO: UPDATE THIS SO IT ISNT MANIA-DEPENDENT
-            Hud.UpdatePosition(UserSettings.Rubicon.Mania.DownScroll);
+            GameHud.Setup(this);
         }
+        
+        if (UiStyle.BarLineHud != null && UiStyle.BarLineHud.CanInstantiate())
+        {
+            PlayerHud = UiStyle.BarLineHud.Instantiate<BarLineHud>();
+            PlayerHud.Setup(BarLines[TargetIndex], this);
+        }
+        
+        UpdateOptions();
 
         // TODO: BAD CODE, CHANGE LATER
         foreach (StringName noteType in noteTypeMap.Keys)
@@ -448,37 +447,26 @@ namespace Rubicon.Core.Rulesets;
 
     public void InitializeGodotScript(Node node)
     {
+        // Handle CSharp elements first.
         if (node is IPlayElement element)
         {
             element.PlayField = this;
             element.Initialize();
+
+            if (node is CsHudElement hudElement)
+                OptionsUpdated += hudElement.OptionsUpdated;
+            
             return;
         }
         
-        Script currentScript = node.GetScript().As<Script>();
-        bool isValidScript = false;
-        while (currentScript is not null)
-        {
-            string[] validScriptNames = ApiConstants.ValidGodotScriptNames;
-            for (int i = 0; i < validScriptNames.Length; i++)
-            {
-                if (currentScript.GetGlobalName() == validScriptNames[i])
-                {
-                    isValidScript = true;
-                    break;
-                }
-            }
-
-            if (isValidScript)
-                break;
-
-            currentScript = currentScript.GetBaseScript();
-        }
-
-        if (!isValidScript)
+        // Handle any other programming language
+        if (!node.InheritsFrom(ApiConstants.ValidGodotScriptNames))
             return;
         
         node.Set("play_field", this);
         node.Call("initialize");
+
+        if (node.InheritsFrom(ApiConstants.GdScriptHudElement))
+            Connect(SignalName.OptionsUpdated, new Callable(node, "options_updated"));
     }
 }

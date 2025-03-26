@@ -1,35 +1,51 @@
 using System.Linq;
-using Rubicon.Core.Data;
 using Godot.Collections;
+using Rubicon.Core.API;
 using Rubicon.Core.Rulesets;
-using Node = Godot.Node;
 
 namespace Rubicon.Core.UI;
 
 /// <summary>
-/// Defines a <see cref="Control"/> node with certain settings for the heads-up-display.
+/// Defines a <see cref="Control"/> node that is attached to a <see cref="BarLine"/>.
+/// There are pre-defined references to certain common HUD elements for use in song scripting, however if needs be, you can use the built-in metadata to define anything else you may need.
 /// </summary>
-[GlobalClass] public partial class PlayHud : Control
+[GlobalClass] public partial class BarLineHud : Control
 {
     /// <summary>
-    /// If a child is placed in this array, it is ignored in <see cref="UpdatePosition"/>.
+    /// The node representing the judgment. This isn't necessary, but it's nice to have a reference when scripting.
+    /// </summary>
+    [Export] public Node Judgment;
+    
+    /// <summary>
+    /// The node representing the combo. This isn't necessary, but it's nice to have a reference when scripting.
+    /// </summary>
+    [Export] public Node Combo;
+    
+    /// <summary>
+    /// The node representing the hit distance. This isn't necessary, but it's nice to have a reference when scripting.
+    /// </summary>
+    [Export] public Node HitDistance;
+    
+    /// <summary>
+    /// If a child is placed in this array, it is ignored in <see cref="Flip"/>.
     /// </summary>
     [Export] public Node[] UpdateExceptions = [];
 
-    private bool _inDownScrollPositions = false;
-
-    public void Setup(PlayField playField)
+    private bool _flipped = false;
+    
+    public void Setup(BarLine barLine, PlayField playField)
     {
+        barLine.AddChild(this);
         InitializeChildren(GetChildren(), playField);
     }
-
+    
     /// <summary>
-    /// Updates the children's anchors depending on if the game is in down scroll or not.
+    /// Flips its own children's anchors.
     /// </summary>
-    /// <param name="downScroll"></param>
-    public void UpdatePosition(bool downScroll)
+    /// <param name="flip">Whether to flip the elements on this HUD.</param>
+    public void Flip(bool flip)
     {
-        if (_inDownScrollPositions == downScroll)
+        if (_flipped == flip)
             return;
         
         Array<Node> children = GetChildren();
@@ -55,9 +71,9 @@ namespace Rubicon.Core.UI;
             control.OffsetTop = offsetBottom * -1f;
         }
 
-        _inDownScrollPositions = downScroll;
+        _flipped = flip;
     }
-
+    
     private void InitializeChildren(Array<Node> children, PlayField playField)
     {
         for (int i = 0; i < children.Count; i++)

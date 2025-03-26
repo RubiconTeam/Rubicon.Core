@@ -1,22 +1,28 @@
-using Rubicon.Core;
-
 namespace Rubicon.Core.API;
 
-[GlobalClass] public abstract partial class CsTimerBar : CsHudElement
+/// <summary>
+/// A template for a bar that tracks the time left in-game.
+/// </summary>
+[GlobalClass] public abstract partial class CsTimerBar : CsCustomBar
 {
-    private float _length = 0f;
-
+    /// <summary>
+    /// The length of the instrumental in seconds. Is modifiable just in case you want to screw around with it.
+    /// </summary>
+    [Export] public float Length = 0f;
+    
+    /// <inheritdoc />
     public override void Initialize()
     {
-        base._Ready();
-        
-        _length = (float)PlayField.Music.Stream.GetLength();
+        if (PlayField != null)
+            Length = (float)PlayField.Music.Stream.GetLength();
     }
 
+    /// <inheritdoc />
     public override void _Process(double delta)
     {
-        UpdateTimer(Conductor.Time, _length);
+        if (PlayField != null)
+            ProgressRatio = Conductor.RawTime / Length;
+        
+        base._Process(delta);
     }
-
-    public abstract void UpdateTimer(float currentTime, float length);
 }

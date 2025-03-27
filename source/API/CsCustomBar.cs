@@ -11,11 +11,20 @@ namespace Rubicon.Core.API;
     /// How much progress this bar has made from 0.0 to 1.0.
     /// </summary>
     [Export] public float ProgressRatio = 0f;
-    
+
     /// <summary>
     /// What direction the bar filling goes.
     /// </summary>
-    [Export] public BarDirection Direction = BarDirection.LeftToRight;
+    [Export]
+    public BarDirection Direction
+    {
+        get => _direction;
+        set
+        {
+            _direction = value;
+            ChangeDirection(value);
+        }
+    }
     
     /// <summary>
     /// The bar's color on the left side.
@@ -59,6 +68,14 @@ namespace Rubicon.Core.API;
 
     private Color _leftColor = Colors.Red;
     private Color _rightColor = Colors.Green;
+    private BarDirection _direction = BarDirection.LeftToRight;
+
+    public override void _Ready()
+    {
+        base._Ready();
+        
+        ChangeDirection(Direction);
+    }
 
     public override void _Process(double delta)
     {
@@ -82,4 +99,10 @@ namespace Rubicon.Core.API;
     /// </summary>
     /// <param name="rightColor">The new right color</param>
     protected abstract void ChangeRightColor(Color rightColor);
+    
+    /// <summary>
+    /// Changes the direction of the bar.
+    /// </summary>
+    /// <param name="direction">The new direction</param>
+    protected abstract void ChangeDirection(BarDirection direction);
 }

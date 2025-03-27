@@ -312,6 +312,51 @@ namespace Rubicon.Core.Rulesets;
     }
 
     /// <summary>
+    /// Get the judgment UI component for the currently running PlayField.
+    /// </summary>
+    /// <returns>The Judgment UI component if it exists, or null if it doesn't</returns>
+    public Node GetJudgment()
+    {
+        if (PlayerHud != null && PlayerHud.Judgment != null)
+            return PlayerHud.Judgment;
+        
+        if (GameHud != null && GameHud.Judgment != null)
+            return GameHud.Judgment;
+        
+        return null;
+    }
+    
+    /// <summary>
+    /// Get the combo display UI component for the currently running PlayField.
+    /// </summary>
+    /// <returns>The combo display UI component if it exists, or null if it doesn't</returns>
+    public Node GetComboDisplay()
+    {
+        if (PlayerHud != null && PlayerHud.Combo != null)
+            return PlayerHud.Combo;
+        
+        if (GameHud != null && GameHud.Combo != null)
+            return GameHud.Combo;
+        
+        return null;
+    }
+    
+    /// <summary>
+    /// Get the hit distance UI component for the currently running PlayField.
+    /// </summary>
+    /// <returns>The hit distance UI component if it exists, or null if it doesn't</returns>
+    public Node GetHitDistance()
+    {
+        if (PlayerHud != null && PlayerHud.HitDistance != null)
+            return PlayerHud.HitDistance;
+        
+        if (GameHud != null && GameHud.HitDistance != null)
+            return GameHud.HitDistance;
+        
+        return null;
+    }
+
+    /// <summary>
     /// This function is triggered upon an update to the settings.
     /// </summary>
     public abstract void UpdateOptions();

@@ -359,7 +359,10 @@ namespace Rubicon.Core.Rulesets;
     /// <summary>
     /// This function is triggered upon an update to the settings.
     /// </summary>
-    public abstract void UpdateOptions();
+    public virtual void UpdateOptions()
+    {
+        EmitSignalOptionsUpdated();
+    }
 
     /// <summary>
     /// Triggers every time the player hits a note to update the in-game statistics

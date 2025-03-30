@@ -70,7 +70,7 @@ namespace Rubicon.Core.Rulesets;
     /// <summary>
     /// A control node that's attached to the player's <see cref="BarLine"/>.
     /// </summary>
-    [Export] public BarLineHud PlayerHud;
+    [Export] public GameHud PlayerHud;
     
     /// <summary>
     /// The bar lines associated with this play field.
@@ -225,8 +225,12 @@ namespace Rubicon.Core.Rulesets;
         
         if (UiStyle.BarLineHud != null && UiStyle.BarLineHud.CanInstantiate())
         {
-            PlayerHud = UiStyle.BarLineHud.Instantiate<BarLineHud>();
-            PlayerHud.Setup(BarLines[TargetIndex], this);
+            PlayerHud = UiStyle.BarLineHud.Instantiate<GameHud>();
+            
+            BarLines[TargetIndex].AddChild(PlayerHud);
+            BarLines[TargetIndex].MoveChild(PlayerHud, 0);
+            
+            PlayerHud.Setup(this);
         }
         
         UpdateOptions();
@@ -275,7 +279,7 @@ namespace Rubicon.Core.Rulesets;
     {
         base._Process(delta);
         
-        if (GetFailCondition())
+        if (HasFailed())
             Fail();
     }
 
@@ -357,6 +361,39 @@ namespace Rubicon.Core.Rulesets;
         return null;
     }
 
+    public Node GetHealthBar()
+    {
+        if (PlayerHud != null && PlayerHud.HealthBar != null)
+            return PlayerHud.HealthBar;
+
+        if (GameHud != null && GameHud.HealthBar != null)
+            return GameHud.HealthBar;
+        
+        return null;
+    }
+    
+    public Node GetScorePanel()
+    {
+        if (PlayerHud != null && PlayerHud.ScorePanel != null)
+            return PlayerHud.ScorePanel;
+
+        if (GameHud != null && GameHud.ScorePanel != null)
+            return GameHud.ScorePanel;
+        
+        return null;
+    }
+    
+    public Node GetTimerBar()
+    {
+        if (PlayerHud != null && PlayerHud.TimerBar != null)
+            return PlayerHud.TimerBar;
+
+        if (GameHud != null && GameHud.TimerBar != null)
+            return GameHud.TimerBar;
+        
+        return null;
+    }
+
     /// <summary>
     /// This function is triggered upon an update to the settings.
     /// </summary>
@@ -379,7 +416,7 @@ namespace Rubicon.Core.Rulesets;
     /// The fail condition for this play field.
     /// </summary>
     /// <returns>Whether the player has failed</returns>
-    public virtual bool GetFailCondition() => false;
+    public virtual bool HasFailed() => false;
 
     /// <summary>
     /// Creates a new bar line and sets it up along with it.

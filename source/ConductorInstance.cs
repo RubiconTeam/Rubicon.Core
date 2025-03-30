@@ -137,7 +137,14 @@ public partial class ConductorInstance : Node
 	private int _lastStep = -int.MaxValue;
 	private int _lastMeasure = -int.MaxValue;
 	#endregion
-		
+
+	public override void _Ready()
+	{
+		base._Ready();
+
+		ProcessMode = ProcessModeEnum.Always;
+	}
+
 	public override void _Process(double delta)
 	{
 		if (!Playing)

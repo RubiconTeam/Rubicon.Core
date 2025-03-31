@@ -1,4 +1,3 @@
-extends RefCounted
 ## Helper functions for Conductor and time-based stuff.
 ##
 ## ConductorUtility's functions ported into GDScript.

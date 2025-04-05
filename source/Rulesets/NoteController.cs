@@ -99,6 +99,8 @@ namespace Rubicon.Core.Rulesets;
 	private NoteData[] _notes = [];
 	private NoteResult _result = new();
 
+	public abstract void Setup();
+	
 	public override void _Process(double delta)
 	{
 		base._Process(delta);

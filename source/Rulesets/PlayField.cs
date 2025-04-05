@@ -169,9 +169,11 @@ namespace Rubicon.Core.Rulesets;
         for (int i = 0; i < chart.Charts.Length; i++)
         {
             ChartData indChart = chart.Charts[i];
-            BarLine curBarLine = CreateBarLine(indChart, i);
+            BarLine curBarLine = CreateBarLine();
             curBarLine.Name = indChart.Name;
             curBarLine.PlayField = this;
+            curBarLine.Setup(indChart, this);
+            
             if (indChart.Name == TargetBarLine)
             {
                 TargetIndex = i;
@@ -181,6 +183,8 @@ namespace Rubicon.Core.Rulesets;
             AddChild(curBarLine);
             BarLines[i] = curBarLine;
             curBarLine.NoteHit += BarLineHit;
+            
+            AfterBarLineSetup(curBarLine);
         }
         
         Conductor.Reset();
@@ -419,12 +423,16 @@ namespace Rubicon.Core.Rulesets;
     public virtual bool HasFailed() => false;
 
     /// <summary>
-    /// Creates a new bar line and sets it up along with it.
+    /// Creates a new bar line.
     /// </summary>
-    /// <param name="chart">The chart to assign</param>
-    /// <param name="index">The assigned index of the bar line</param>
     /// <returns>A new <see cref="BarLine"/></returns>
-    public abstract BarLine CreateBarLine(ChartData chart, int index);
+    public abstract BarLine CreateBarLine();
+
+    /// <summary>
+    /// Invoked right after <see cref="BarLine.Setup"/> gets called.
+    /// </summary>
+    /// <param name="barLine">The bar line that just got setup.</param>
+    public abstract void AfterBarLineSetup(BarLine barLine);
 
     /// <summary>
     /// The function that is connected to the bar lines when a note is hit. Can be overriden if needed for a specific ruleset.

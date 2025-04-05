@@ -16,13 +16,13 @@ namespace Rubicon.Core.Rulesets;
 	/// <summary>
 	/// Contains all the nodes used to manage notes.
 	/// </summary>
-	[Export] public NoteController[] Managers;
+	[Export] public NoteController[] Controllers;
 	
 	/// <summary>
 	/// The PlayField this instance is associated with.
 	/// </summary>
 	[Export] public PlayField PlayField;
-
+	
 	/// <summary>
 	/// The distance to offset notes by position-wise.
 	/// </summary>
@@ -42,6 +42,26 @@ namespace Rubicon.Core.Rulesets;
 	/// A signal that is emitted every time a manager in this bar line either presses or lets go of a bind.
 	/// </summary>
 	[Signal] public delegate void BindPressedEventHandler(BarLine barLine);
+
+	public virtual void Setup(ChartData chart, PlayField playField)
+	{
+		Chart = chart;
+		Controllers = new NoteController[chart.Lanes];
+		for (int i = 0; i < Controllers.Length; i++)
+		{
+			NoteController noteController = CreateNoteController();
+			noteController.Name = $"Note Controller {i}";
+			noteController.ParentBarLine = this;
+			noteController.Lane = i;
+			noteController.Notes = Chart.GetNotesAtLane((byte)i);
+			noteController.ScrollSpeed = playField.Chart.ScrollSpeed;
+			noteController.Setup();
+			AddChild(noteController);
+			Controllers[i] = noteController;
+		}
+	}
+
+	public abstract NoteController CreateNoteController();
 	
 	public override void _Process(double delta)
 	{
@@ -81,7 +101,7 @@ namespace Rubicon.Core.Rulesets;
 	/// <param name="autoplay">Bool that decides if the <see cref="BarLine"/> should be auto-played or not.</param>
 	public void SetAutoPlay(bool autoplay)
 	{
-		foreach (NoteController noteManager in Managers)
+		foreach (NoteController noteManager in Controllers)
 			noteManager.Autoplay = autoplay;
 	}
 
@@ -91,7 +111,7 @@ namespace Rubicon.Core.Rulesets;
 	/// <param name="scrollSpeed">The new speed to be applied.</param>
 	public void SetScrollSpeed(float scrollSpeed)
 	{
-		foreach (NoteController noteManager in Managers)
+		foreach (NoteController noteManager in Controllers)
 			noteManager.ScrollSpeed = scrollSpeed;
 	}
 }

@@ -132,7 +132,7 @@ namespace Rubicon.Core.Rulesets;
 			if (Notes[NoteHitIndex].ShouldMiss)
 				break;
 			
-			ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: 0f, holding: Notes[NoteHitIndex].Length > 0f));
+			ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: 0f, holding: Notes[NoteHitIndex].MeasureLength > 0f));
 			NoteHitIndex++;
 		}
 		
@@ -182,9 +182,9 @@ namespace Rubicon.Core.Rulesets;
 		result.Index = noteIndex;
 		
 		// Auto detect hit based on distance
-		if (result.Note.Length > 0 && !holding && HoldingIndex == noteIndex) // If hold note was let go
+		if (result.Note.MeasureLength > 0 && !holding && HoldingIndex == noteIndex) // If hold note was let go
 		{
-			result.Rating = Mathf.Abs(Conductor.CurrentMeasure - result.Note.Time - result.Note.Length) < 1f ? Judgment.Perfect : Judgment.Miss;
+			result.Rating = Mathf.Abs(Conductor.CurrentMeasure - result.Note.MeasureTime - result.Note.MeasureLength) < 1f ? Judgment.Perfect : Judgment.Miss;
 			result.Hit = Hit.Tail;
 		}
 		else
@@ -207,7 +207,7 @@ namespace Rubicon.Core.Rulesets;
 			}
 
 			result.Rating = (Judgment)hit;
-			result.Hit = result.Note.Length > 0 && result.Rating != Judgment.Miss ? Hit.Hold : Hit.Tap;
+			result.Hit = result.Note.MeasureLength > 0 && result.Rating != Judgment.Miss ? Hit.Hold : Hit.Tap;
 		}
 
 		if (HitObjects[noteIndex] != null)

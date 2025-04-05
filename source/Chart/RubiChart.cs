@@ -16,12 +16,6 @@ namespace Rubicon.Core.Chart;
 public partial class RubiChart : Resource
 {
     /// <summary>
-    /// The current chart version.
-    /// </summary>
-    public readonly static VersionInfo ChartVersion = new(1, 1, 1, 0);
-    
-    #region Public Variables
-    /// <summary>
     /// The name of the people who helped with this chart.
     /// </summary>
     [Export] public string Charter = "";
@@ -34,7 +28,7 @@ public partial class RubiChart : Resource
     /// <summary>
     /// The Rubicon Engine version this chart was created on.
     /// </summary>
-    [Export] public uint Version = ChartVersion.Raw;
+    [Export] public uint Version = RubiChartConstants.ChartVersion.Raw;
 
     /// <summary>
     /// The default scroll speed for this chart.
@@ -44,15 +38,7 @@ public partial class RubiChart : Resource
     /// <summary>
     /// The individual charts (or "strum lines") that each contain its own notes.
     /// </summary>
-    [Export] public IndividualChart[] Charts = [];
-    #endregion
-
-    #region Public Methods
-    /// <summary>
-    /// Gets the current version of the RubiChart format.
-    /// </summary>
-    /// <returns>The current version of the RubiChart format</returns>
-    public VersionInfo GetVersion() => ChartVersion;
+    [Export] public ChartData[] Charts = [];
     
     /// <summary>
     /// Converts everything in this chart to millisecond format.
@@ -60,10 +46,9 @@ public partial class RubiChart : Resource
     /// <returns>Itself</returns>
     public RubiChart ConvertData(BpmInfo[] bpmInfo)
     {
-        foreach (IndividualChart curChart in Charts)
+        foreach (ChartData curChart in Charts)
         {
-            for (int n = 0; n < curChart.Notes.Length; n++)
-                curChart.Notes[n].ConvertData(bpmInfo, curChart.SvChanges);
+            curChart.ConvertData(bpmInfo);
 
             if (curChart.SvChanges.Length <= 1)
                 continue;
@@ -75,68 +60,32 @@ public partial class RubiChart : Resource
         return this;
     }
 
-    /// <summary>
-    /// Sorts the notes properly and attempts to get rid of any duplicate notes and notes inside holds.
-    /// </summary>
-    public void Format()
+    public string[] GetAllNoteTypes()
     {
+        List<string> noteTypes = new List<string>();
         for (int c = 0; c < Charts.Length; c++)
         {
-            List<NoteData> notes = [];
-
-            for (int l = 0; l < Charts[c].Lanes; l++)
+            ChartData curChart = Charts[c];
+            for (int s = 0; s < curChart.Sections.Length; s++)
             {
-                List<NoteData> lane = Charts[c].Notes.Where(x => x.Lane == l).ToList();
-                lane.Sort((x, y) =>
+                SectionData curSection = curChart.Sections[s];
+                for (int r = 0; r < curSection.Rows.Length; r++)
                 {
-                    if (x.Time < y.Time)
-                        return -1;
-                    if (x.Time > y.Time)
-                        return 1;
-
-                    return 0;
-                });
-
-                for (int i = 0; i < lane.Count - 1; i++)
-                {
-                    if (lane[i].Length > 0)
+                    RowData curRow = curSection.Rows[r];
+                    for (int n = 0; n < curRow.Notes.Length; n++)
                     {
-                        double start = lane[i].Time;
-                        double end = lane[i].Time + lane[i].Length;
-                        while (i < lane.Count - 1 && lane[i + 1].Time >= start && lane[i + 1].Time < end)
-                        {
-                            GD.Print($"Removed note inside hold note area at {lane[i + 1].Time} in lane {l} ({start}-{end})");
-                            lane.RemoveAt(i + 1);
-                        }
-                    }
-
-                    while (i < lane.Count - 1 && lane[i + 1].Time == lane[i].Time)
-                    {
-                        GD.Print($"Removed duplicate note at {lane[i + 1].Time} in lane {l}");
-                        lane.RemoveAt(i + 1);
+                        NoteData curNote = curRow.Notes[n];
+                        string typeString = curNote.Type.ToString();
+                        bool hasType = typeString.ToLower() != "normal";
+                        if (!hasType || noteTypes.Contains(typeString))
+                            continue;
+                        
+                        noteTypes.Add(typeString);
                     }
                 }
-
-                notes.AddRange(lane);
             }
-
-            notes.Sort((x, y) =>
-            {
-                if (x.Time < y.Time)
-                    return -1;
-                if (x.Time > y.Time)
-                    return 1;
-
-                if (x.Lane < y.Lane)
-                    return -1;
-                if (x.Lane > y.Lane)
-                    return 1;
-
-                return 0;
-            });
-
-            Charts[c].Notes = notes.ToArray();
         }
+                        
+        return noteTypes.ToArray();
     }
-    #endregion
 }

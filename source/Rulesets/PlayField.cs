@@ -1,4 +1,3 @@
-using System.Linq;
 using Godot.Collections;
 using Rubicon.Core.API;
 using Rubicon.Core.Chart;
@@ -151,7 +150,7 @@ namespace Rubicon.Core.Rulesets;
         Input.UseAccumulatedInput = false;
 
         Metadata.ConvertData();
-        Chart.ConvertData(meta.BpmInfo).Format();
+        Chart.ConvertData(meta.BpmInfo);
         
         // Handle UI Style
         string uiStylePath = $"res://resources/ui/styles/{Metadata.UiStyle}/Style";
@@ -167,21 +166,9 @@ namespace Rubicon.Core.Rulesets;
         
         BarLines = new BarLine[chart.Charts.Length];
         TargetBarLine = meta.PlayableCharts[targetIndex];
-        Dictionary<StringName, Array<NoteData>> noteTypeMap = new Dictionary<StringName, Array<NoteData>>();
         for (int i = 0; i < chart.Charts.Length; i++)
         {
-            IndividualChart indChart = chart.Charts[i];
-            for (int n = 0; n < indChart.Notes.Length; n++)
-            {
-                NoteData curNote = indChart.Notes[n];
-                StringName noteType = curNote.Type;
-                
-                if (!noteTypeMap.ContainsKey(noteType))
-                    noteTypeMap[noteType] = [];
-                
-                noteTypeMap[noteType].Add(curNote);
-            }
-            
+            ChartData indChart = chart.Charts[i];
             BarLine curBarLine = CreateBarLine(indChart, i);
             curBarLine.Name = indChart.Name;
             curBarLine.PlayField = this;
@@ -236,6 +223,19 @@ namespace Rubicon.Core.Rulesets;
         UpdateOptions();
 
         // TODO: BAD CODE, CHANGE LATER
+        Dictionary<StringName, Array<NoteData>> noteTypeMap = new Dictionary<StringName, Array<NoteData>>();
+        string[] noteTypeList = Chart.GetAllNoteTypes();
+        for (int t = 0; t < noteTypeList.Length; t++)
+        {
+            string curNoteType = noteTypeList[t];
+            
+            Array<NoteData> notes = new Array<NoteData>();
+            for (int c = 0; c < Chart.Charts.Length; c++)
+                notes.AddRange(Chart.Charts[c].GetNotesOfType(curNoteType));
+            
+            noteTypeMap[curNoteType] = notes;
+        }
+        
         foreach (StringName noteType in noteTypeMap.Keys)
         {
             if (!RubiconCore.NoteTypePaths.ContainsKey(noteType))
@@ -424,7 +424,7 @@ namespace Rubicon.Core.Rulesets;
     /// <param name="chart">The chart to assign</param>
     /// <param name="index">The assigned index of the bar line</param>
     /// <returns>A new <see cref="BarLine"/></returns>
-    public abstract BarLine CreateBarLine(IndividualChart chart, int index);
+    public abstract BarLine CreateBarLine(ChartData chart, int index);
 
     /// <summary>
     /// The function that is connected to the bar lines when a note is hit. Can be overriden if needed for a specific ruleset.
@@ -476,7 +476,7 @@ namespace Rubicon.Core.Rulesets;
                                 break;
                             case Judgment.Miss:
                                 ScoreTracker.Misses++;
-                                if (result.Note.Length > 0)
+                                if (result.Note.MeasureLength > 0)
                                     ScoreTracker.Misses++;
                                 break;
                         }

@@ -118,56 +118,22 @@ namespace Rubicon.Core.Rulesets;
     /// Sets the <see cref="NoteCount"/> and <see cref="MaxCombo"/> from the chart.
     /// </summary>
     /// <param name="chart">Which chart should be accounted.</param>
-    /// <param name="target">Which character's <see cref="IndividualChart"/> should be targeted.</param>
+    /// <param name="target">Which character's <see cref="ChartData"/> should be targeted.</param>
     public void Initialize(RubiChart chart, StringName target)
     {
         Chart = chart;
         
-        IndividualChart playerChart = chart.Charts.FirstOrDefault(x => x.Name == target);
+        ChartData playerChart = chart.Charts.FirstOrDefault(x => x.Name == target);
         if (playerChart == null)
             return;
         
-        float startTime = 0;
-        List<TargetSwitch> switches = [..playerChart.Switches];
-        switches.Insert(0, new TargetSwitch{ Time = 0f, MsTime = 0f, Name = target });
-        for (int i = 0; i < switches.Count; i++)
-        {
-            IndividualChart curChart = chart.Charts.FirstOrDefault(x => x.Name == switches[i].Name);
-            if (curChart == null)
-                continue;
-            
-            if (i < switches.Count - 1)
-            {
-                int tapNoteCount = GetNoteCountInRange(curChart.Notes, startTime, switches[i + 1].MsTime);
-                MaxCombo += tapNoteCount;
-                NoteCount += tapNoteCount + GetHoldNoteCountInRange(curChart.Notes, startTime, switches[i + 1].MsTime);
-                startTime = switches[i + 1].Time;
-                continue;
-            }
-
-            int tapNotes = GetNoteCountInRange(curChart.Notes, startTime);
-            MaxCombo += tapNotes;
-            NoteCount += tapNotes + GetHoldNoteCountInRange(curChart.Notes, startTime);
-        }
+        NoteData[] notes = playerChart.GetNotes();
+        MaxCombo += notes.Length;
+        NoteCount += MaxCombo + GetHoldNoteCount(notes);
     }
 
-    private int GetNoteCountInRange(NoteData[] notes, double start)
+    private int GetHoldNoteCount(NoteData[] notes)
     {
-        return notes.Count(x => x.Time >= start && x.CountsTowardScore);
-    }
-    
-    private int GetNoteCountInRange(NoteData[] notes, double start, double end)
-    {
-        return notes.Count(x => x.Time >= start && x.Time <= end && x.CountsTowardScore);
-    }
-    
-    private int GetHoldNoteCountInRange(NoteData[] notes, double start)
-    {
-        return notes.Count(x => x.Time >= start && x.CountsTowardScore && x.Length > 0);
-    }
-    
-    private int GetHoldNoteCountInRange(NoteData[] notes, double start, double end)
-    {
-        return notes.Count(x => x.Time >= start && x.Time <= end && x.CountsTowardScore && x.Length > 0);
+        return notes.Count(x => x.MeasureLength > 0f);
     }
 }

@@ -11,7 +11,7 @@ namespace Rubicon.Core.Rulesets;
 	/// <summary>
 	/// The individual chart for this bar line. Contains notes and scroll velocity changes.
 	/// </summary>
-	[Export] public IndividualChart Chart;
+	[Export] public ChartData Chart;
 	
 	/// <summary>
 	/// Contains all the nodes used to manage notes.

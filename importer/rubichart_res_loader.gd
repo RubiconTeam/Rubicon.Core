@@ -4,7 +4,7 @@ class_name RbcResourceFormatLoader
 
 extends ResourceFormatLoader
 
-const RbcV1_1_0_0 = preload("res://addons/Rubicon.Core/importer/loaders/rbc_1.1.gd")
+const RbcV2_0_0_0 = preload("res://addons/Rubicon.Core/importer/loaders/rbc_2.0.gd")
 
 func _get_recognized_extensions() -> PackedStringArray:
 	return PackedStringArray(["rbc"])
@@ -34,15 +34,23 @@ func _load(path: String, original_path: String, use_sub_threads: bool, cache_mod
 
 	var rbc_check : PackedByteArray = reader.get_buffer(4)
 	if rbc_check.decode_u32(0) == 16842752: # Parse RubiChart v1.1 charts
-		chart = RbcV1_1_0_0.convert(reader)
+		print("RBC file at " + reader.get_path() + " is version 1.1! Please convert it to at least RubiChart v2.0.0 or higher.")
+		reader.close()
+		return ERR_INVALID_DATA
 	else:
 		if not (rbc_check.get_string_from_utf8() == "RBCN"):
 			return ERR_INVALID_DATA
 		
 		var version : int = reader.get_32()
 		match version:
+			16843008:
+				print("RBC file at " + reader.get_path() + " is version 1.1.1! Please convert it to at least RubiChart v2.0.0 or higher.")
+				reader.close()
+				return ERR_INVALID_DATA
+			33554432:
+				chart = RbcV2_0_0_0.convert(reader)	
 			_:
-				chart = RbcV1_1_0_0.convert(reader)
+				chart = RbcV2_0_0_0.convert(reader)
 
 	reader.close()
 	return chart

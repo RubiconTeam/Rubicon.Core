@@ -72,15 +72,13 @@ public partial class RubiChart : Resource
                 for (int r = 0; r < curSection.Rows.Length; r++)
                 {
                     RowData curRow = curSection.Rows[r];
-                    for (int n = 0; n < curRow.Notes.Length; n++)
+                    string[] noteTypesInRow = curRow.GetNoteTypes();
+                    for (int n = 0; n < noteTypesInRow.Length; n++)
                     {
-                        NoteData curNote = curRow.Notes[n];
-                        string typeString = curNote.Type.ToString();
-                        bool hasType = typeString.ToLower() != "normal";
-                        if (!hasType || noteTypes.Contains(typeString))
+                        if (noteTypes.Contains(noteTypesInRow[n]))
                             continue;
                         
-                        noteTypes.Add(typeString);
+                        noteTypes.Add(noteTypesInRow[n]);
                     }
                 }
             }

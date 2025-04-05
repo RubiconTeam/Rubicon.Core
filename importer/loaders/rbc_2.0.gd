@@ -47,7 +47,6 @@ static func convert(reader : FileAccess) -> RubiChart:
 		
 		var hold_note_cache : Dictionary[int, NoteData]= {}
 		var section_count : int = int(reader.get_32())
-		print(section_count)
 		
 		var sections : Array[SectionData] = []
 		while section_count > 0:
@@ -63,7 +62,6 @@ static func convert(reader : FileAccess) -> RubiChart:
 				row_count -= 1
 	
 				var cur_row : RowData = RowData.new()
-				cur_row.Section = cur_section
 				cur_row.Quant = reader.get_8()
 				cur_row.Offset = reader.get_8()
 				cur_row.LanePriority = reader.get_8()
@@ -71,7 +69,8 @@ static func convert(reader : FileAccess) -> RubiChart:
 				rows.push_back(cur_row)
 
 				var note_count : int = reader.get_8()
-				var notes : Array[NoteData] = []
+				var start_notes : Array[NoteData] = []
+				var end_notes : Array[NoteData] = []
 				while note_count > 0:
 					note_count -= 1
 	
@@ -80,9 +79,10 @@ static func convert(reader : FileAccess) -> RubiChart:
 					var measure_time : float = cur_section.Measure + float(cur_row.Offset) / cur_row.Quant
 					if hold_note_cache.has(lane) and hold_note_cache[lane] != null:
 						var hold_note : NoteData = hold_note_cache[lane]
-						hold_note.EndingRow = cur_row
+						hold_note.MeasureLength = measure_time - hold_note.MeasureTime
+
 						hold_note_cache[lane] = null
-						notes.push_back(hold_note)
+						end_notes.push_back(hold_note)
 						continue
 					
 					var is_hold : bool = ((note_data & 0b10000000) >> 7) == 1
@@ -90,6 +90,7 @@ static func convert(reader : FileAccess) -> RubiChart:
 					var has_params : bool = ((note_data & 0b00100000) >> 5) == 1
 
 					var cur_note : NoteData = NoteData.new()
+					cur_note.MeasureTime = measure_time
 					cur_note.Lane = lane
 					
 					if is_hold:
@@ -101,10 +102,10 @@ static func convert(reader : FileAccess) -> RubiChart:
 					if has_params:
 						read_note_parameters(reader, cur_note)
 
-					cur_note.StartingRow = cur_row
-					notes.push_back(cur_note)
+					start_notes.push_back(cur_note)
 
-				cur_row.Notes = notes
+				cur_row.StartNotes = start_notes
+				cur_row.EndNotes = end_notes
 
 			cur_section.Rows = rows
 

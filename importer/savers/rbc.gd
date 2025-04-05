@@ -9,7 +9,15 @@ static func save(chart : RubiChart, writer : FileAccess) -> void:
 	for ind_chart : ChartData in chart.Charts:
 		for section : SectionData in ind_chart.Sections:
 			for row : RowData in section.Rows:
-				for note : NoteData in row.Notes:
+				for note : NoteData in row.StartNotes:
+					var has_type : bool = note.Type.to_lower() != "normal"
+					if not has_type or type_index_map.has(note.Type):
+						continue
+					
+					note_types.push_back(note.Type)
+					type_index_map.set(note.Type, note_types.size() - 1)
+
+				for note : NoteData in row.EndNotes:
 					var has_type : bool = note.Type.to_lower() != "normal"
 					if not has_type or type_index_map.has(note.Type):
 						continue
@@ -80,19 +88,20 @@ static func save(chart : RubiChart, writer : FileAccess) -> void:
 				writer.store_8(cur_row.Quant)
 				writer.store_8(cur_row.Offset)
 				writer.store_8(cur_row.LanePriority)
-				
-				var note_count : int = cur_row.Notes.size()
+
+				var chart_notes : Array = cur_row.GetNotes(true)
+				var note_count : int = chart_notes.size()
 				writer.store_8(note_count)
 				for n in note_count:
-					var cur_note : NoteData = cur_row.Notes[n]
+					var cur_note : NoteData = chart_notes[n]
 					var note_data : int = cur_note.Lane
 					
-					var is_hold : bool = cur_note.EndingRow != null
-					var is_ending_row : bool = is_hold and cur_row == cur_note.EndingRow
+					var is_ending_row : bool = cur_row.EndNotes.has(cur_note)
 					if is_ending_row:
 						writer.store_8(note_data)
 						continue
 					
+					var is_hold : bool = cur_note.MeasureLength > 0
 					if is_hold:
 						note_data = (1 << 7) | note_data
 					

@@ -9,6 +9,16 @@ namespace Rubicon.Core.Chart;
 
     [Export] public RowData[] Rows = [];
 
+    public void ConvertData(BpmInfo[] bpmInfo, SvChange[] svChanges)
+    {
+        for (int r = 0; r < Rows.Length; r++)
+        {
+            RowData row = Rows[r];
+            row.Section = this;
+            row.ConvertData(bpmInfo, svChanges);
+        }
+    }
+
     public RowData AddRow(byte offset, byte quant)
     {
         FixOffsetAndQuant(ref offset, ref quant);
@@ -55,7 +65,7 @@ namespace Rubicon.Core.Chart;
         for (int i = 0; i < Rows.Length; i++)
         {
             RowData row = Rows[i];
-            if (row.Notes.Length > 0)
+            if (row.StartNotes.Length > 0 || row.EndNotes.Length > 0)
                 continue;
 
             rowList.Remove(row);

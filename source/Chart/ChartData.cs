@@ -35,7 +35,7 @@ public partial class ChartData : Resource
 
     [Export] public NoteData[] Strays = [];
 
-    public NoteData[] GetNotes()
+    public NoteData[] GetNotes(bool includeEnds = false)
     {
         List<NoteData> notes = new List<NoteData>();
         for (int s = 0; s < Sections.Length; s++)
@@ -44,7 +44,7 @@ public partial class ChartData : Resource
             for (int r = 0; r < section.Rows.Length; r++)
             {
                 RowData row = section.Rows[r];
-                notes.AddRange(row.Notes.Where(x => x.EndingRow != row));
+                notes.AddRange(row.GetNotes(includeEnds));
             }
         }
         
@@ -54,7 +54,7 @@ public partial class ChartData : Resource
         return notes.ToArray();
     }
     
-    public NoteData[] GetNotesAtLane(byte lane)
+    public NoteData[] GetNotesAtLane(byte lane, bool includeEnds = false)
     {
         List<NoteData> notes = new List<NoteData>();
         for (int s = 0; s < Sections.Length; s++)
@@ -63,7 +63,9 @@ public partial class ChartData : Resource
             for (int r = 0; r < section.Rows.Length; r++)
             {
                 RowData row = section.Rows[r];
-                notes.AddRange(row.Notes.Where(x => x.Lane == lane && x.EndingRow != row));
+                NoteData note = row.GetNoteAtLane(lane, includeEnds);
+                if (note != null)
+                    notes.Add(note);
             }
         }
         
@@ -73,7 +75,7 @@ public partial class ChartData : Resource
         return notes.ToArray();
     }
 
-    public NoteData[] GetNotesOfType(StringName noteType)
+    public NoteData[] GetNotesOfType(StringName noteType, bool includeEnds = false)
     {
         List<NoteData> notes = new List<NoteData>();
         for (int s = 0; s < Sections.Length; s++)
@@ -82,7 +84,7 @@ public partial class ChartData : Resource
             for (int r = 0; r < section.Rows.Length; r++)
             {
                 RowData row = section.Rows[r];
-                notes.AddRange(row.Notes.Where(x => x.Type == noteType && x.EndingRow != row));
+                notes.AddRange(row.GetNotesOfType(noteType, includeEnds));
             }
         }
         
@@ -96,7 +98,7 @@ public partial class ChartData : Resource
     {
         SectionData section = AddSection(measure);
         RowData row = section.AddRow(offset, quant);
-        row.AddNote(note);
+        row.AddStartNote(note);
 
         note.StartingRow = row;
     }
@@ -105,7 +107,7 @@ public partial class ChartData : Resource
     {
         SectionData section = AddSection(measure);
         RowData row = section.AddRow(offset, quant);
-        row.AddNote(note);
+        row.AddEndNote(note);
 
         note.EndingRow = row;
     }
@@ -338,9 +340,7 @@ public partial class ChartData : Resource
     public void ConvertData(BpmInfo[] bpmInfo)
     {
         for (int s = 0; s < Sections.Length; s++)
-            for (int r = 0; r < Sections[s].Rows.Length; r++)
-                for (int n = 0 ; n < Sections[s].Rows[r].Notes.Length; n++)
-                    Sections[s].Rows[r].Notes[n].ConvertData(bpmInfo, SvChanges);
+            Sections[s].ConvertData(bpmInfo, SvChanges);
         
         for (int i = 0; i < Strays.Length; i++)
             Strays[i].ConvertData(bpmInfo, SvChanges);

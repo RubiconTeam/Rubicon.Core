@@ -17,7 +17,7 @@ func initialize(): ## If it hasn't been initialized already, link itself to the 
 		
 	var factory : NoteFactory = play_field.Factory
 	
-	factory.SpawnNote.connect(spawn_note)
+	factory.NoteSpawned.connect(spawn_note)
 	play_field.InitializeNote.connect(initialize_note) 
 	play_field.ModifyResult.connect(note_hit)
 	

@@ -95,6 +95,16 @@ namespace Rubicon.Core.Rulesets;
 	/// The <see cref="InputEvent"/> name for this controller.
 	/// </summary>
 	[Export] public string Action;
+	
+	/// <summary>
+	/// Emitted when a note is spawned.
+	/// </summary>
+	[Signal] public delegate void NoteSpawnedEventHandler(Note hitObject);
+	
+	/// <summary>
+	/// Emitted when a note is hit.
+	/// </summary>
+	[Signal] public delegate void NoteHitEventHandler(NoteResult element);
 
 	private NoteData[] _notes = [];
 	private NoteResult _result = new();
@@ -126,6 +136,8 @@ namespace Rubicon.Core.Rulesets;
 				AssignData(note, Notes[NoteSpawnIndex]);
 				Notes[NoteSpawnIndex].Spawned = true;
 				NoteSpawnIndex++;
+				
+				EmitSignalNoteSpawned(note);
 			}
 		}
 
@@ -246,5 +258,10 @@ namespace Rubicon.Core.Rulesets;
 	/// Triggers upon this note manager hitting/missing a note.
 	/// </summary>
 	/// <param name="element">Contains information about a note and its hits</param>
-	protected abstract void OnNoteHit(NoteResult element);
+	protected virtual void OnNoteHit(NoteResult element)
+	{
+		element.Note.Hit = true;
+		EmitSignalNoteHit(element);
+		ParentBarLine.OnNoteHit(element);
+	}
 }

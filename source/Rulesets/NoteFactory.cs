@@ -14,7 +14,7 @@ namespace Rubicon.Core.Rulesets;
     /// <summary>
     /// Triggers when a note is spawned.
     /// </summary>
-    [Signal] public delegate void SpawnNoteEventHandler(Note note, StringName noteType);
+    [Signal] public delegate void NoteSpawnedEventHandler(Note note, StringName noteType);
 
     /// <summary>
     /// Obtains a note for the type provided. If none are present, a new one is created.

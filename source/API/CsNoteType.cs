@@ -32,7 +32,7 @@ namespace Rubicon.Core.API;
         if (_initialized)
             return;
 
-        PlayField.Factory.SpawnNote += SpawnNote;
+        PlayField.Factory.NoteSpawned += SpawnNote;
         PlayField.InitializeNote += InitializeNote;
         PlayField.ModifyResult += NoteHit;
 

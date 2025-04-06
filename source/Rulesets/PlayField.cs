@@ -1,3 +1,4 @@
+using System.Linq;
 using Godot.Collections;
 using Rubicon.Core.API;
 using Rubicon.Core.Chart;
@@ -127,6 +128,16 @@ namespace Rubicon.Core.Rulesets;
     [Signal] public delegate void NoteHitEventHandler(StringName barLineName, NoteResult element);
     
     /// <summary>
+    /// Emitted when a new bar line is added.
+    /// </summary>
+    [Signal] public delegate void BarLineAddedEventHandler(StringName barLineName);
+    
+    /// <summary>
+    /// Emitted when a bar line is removed.
+    /// </summary>
+    [Signal] public delegate void BarLineRemovedEventHandler(StringName barLineName);
+    
+    /// <summary>
     /// Emitted by <see cref="PlayField.UpdateOptions"/>, in case anything needs changing after options were changed.
     /// </summary>
     [Signal] public delegate void OptionsUpdatedEventHandler();
@@ -161,7 +172,8 @@ namespace Rubicon.Core.Rulesets;
             GD.PrintErr($"[PlayField] UI Style {Metadata.UiStyle} does not exist. Defaulting to {defaultUi}");
             uiStylePath = defaultUiPath;
         }
-        
+
+        Factory = CreateNoteFactory();
         UiStyle = ResourceLoader.LoadThreadedGet(PathUtility.GetResourcePath(uiStylePath)) as UiStyle;
         
         BarLines = new BarLine[chart.Charts.Length];
@@ -422,6 +434,8 @@ namespace Rubicon.Core.Rulesets;
     /// <returns>Whether the player has failed</returns>
     public virtual bool HasFailed() => false;
 
+    public abstract NoteFactory CreateNoteFactory();
+
     /// <summary>
     /// Creates a new bar line.
     /// </summary>
@@ -433,6 +447,26 @@ namespace Rubicon.Core.Rulesets;
     /// </summary>
     /// <param name="barLine">The bar line that just got setup.</param>
     public abstract void AfterBarLineSetup(BarLine barLine);
+
+    public void AddBarLine(BarLine barLine)
+    {
+        Array<BarLine> barLines = new Array<BarLine>(BarLines);
+        barLines.Add(barLine);
+        BarLines = barLines.ToArray();
+        
+        EmitSignalBarLineAdded(barLine.Name);
+    }
+
+    public void RemoveBarLine(BarLine barLine)
+    {
+        StringName name = barLine.Name;
+        
+        Array<BarLine> barLines = new Array<BarLine>(BarLines);
+        barLines.Remove(barLine);
+        BarLines = barLines.ToArray();
+        
+        EmitSignalBarLineRemoved(name);
+    }
 
     /// <summary>
     /// The function that is connected to the bar lines when a note is hit. Can be overriden if needed for a specific ruleset.

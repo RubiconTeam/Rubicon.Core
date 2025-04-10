@@ -1,6 +1,4 @@
-using System.Linq;
 using Godot.Collections;
-using Rubicon.Core;
 using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
 using PukiTools.GodotSharp;
@@ -87,6 +85,11 @@ namespace Rubicon.Core.Rulesets;
 	[Export] public bool Pressing = false;
 
 	/// <summary>
+	/// Whether this note controller is being remotely controlled by something else.
+	/// </summary>
+	[Export] public bool RemotelyControlled = false;
+
+	/// <summary>
 	/// The queue list for notes to be processed next frame.
 	/// </summary>
 	[Export] public Array<NoteResult> ProcessQueue = [];
@@ -141,20 +144,23 @@ namespace Rubicon.Core.Rulesets;
 			}
 		}
 
-		while (Autoplay && InputsEnabled && !IsComplete && Notes[NoteHitIndex].MsTime - time <= 0f)
+		if (!RemotelyControlled)
 		{
-			if (Notes[NoteHitIndex].ShouldMiss)
-				break;
+			while (Autoplay && InputsEnabled && !IsComplete && Notes[NoteHitIndex].MsTime - time <= 0f)
+			{
+				if (Notes[NoteHitIndex].ShouldMiss)
+					break;
 			
-			ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: 0f, holding: Notes[NoteHitIndex].MeasureLength > 0f));
-			NoteHitIndex++;
-		}
+				ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: 0f, holding: Notes[NoteHitIndex].MeasureLength > 0f));
+				NoteHitIndex++;
+			}
 		
-		float badHitWindow = -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle();
-		while (!IsComplete && Notes[NoteHitIndex].MsTime - time <= badHitWindow)
-		{
-			ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: badHitWindow - 1f, holding: false));
-			NoteHitIndex++;
+			float badHitWindow = -ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle();
+			while (!IsComplete && Notes[NoteHitIndex].MsTime - time <= badHitWindow)
+			{
+				ProcessQueue.Add(GetResult(noteIndex: NoteHitIndex, distance: badHitWindow - 1f, holding: false));
+				NoteHitIndex++;
+			}
 		}
 		
 		for (int i = 0; i < ProcessQueue.Count; i++)
@@ -234,7 +240,7 @@ namespace Rubicon.Core.Rulesets;
 	{
 		base._Input(@event);
 		
-		if (Autoplay || !InputsEnabled || !InputMap.HasAction(Action) || !@event.IsAction(Action) || @event.IsEcho())
+		if (Autoplay || RemotelyControlled || !InputsEnabled || !InputMap.HasAction(Action) || !@event.IsAction(Action) || @event.IsEcho())
 			return;
 
 		if (@event.IsPressed())

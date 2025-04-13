@@ -6,4 +6,6 @@ public partial class UiStyle : Resource
     [Export] public PackedScene MainHud;
 
     [Export] public PackedScene BarLineHud;
+    
+    [Export] public PackedScene PauseMenu;
 }

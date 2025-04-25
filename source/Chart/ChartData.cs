@@ -337,7 +337,7 @@ public partial class ChartData : Resource
         Array.Sort(Strays, (x, y) => x.MeasureTime.CompareTo(y.MeasureTime));
     }
 
-    public void ConvertData(BpmInfo[] bpmInfo)
+    public void ConvertData(TimeChange[] bpmInfo)
     {
         for (int s = 0; s < Sections.Length; s++)
             Sections[s].ConvertData(bpmInfo, SvChanges);

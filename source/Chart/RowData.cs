@@ -17,7 +17,7 @@ namespace Rubicon.Core.Chart;
 
     [Export] public NoteData[] EndNotes = [];
 
-    public void ConvertData(BpmInfo[] bpmInfo, SvChange[] svChanges)
+    public void ConvertData(TimeChange[] bpmInfo, SvChange[] svChanges)
     {
         for (int s = 0; s < StartNotes.Length; s++)
         {

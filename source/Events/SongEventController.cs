@@ -35,23 +35,12 @@ namespace Rubicon.Core.Events;
         List<StringName> eventsInitialized = [];
         for (int i = 0; i < _events.Length; i++)
         {
-            if (eventsInitialized.Contains(_events[i].Name))
+            StringName eventName = _events[i].Name;
+            if (eventsInitialized.Contains(eventName))
                 return;
             
-            eventsInitialized.Add(_events[i].Name);
-
-            string eventPath = $"res://resources/game/events/{_events[i].Name}";
-            bool eventTscnExists = ResourceLoader.Exists(eventPath + ".tscn");
-            bool eventScnExists = ResourceLoader.Exists(eventPath + ".scn");
-            if (!eventTscnExists && !eventScnExists)
-                continue;
-            
-            if (eventTscnExists)
-                eventPath += ".tscn";
-            else
-                eventPath += ".scn";
-            
-            PackedScene eventScene = GD.Load<PackedScene>(eventPath);
+            eventsInitialized.Add(eventName);
+            PackedScene eventScene = ResourceLoader.Load<PackedScene>(RubiconEngine.Events.Paths[eventName].Path);
             Node @event = eventScene.Instantiate();
             
             AddChild(@event);

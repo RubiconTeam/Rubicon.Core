@@ -32,9 +32,9 @@ public partial class EventData : Resource
     /// Converts the pre-existing Time and Length variables to milliseconds and stores them in MsTime and MsLength, using the provided BpmInfo.
     /// </summary>
     /// <param name="bpmInfo">An Array of BpmInfos</param>
-    public void ConvertData(BpmInfo[] bpmInfo)
+    public void ConvertData(TimeChange[] bpmInfo)
     {
-        BpmInfo bpm = bpmInfo.Last();
+        TimeChange bpm = bpmInfo.Last();
         for (int i = 0; i < bpmInfo.Length; i++)
         {
             if (bpmInfo[i].Time > Time)

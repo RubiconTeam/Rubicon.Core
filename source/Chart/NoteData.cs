@@ -84,7 +84,7 @@ public partial class NoteData : Resource
     /// Converts data into time used by the game and also scroll velocity changes.
     /// </summary>
     /// <param name="bpmInfo">An Array of BpmInfos</param>
-    public void ConvertData(BpmInfo[] bpmInfo, SvChange[] svChangeList)
+    public void ConvertData(TimeChange[] bpmInfo, SvChange[] svChangeList)
     {
         if (StartingRow != null)
         {
@@ -97,7 +97,7 @@ public partial class NoteData : Resource
             }
         }
         
-        BpmInfo bpm = bpmInfo.Last();
+        TimeChange bpm = bpmInfo.Last();
         for (int i = 0; i < bpmInfo.Length; i++)
         {
             if (bpmInfo[i].Time > MeasureTime)

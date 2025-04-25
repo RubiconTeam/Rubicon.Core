@@ -27,9 +27,9 @@ namespace Rubicon.Core.Chart;
     /// </summary>
     [Export] public float Multiplier = 1f;
 
-    public void ConvertData(BpmInfo[] bpmInfo, SvChange previousChange = null)
+    public void ConvertData(TimeChange[] bpmInfo, SvChange previousChange = null)
     {
-        BpmInfo bpm = bpmInfo.Last();
+        TimeChange bpm = bpmInfo.Last();
         for (int i = 0; i < bpmInfo.Length; i++)
         {
             if (bpmInfo[i].Time > Time)

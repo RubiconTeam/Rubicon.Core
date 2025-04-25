@@ -1,6 +1,8 @@
 using System.Linq;
 using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
+using Rubicon.Core.Events;
+using Rubicon.Core.UI;
 
 namespace Rubicon.Core.Meta;
 
@@ -35,31 +37,33 @@ namespace Rubicon.Core.Meta;
     [Export] public AudioStream Vocals;
 
     [Export] public SongDifficulty[] Difficulties = [];
+
+    [Export] public EventMeta Events;
     
     /// <summary>
-    /// A list of BPM changes.
+    /// A list of time changes.
     /// </summary>
-    [Export] public BpmInfo[] BpmInfo = [];
-    
+    [Export] public TimeChange[] TimeChanges = [];
+
+    /// <summary>
+    /// Contains data for nodes to instantiate upon this song being loaded.
+    /// </summary>
+    [Export] public ModulePathData[] Modules = [];
+
     /// <summary>
     /// The UI style to use for this song.
     /// </summary>
-    [ExportGroup("Style"), Export] public string UiStyle = ProjectSettings.GetSetting("rubicon/general/default_ui_style").AsString();
+    [ExportGroup("Style"), Export(PropertyHint.File, "*.tres,*.res")] public string UiStyle;
 
     /// <summary>
     /// The Note Skin to use for this song.
     /// </summary>
-    [Export] public string NoteSkin = ProjectSettings.GetSetting("rubicon/rulesets/mania/default_note_skin").AsString();
-    
-    /// <summary>
-    /// Determines what type of backend the engine will use when loading into a song.
-    /// </summary>
-    [ExportGroup("Environment"), Export] public GameEnvironment Environment = GameEnvironment.None;
-    
+    [Export] public string NoteSkin;
+
     /// <summary>
     /// The stage to spawn in for this song.
     /// </summary>
-    [Export] public string Stage = "stage";
+    [ExportGroup("Environment"), Export(PropertyHint.File, "*.tscn,*.scn")] public string[] Stages = [];
     
     /// <summary>
     /// The characters to spawn in the song.
@@ -67,7 +71,7 @@ namespace Rubicon.Core.Meta;
     [Export] public CharacterMeta[] Characters = [];
 
     /// <summary>
-    /// Offsets the position of the notes, in milliseconds.s
+    /// Offsets the starting time of the audio, in seconds.
     /// </summary>
     [ExportGroup("Options"), Export] public float Offset = 0f;
     
@@ -87,8 +91,8 @@ namespace Rubicon.Core.Meta;
     /// <returns>Itself</returns>
     public SongMeta ConvertData()
     {
-        for (int i = 1; i < BpmInfo.Length; i++)
-            BpmInfo[i].MsTime = BpmInfo[i - 1].MsTime + ConductorUtility.MeasureToMs(BpmInfo[i].Time - BpmInfo[i - 1].Time, BpmInfo[i - 1].Bpm, BpmInfo[i].TimeSignatureNumerator);
+        for (int i = 1; i < TimeChanges.Length; i++)
+            TimeChanges[i].MsTime = TimeChanges[i - 1].MsTime + ConductorUtility.MeasureToMs(TimeChanges[i].Time - TimeChanges[i - 1].Time, TimeChanges[i - 1].Bpm, TimeChanges[i].TimeSignatureNumerator);
 
         return this;
     }

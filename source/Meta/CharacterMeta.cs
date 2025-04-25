@@ -4,9 +4,9 @@ namespace Rubicon.Core.Meta;
 public partial class CharacterMeta : Resource
 {
     /// <summary>
-    /// The character to get. Used for pathing.
+    /// The path to the character to instantiate.
     /// </summary>
-    [Export] public string Character = "";
+    [Export(PropertyHint.File, "*.tscn,*.scn")] public string Character = "";
 
     /// <summary>
     /// The nickname this character will be given. This also determines where it will spawn on-stage.

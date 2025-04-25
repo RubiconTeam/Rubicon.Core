@@ -44,7 +44,7 @@ public partial class RubiChart : Resource
     /// Converts everything in this chart to millisecond format.
     /// </summary>
     /// <returns>Itself</returns>
-    public RubiChart ConvertData(BpmInfo[] bpmInfo)
+    public RubiChart ConvertData(TimeChange[] bpmInfo)
     {
         foreach (ChartData curChart in Charts)
         {

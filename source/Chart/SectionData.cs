@@ -9,7 +9,7 @@ namespace Rubicon.Core.Chart;
 
     [Export] public RowData[] Rows = [];
 
-    public void ConvertData(BpmInfo[] bpmInfo, SvChange[] svChanges)
+    public void ConvertData(TimeChange[] bpmInfo, SvChange[] svChanges)
     {
         for (int r = 0; r < Rows.Length; r++)
         {

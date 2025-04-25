@@ -49,9 +49,9 @@ public static class ConductorUtility
     /// <param name="msTime">The time in milliseconds</param>
     /// <param name="bpmList">The bpm list (<see cref="RubiChart.ConvertData"/> needs to be invoked beforehand!)</param>
     /// <returns>The milliseconds, in measures</returns>
-    public static float MsToMeasures(float msTime, BpmInfo[] bpmList)
+    public static float MsToMeasures(float msTime, TimeChange[] bpmList)
     {
-        BpmInfo bpm = bpmList.Last();
+        TimeChange bpm = bpmList.Last();
         for (int i = 0; i < bpmList.Length; i++)
         {
             if (bpmList[i].MsTime > msTime)

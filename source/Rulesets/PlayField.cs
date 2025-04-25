@@ -161,20 +161,11 @@ namespace Rubicon.Core.Rulesets;
         Input.UseAccumulatedInput = false;
 
         Metadata.ConvertData();
-        Chart.ConvertData(meta.BpmInfo);
+        Chart.ConvertData(meta.TimeChanges);
         
         // Handle UI Style
-        string uiStylePath = $"res://resources/ui/styles/{Metadata.UiStyle}/Style";
-        if (!PathUtility.ResourceExists(uiStylePath))
-        {
-            string defaultUi = ProjectSettings.GetSetting("rubicon/general/default_ui_style").AsString();
-            string defaultUiPath = $"res://resources/ui/styles/{defaultUi}/Style";
-            GD.PrintErr($"[PlayField] UI Style {Metadata.UiStyle} does not exist. Defaulting to {defaultUi}");
-            uiStylePath = defaultUiPath;
-        }
-
         Factory = CreateNoteFactory();
-        UiStyle = ResourceLoader.LoadThreadedGet(PathUtility.GetResourcePath(uiStylePath)) as UiStyle;
+        UiStyle = GD.Load<UiStyle>(Metadata.UiStyle);
         
         BarLines = new BarLine[chart.Charts.Length];
         TargetBarLine = meta.PlayableCharts[targetIndex];
@@ -200,8 +191,8 @@ namespace Rubicon.Core.Rulesets;
         }
         
         Conductor.Reset();
-        Conductor.ChartOffset = Metadata.Offset;
-        Conductor.BpmList = Metadata.BpmInfo;
+        Conductor.Offset = Metadata.Offset;
+        Conductor.TimeChanges = Metadata.TimeChanges;
 
         Music = AudioManager.GetGroup("Music").Play(Metadata.Instrumental, false);
         PrintUtility.Print("PlayField", "Instrumental loaded", true);
@@ -211,7 +202,7 @@ namespace Rubicon.Core.Rulesets;
         if (Events != null)
         {
             for (int i = 0; i < Events.Events.Length; i++)
-                Events.Events[i].ConvertData(Metadata.BpmInfo);
+                Events.Events[i].ConvertData(Metadata.TimeChanges);
             
             EventController = new SongEventController();
             EventController.Setup(events, this);
@@ -254,31 +245,12 @@ namespace Rubicon.Core.Rulesets;
         
         foreach (StringName noteType in noteTypeMap.Keys)
         {
-            if (!RubiconCore.NoteTypePaths.ContainsKey(noteType))
+            if (!RubiconCore.NoteTypes.Paths.ContainsKey(noteType))
                 continue;
             
-            string noteTypePath = RubiconCore.NoteTypePaths[noteType];
-            Resource noteTypeResource = ResourceLoader.LoadThreadedGet(noteTypePath);
-            if (noteTypeResource is PackedScene packedScene)
-            {
-                Node node = packedScene.Instantiate();
-                InitializeGodotScript(node);
-                AddChild(node);
-            }
-
-            if (noteTypeResource is GDScript gdScript)
-            {
-                Node node = gdScript.New().As<Node>();
-                InitializeGodotScript(node);
-                AddChild(node);
-            }
-
-            if (noteTypeResource is CSharpScript csScript)
-            {
-                Node node = csScript.New().As<Node>();
-                InitializeGodotScript(node);
-                AddChild(node);
-            }
+            Node noteTypeScene = RubiconCore.NoteTypes.Paths[noteType].LoadAndInstantiate();
+            InitializeGodotScript(noteTypeScene);
+            AddChild(noteTypeScene);
         }
         
         foreach (var pair in noteTypeMap)
@@ -316,8 +288,8 @@ namespace Rubicon.Core.Rulesets;
     {
         ProcessMode = ProcessModeEnum.Inherit;
         Conductor.Resume();
-        
-        float time = Conductor.RawTime;
+
+        float time = Conductor.AudioTime;
         Music.Play(time);
     }
 

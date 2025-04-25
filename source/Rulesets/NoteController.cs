@@ -62,7 +62,7 @@ namespace Rubicon.Core.Rulesets;
 	/// Is true when the manager has no notes to hit for at least a measure.
 	/// </summary>
 	public bool OnBreak => !IsComplete && Notes[NoteHitIndex].MsTime - Conductor.Time * 1000f >
-		ConductorUtility.MeasureToMs(Conductor.CurrentMeasure, Conductor.Bpm, Conductor.TimeSigNumerator);
+		ConductorUtility.MeasureToMs(Conductor.CurrentMeasure, Conductor.TimeChanges[Conductor.TimeChangeIndex].Bpm, Conductor.TimeChanges[Conductor.TimeChangeIndex].TimeSignatureNumerator);
 	
 	/// <summary>
 	/// The next note's index to be hit.

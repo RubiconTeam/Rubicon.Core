@@ -18,8 +18,6 @@ namespace Rubicon.Core.API;
     /// </summary>
     public virtual void Initialize()
     {
-        base._Ready();
-
         if (_initialized)
             return;
         

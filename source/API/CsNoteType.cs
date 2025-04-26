@@ -27,7 +27,7 @@ namespace Rubicon.Core.API;
     /// <summary>
     /// If it hasn't been initialized already, link itself to the play field.
     /// </summary>
-    public void Initialize()
+    public virtual void Initialize()
     {
         if (_initialized)
             return;

@@ -52,7 +52,7 @@ public static class ConductorUtility
     public static float MsToMeasures(float msTime, TimeChange[] bpmList)
     {
         TimeChange bpm = bpmList.Last();
-        for (int i = 0; i < bpmList.Length; i++)
+        for (int i = 1; i < bpmList.Length; i++)
         {
             if (bpmList[i].MsTime > msTime)
             {

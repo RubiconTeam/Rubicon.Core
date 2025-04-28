@@ -30,9 +30,14 @@ public partial class ConductorInstance : Node
 	[Export] public bool Playing = false;
 
 	/// <summary>
-	/// The current timestamp from when the time was last set.
+	/// The current timestamp from when the time was last set. Only updated every frame.
 	/// </summary>
-	[Export] public float Time { get => GetTime(); set => SetTime(value); }
+	[Export] public float Time { get => _visualTime; set => SetTime(value); }
+	
+	/// <summary>
+	/// The current timestamp from when the time was last set. Will get the EXACT timestamp when this is called.
+	/// </summary>
+	[Export] public float ExactTime { get => GetTime(); set => SetTime(value); }
 
 	/// <summary>
 	/// The current audio timestamp.
@@ -82,8 +87,10 @@ public partial class ConductorInstance : Node
 	#region Private Fields
 	private double _relativeStartTime = 0;
 	private double _relativeTimeOffset = 0;
+	
 	private float _lastTime = float.NegativeInfinity;
 	private double _time = 0d;
+	private float _visualTime = 0f;
 		
 	private float _cachedStep;
 	private float _cachedStepTime;
@@ -111,10 +118,9 @@ public partial class ConductorInstance : Node
 	public override void _Process(double delta)
 	{
 		if (!Playing)
-		{
-			_relativeStartTime = Godot.Time.GetUnixTimeFromSystem();
-			_relativeTimeOffset = _time;
-		}
+			return;
+
+		_visualTime = ExactTime;
 
 		base._Process(delta);
 			
@@ -149,7 +155,7 @@ public partial class ConductorInstance : Node
 	public void Play(float time = 0f)
 	{
 		Resume();
-		Time = time;
+		SetTime(time);
 	}
 
 	/// <summary>
@@ -157,6 +163,7 @@ public partial class ConductorInstance : Node
 	/// </summary>
 	public void Resume()
 	{
+		SetAudioTime((float)_time);
 		Playing = true;
 	}
 
@@ -165,7 +172,8 @@ public partial class ConductorInstance : Node
 	/// </summary>
 	public void Pause()
 	{
-		_time = Time;
+		_time = GetAudioTime();
+		_visualTime = (float)_time;
 		Playing = false;
 	}
 
@@ -216,6 +224,7 @@ public partial class ConductorInstance : Node
 	public void SetAudioTime(float time)
 	{
 		_time = time;
+		_visualTime = time;
 		_relativeStartTime = Godot.Time.GetUnixTimeFromSystem();
 		_relativeTimeOffset = time;
 	}
@@ -244,15 +253,15 @@ public partial class ConductorInstance : Node
 	/// <returns>The current step</returns>
 	public float GetCurrentStep()
 	{
-		if (_cachedStepTime == Time)
+		if (_cachedStepTime == ExactTime)
 			return _cachedStep;
 
 		TimeChange curTimeChange = GetCurrentTimeChange();
 		if (TimeChanges.Length <= 1)
 			return Time / (60f / (curTimeChange.Bpm * curTimeChange.TimeSignatureDenominator));
 
-		_cachedStepTime = Time;
-		_cachedStep = (Time - curTimeChange.MsTime / 1000f) / (60f / (curTimeChange.Bpm * curTimeChange.TimeSignatureDenominator)) + (curTimeChange.Time * curTimeChange.TimeSignatureNumerator * curTimeChange.TimeSignatureDenominator);
+		_cachedStepTime = ExactTime;
+		_cachedStep = (ExactTime - curTimeChange.MsTime / 1000f) / (60f / (curTimeChange.Bpm * curTimeChange.TimeSignatureDenominator)) + (curTimeChange.Time * curTimeChange.TimeSignatureNumerator * curTimeChange.TimeSignatureDenominator);
 		return _cachedStep;
 	}
 
@@ -262,15 +271,15 @@ public partial class ConductorInstance : Node
 	/// <returns>The current beat</returns>
 	public float GetCurrentBeat()
 	{
-		if (_cachedBeatTime == Time)
+		if (_cachedBeatTime == ExactTime)
 			return _cachedBeat;
 
 		TimeChange curTimeChange = GetCurrentTimeChange();
 		if (TimeChanges.Length <= 1)
 			return Time / (60f / curTimeChange.Bpm);
 
-		_cachedBeatTime = Time;
-		_cachedBeat = (Time - curTimeChange.MsTime / 1000f) / (60f / curTimeChange.Bpm) + curTimeChange.Time * curTimeChange.TimeSignatureNumerator;
+		_cachedBeatTime = ExactTime;
+		_cachedBeat = (ExactTime - curTimeChange.MsTime / 1000f) / (60f / curTimeChange.Bpm) + curTimeChange.Time * curTimeChange.TimeSignatureNumerator;
 		return _cachedBeat;
 	}
 
@@ -280,15 +289,15 @@ public partial class ConductorInstance : Node
 	/// <returns>The current measure</returns>
 	public float GetCurrentMeasure()
 	{
-		if (_cachedMeasureTime == Time)
+		if (_cachedMeasureTime == ExactTime)
 			return _cachedMeasure;
 
 		TimeChange curTimeChange = GetCurrentTimeChange();
 		if (TimeChanges.Length <= 1)
 			return Time / (60f / (curTimeChange.Bpm / curTimeChange.TimeSignatureNumerator));
 
-		_cachedMeasureTime = Time;
-		_cachedMeasure = (Time - curTimeChange.MsTime / 1000f) / (60f / (curTimeChange.Bpm / curTimeChange.TimeSignatureNumerator)) + curTimeChange.Time;
+		_cachedMeasureTime = ExactTime;
+		_cachedMeasure = (ExactTime - curTimeChange.MsTime / 1000f) / (60f / (curTimeChange.Bpm / curTimeChange.TimeSignatureNumerator)) + curTimeChange.Time;
 		return _cachedMeasure;
 	}
 	

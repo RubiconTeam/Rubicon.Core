@@ -1,4 +1,4 @@
-namespace Rubicon.Core.Events;
+namespace Rubicon.Core.Meta;
 
 /// <summary>
 /// <see cref="Resource"/> that stores multiple instances of <see cref="EventData"/>.

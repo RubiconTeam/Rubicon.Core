@@ -1,8 +1,6 @@
 using System.Linq;
 using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
-using Rubicon.Core.Events;
-using Rubicon.Core.UI;
 
 namespace Rubicon.Core.Meta;
 

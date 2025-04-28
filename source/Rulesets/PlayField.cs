@@ -3,7 +3,6 @@ using Godot.Collections;
 using Rubicon.Core.API;
 using Rubicon.Core.Chart;
 using Rubicon.Core.Data;
-using Rubicon.Core.Events;
 using Rubicon.Core.Meta;
 using PukiTools.GodotSharp;
 using PukiTools.GodotSharp.Audio;
@@ -96,11 +95,6 @@ namespace Rubicon.Core.Rulesets;
     /// The music player for this play field.
     /// </summary>
     [Export] public AudioStreamPlayer Music;
-
-    /// <summary>
-    /// Controls events that can happen throughout the song.
-    /// </summary>
-    [Export] public SongEventController EventController;
     
     /// <summary>
     /// A signal that is emitted upon failure.
@@ -143,7 +137,7 @@ namespace Rubicon.Core.Rulesets;
     /// <param name="meta">The song meta</param>
     /// <param name="chart">The chart loaded</param>
     /// <param name="targetIndex">The index to play in <see cref="SongMeta.PlayableCharts"/>.</param>
-    public virtual void Setup(RuleSet ruleSetData, SongMeta meta, RubiChart chart, int targetIndex, EventMeta events = null)
+    public virtual void Setup(RuleSet ruleSetData, SongMeta meta, RubiChart chart, int targetIndex)
     {
         SetAnchorsPreset(LayoutPreset.FullRect);
         
@@ -151,7 +145,6 @@ namespace Rubicon.Core.Rulesets;
         RuleSet = ruleSetData;
         Metadata = meta;
         Chart = chart;
-        Events = events;
         
         Input.UseAccumulatedInput = false;
 
@@ -193,15 +186,7 @@ namespace Rubicon.Core.Rulesets;
         Music = AudioManager.GetGroup("Music").Play(Metadata.Instrumental, false);
         PrintUtility.Print("PlayField", "Instrumental loaded", true);
         
-        if (Events != null)
-        {
-            for (int i = 0; i < Events.Events.Length; i++)
-                Events.Events[i].ConvertData(Metadata.TimeChanges);
-            
-            EventController = new SongEventController();
-            EventController.Setup(events, this);
-            AddChild(EventController);
-        }
+        
 
         if (UiStyle.MainHud != null && UiStyle.MainHud.CanInstantiate())
         {

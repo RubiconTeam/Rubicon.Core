@@ -85,15 +85,6 @@ namespace Rubicon.Core.Rulesets;
 	/// </summary>
 	/// <param name="result">The input element received</param>
 	public abstract void OnNoteHit(NoteResult result);
-
-	/// <summary>
-	/// Determines if the player should miss when hitting a blank space with a specified lane.
-	/// </summary>
-	/// <param name="index">The index of the lane that should ignore Ghost Tapping.</param>
-	public void InvokeGhostTap(int index)
-	{
-		PlayField.HandleGhostTap(Name, index);
-	}
 	
 	/// <summary>
 	/// Determines if every <see cref="NoteController"/> in the BarLine should be played automatically.

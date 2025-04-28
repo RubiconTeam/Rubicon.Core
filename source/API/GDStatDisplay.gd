@@ -10,7 +10,7 @@ func initialize() -> void: ## If it hasn't been initialized already, add itself 
 	if _initialized:
 		return
 		
-	play_field.StatisticsUpdated.connect(update_stats)
+	play_field.ScoreManager.StatisticsUpdated.connect(update_stats)
 	_initialized = true
 
 func update_stats(_combo : int, _hit : int, _distance : float) -> void: ## Triggers when the player either hits or misses a note. Must be inherited!

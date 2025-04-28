@@ -25,7 +25,7 @@ namespace Rubicon.Core.API;
         if (_initialized)
 	        return;
         
-        PlayField.StatisticsUpdated += UpdateStats;
+        PlayField.ScoreManager.StatisticsUpdated += UpdateStats;
         _initialized = true;
     }
 

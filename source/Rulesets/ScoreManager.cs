@@ -10,7 +10,7 @@ namespace Rubicon.Core.Rulesets;
 /// A class that tracks the results of a song,
 /// such as Score, Rank, Accuracy and Judgments.
 /// </summary>
-[GlobalClass] public partial class ScoreTracker : RefCounted
+[GlobalClass] public abstract partial class ScoreManager : RefCounted
 {
     /// <summary>
     /// Current score of the song.
@@ -78,7 +78,6 @@ namespace Rubicon.Core.Rulesets;
 
     /// <summary>
     /// The amount of times a combo has been broken.
-    /// Not necessarily the same as <see cref="Misses"/>.
     /// </summary>
     [Export] public int ComboBreaks = 0;
 
@@ -86,54 +85,21 @@ namespace Rubicon.Core.Rulesets;
     /// The highest amount of notes hit in a row.
     /// </summary>
     [Export] public int HighestCombo = 0;
-
-    /// <summary>
-    /// How many notes there is in the chart.
-    /// </summary>
-    [Export] public int NoteCount = 0;
-
-    /// <summary>
-    /// The highest combo that can be achieved in a song.
-    /// </summary>
-    [Export] public int MaxCombo = 0;
-
-    /// <summary>
-    /// The amount of notes hit, counting the start of a hold note.
-    /// Only takes account of notes that count towards score.
-    /// </summary>
-    [Export] public int NotesHit = 0;
-
-    /// <summary>
-    /// The amount of notes hit, counting the start and end of a hold note.
-    /// Only takes account of notes that count towards score.
-    /// </summary>
-    [Export] public int TailsHit = 0;
     
     /// /// <summary>
-    /// The chart of the current song and difficulty.
+    /// A reference to the player's chart.
     /// </summary>
-    [ExportGroup("References"), Export] public RubiChart Chart;
+    [ExportGroup("References"), Export] public ChartData Chart;
     
     /// <summary>
-    /// Sets the <see cref="NoteCount"/> and <see cref="MaxCombo"/> from the chart.
+    /// Triggers upon the statistics updating.
     /// </summary>
-    /// <param name="chart">Which chart should be accounted.</param>
-    /// <param name="target">Which character's <see cref="ChartData"/> should be targeted.</param>
-    public void Initialize(RubiChart chart, StringName target)
+    [Signal] public delegate void StatisticsUpdatedEventHandler(long combo, Judgment hit, float distance);
+    
+    public virtual void Initialize(RubiChart chart, StringName target)
     {
-        Chart = chart;
-        
-        ChartData playerChart = chart.Charts.FirstOrDefault(x => x.Name == target);
-        if (playerChart == null)
-            return;
-        
-        NoteData[] notes = playerChart.GetNotes();
-        MaxCombo += notes.Length;
-        NoteCount += MaxCombo + GetHoldNoteCount(notes);
+        Chart = chart.Charts.FirstOrDefault(x => x.Name == target);
     }
-
-    private int GetHoldNoteCount(NoteData[] notes)
-    {
-        return notes.Count(x => x.MeasureLength > 0f);
-    }
+    
+    public abstract void JudgeNoteResult(NoteResult result);
 }

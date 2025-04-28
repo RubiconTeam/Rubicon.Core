@@ -168,11 +168,6 @@ namespace Rubicon.Core.Rulesets;
 			
 		ProcessQueue.Clear();
 	}
-
-	public void InvokeGhostTap()
-	{
-		ParentBarLine.InvokeGhostTap(Lane);
-	}
 	
 	/// <summary>
 	/// Gets the current note's distance from <see cref="Conductor.Time"/>.

@@ -35,7 +35,7 @@ namespace Rubicon.Core.Rulesets;
     /// <summary>
     /// Keeps track of the player's combos and score.
     /// </summary>
-    [Export] public ScoreTracker ScoreTracker = new();
+    [Export] public ScoreManager ScoreManager;
 
     /// <summary>
     /// The Chart for this PlayField.
@@ -103,11 +103,6 @@ namespace Rubicon.Core.Rulesets;
     [Export] public SongEventController EventController;
     
     /// <summary>
-    /// Triggers upon the statistics updating.
-    /// </summary>
-    [Signal] public delegate void StatisticsUpdatedEventHandler(long combo, Judgment hit, float distance);
-    
-    /// <summary>
     /// A signal that is emitted upon failure.
     /// </summary>
     [Signal] public delegate void FailedEventHandler();
@@ -166,6 +161,7 @@ namespace Rubicon.Core.Rulesets;
         // Handle UI Style
         Factory = CreateNoteFactory();
         UiStyle = GD.Load<UiStyle>(Metadata.UiStyle);
+        ScoreManager = CreateScoreManager();
         
         BarLines = new BarLine[chart.Charts.Length];
         TargetBarLine = meta.PlayableCharts[targetIndex];
@@ -196,8 +192,6 @@ namespace Rubicon.Core.Rulesets;
 
         Music = AudioManager.GetGroup("Music").Play(Metadata.Instrumental, false);
         PrintUtility.Print("PlayField", "Instrumental loaded", true);
-        
-        // TODO: LOAD AUTOLOADS AND NOTE TYPES!!!!
         
         if (Events != null)
         {
@@ -260,7 +254,7 @@ namespace Rubicon.Core.Rulesets;
         }
         
         noteTypeMap.Clear();
-        ScoreTracker.Initialize(chart, TargetBarLine);
+        ScoreManager.Initialize(chart, TargetBarLine);
     }
 
     public override void _Process(double delta)
@@ -298,8 +292,8 @@ namespace Rubicon.Core.Rulesets;
     /// </summary>
     public void Fail()
     {
-        ScoreTracker.Rank = ScoreRank.F;
-        ScoreTracker.Clear = ClearRank.Failure;
+        ScoreManager.Rank = ScoreRank.F;
+        ScoreManager.Clear = ClearRank.Failure;
         
         EmitSignalFailed();
     }
@@ -391,11 +385,6 @@ namespace Rubicon.Core.Rulesets;
     }
 
     /// <summary>
-    /// Triggers every time the player hits a note to update the in-game statistics
-    /// </summary>
-    public abstract void UpdateStatistics();
-
-    /// <summary>
     /// Triggers every time the player hits a note to update their health.
     /// </summary>
     public abstract void UpdateHealth(Judgment hit);
@@ -413,6 +402,8 @@ namespace Rubicon.Core.Rulesets;
     /// </summary>
     /// <returns>A new <see cref="BarLine"/></returns>
     public abstract BarLine CreateBarLine();
+    
+    public abstract ScoreManager CreateScoreManager();
 
     /// <summary>
     /// Invoked right after <see cref="BarLine.Setup"/> gets called.
@@ -456,93 +447,10 @@ namespace Rubicon.Core.Rulesets;
                 UpdateHealth(result.Rating);
         
             if (!result.Flags.HasFlag(NoteResultFlags.Score))
-            {
-                Judgment rating = result.Rating;
-                if (result.Note.CountsTowardScore)
-                {
-                    if (result.Hit == Hit.Tap || result.Hit == Hit.Hold) // Tap note or initial tap of hold note
-                    {
-                        ScoreTracker.NotesHit++;
-                        
-                        switch (rating)
-                        {
-                            case Judgment.Perfect:
-                                ScoreTracker.PerfectHits++;
-                                ScoreTracker.Combo++;
-                                break;
-                            case Judgment.Great:
-                                ScoreTracker.GreatHits++;
-                                ScoreTracker.Combo++;
-                                break;
-                            case Judgment.Good:
-                                ScoreTracker.GoodHits++;
-                                ScoreTracker.Combo++;
-                                break;
-                            case Judgment.Okay:
-                                ScoreTracker.OkayHits++;
-                                ScoreTracker.ComboBreaks++;
-                                ScoreTracker.Combo = 0;
-                                break;
-                            case Judgment.Bad:
-                                ScoreTracker.BadHits++;
-                                ScoreTracker.ComboBreaks++;
-                                ScoreTracker.Combo = 0;
-                                break;
-                            case Judgment.Miss:
-                                ScoreTracker.Misses++;
-                                if (result.Note.MeasureLength > 0)
-                                    ScoreTracker.Misses++;
-                                break;
-                        }
-                    }
-                    else // Hold note end
-                    {
-                        ScoreTracker.TailsHit++;
-                        
-                        switch (rating)
-                        {
-                            case Judgment.Perfect:
-                                ScoreTracker.PerfectHits++;
-                                break;
-                            case Judgment.Miss:
-                                ScoreTracker.Misses++;
-                                break;
-                        }
-                    }   
-                }
-
-                if (rating == Judgment.Miss)
-                {
-                    ScoreTracker.MissStreak++;
-                    ScoreTracker.Combo = 0;
-                    ScoreTracker.ComboBreaks++;
-                }
-                else if (rating != Judgment.None)
-                {
-                    ScoreTracker.MissStreak = 0;   
-                }
-                
-                if (ScoreTracker.Combo > ScoreTracker.HighestCombo)
-                    ScoreTracker.HighestCombo = ScoreTracker.Combo;   
-            
-                UpdateStatistics();
-                
-                if (result.Rating != Judgment.None && result.Hit != Hit.Tail)
-                    EmitSignalStatisticsUpdated(ScoreTracker.Combo, result.Rating, result.Distance);
-            }
+                ScoreManager.JudgeNoteResult(result);
         }
         
         EmitSignalNoteHit(name, result);
-    }
-
-    public void HandleGhostTap(StringName barLineName, int index)
-    {
-        ScoreTracker.Combo = 0;
-        ScoreTracker.ComboBreaks++;
-        UpdateHealth(Judgment.Miss);
-        
-        UpdateStatistics();
-        EmitSignalStatisticsUpdated(ScoreTracker.Combo, Judgment.None, ProjectSettings.GetSetting("rubicon/judgments/bad_hit_window").AsSingle() + 1f);
     }
 
     public void InitializeGodotScript(Node node)

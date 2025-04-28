@@ -37,7 +37,7 @@ public partial class ConductorInstance : Node
 	/// <summary>
 	/// The current audio timestamp.
 	/// </summary>
-	public float AudioTime => GetAudioTime();
+	[Export] public float AudioTime { get => GetAudioTime(); set => SetAudioTime(value); }
 
 	/// <summary>
 	/// The current step according to the time.
@@ -208,6 +208,17 @@ public partial class ConductorInstance : Node
 		return (Offset + (Playing ? (float)(Godot.Time.GetUnixTimeFromSystem() - _relativeStartTime + _relativeTimeOffset) :
 			_time != 0d ? (float)_time : 0f));
 	}
+	
+	/// <summary>
+	/// Sets the audio time of this Conductor.
+	/// </summary>
+	/// <param name="time">The time to set it to, in seconds.</param>
+	public void SetAudioTime(float time)
+	{
+		_time = time;
+		_relativeStartTime = Godot.Time.GetUnixTimeFromSystem();
+		_relativeTimeOffset = time;
+	}
 		
 	/// <summary>
 	/// Gets the timestamp of this Conductor.
@@ -224,9 +235,7 @@ public partial class ConductorInstance : Node
 	/// <param name="time">The time to set it to, in seconds.</param>
 	public void SetTime(float time)
 	{
-		_time = time;
-		_relativeStartTime = Godot.Time.GetUnixTimeFromSystem();
-		_relativeTimeOffset = time;
+		SetAudioTime(time / Speed);
 	}
 
 	/// <summary>

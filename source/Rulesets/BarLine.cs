@@ -1,5 +1,6 @@
 using Rubicon.Core;
 using Rubicon.Core.Chart;
+using Rubicon.Core.UI;
 
 namespace Rubicon.Core.Rulesets;
 
@@ -22,6 +23,8 @@ namespace Rubicon.Core.Rulesets;
 	/// The PlayField this instance is associated with.
 	/// </summary>
 	[Export] public PlayField PlayField;
+
+	[Export] public GameHud LocalHud;
 	
 	/// <summary>
 	/// The distance to offset notes by position-wise.
@@ -59,6 +62,27 @@ namespace Rubicon.Core.Rulesets;
 			AddChild(noteController);
 			Controllers[i] = noteController;
 		}
+	}
+
+	public virtual void AssignLocalHud(GameHud hud, bool queueFree = true, bool keepTransform = false)
+	{
+		if (hud == null || LocalHud == hud)
+			return;
+		
+		if (queueFree)
+			LocalHud?.QueueFree();
+		
+		LocalHud = hud;
+		LocalHud.Name = "HUD";
+		
+		if (LocalHud.GetParent() == null)
+			AddChild(LocalHud);
+		else
+			LocalHud.Reparent(this, keepTransform);
+		
+		MoveChild(LocalHud, 0);
+		
+		LocalHud.Setup(PlayField);
 	}
 
 	public abstract NoteController CreateNoteController();

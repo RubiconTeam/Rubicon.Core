@@ -28,7 +28,6 @@ namespace Rubicon.Core.Chart;
             return row;
 
         row = new RowData();
-        row.Section = this;
         row.Offset = offset;
         row.Quant = quant;
         

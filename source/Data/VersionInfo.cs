@@ -12,7 +12,14 @@ public partial class VersionInfo : Resource // Would be super useful if custom s
     [Export] public byte Major
     {
         get => (byte)((_version & 0xFF000000) >> 24);
-        set => _version = ((uint)value << 24) | ((uint)Minor << 16) | ((uint)Patch << 8) | Build;
+        set
+        {
+            if (!Engine.IsEditorHint() && _majorInitialized)
+                return;
+            
+            _version = ((uint)value << 24) | ((uint)Minor << 16) | ((uint)Patch << 8) | Build;
+            _majorInitialized = true;
+        }
     }
     
     /// <summary>
@@ -21,7 +28,14 @@ public partial class VersionInfo : Resource // Would be super useful if custom s
     [Export] public byte Minor
     {
         get => (byte)((_version & 0x00FF0000) >> 16);
-        set => _version = ((uint)Major << 24) | ((uint)value << 16) | ((uint)Patch << 8) | Build;
+        set
+        {
+            if (!Engine.IsEditorHint() && _minorInitialized)
+                return;
+            
+            _version = ((uint)Major << 24) | ((uint)value << 16) | ((uint)Patch << 8) | Build;
+            _minorInitialized = true;
+        }
     }
     
     /// <summary>
@@ -30,7 +44,14 @@ public partial class VersionInfo : Resource // Would be super useful if custom s
     [Export] public byte Patch
     {
         get => (byte)((_version & 0x0000FF00) >> 8);
-        set => _version = ((uint)Major << 24) | ((uint)Minor << 16) | ((uint)value << 8) | Build;
+        set
+        {
+            if (!Engine.IsEditorHint() && _patchInitialized)
+                return;
+            
+            _version = ((uint)Major << 24) | ((uint)Minor << 16) | ((uint)value << 8) | Build;
+            _patchInitialized = true;
+        }
     }
     
     /// <summary>
@@ -39,7 +60,14 @@ public partial class VersionInfo : Resource // Would be super useful if custom s
     [Export] public byte Build
     {
         get => (byte)(_version & 0x000000FF);
-        set => _version = ((uint)Major << 24) | ((uint)Minor << 16) | ((uint)Patch << 8) | value;
+        set
+        {
+            if (!Engine.IsEditorHint() && _buildInitialized)
+                return;
+
+            _version = ((uint)Major << 24) | ((uint)Minor << 16) | ((uint)Patch << 8) | value;
+            _buildInitialized = true;
+        }
     }
 
     /// <summary>
@@ -55,6 +83,9 @@ public partial class VersionInfo : Resource // Would be super useful if custom s
         get => _version;
         set
         {
+            if (!Engine.IsEditorHint())
+                return;
+            
             _version = value;
 
             Major = (byte)((_version & 0xFF000000) >> 24);
@@ -65,6 +96,11 @@ public partial class VersionInfo : Resource // Would be super useful if custom s
     }
 
     private uint _version = 0;
+    
+    private bool _majorInitialized = false;
+    private bool _minorInitialized = false;
+    private bool _patchInitialized = false;
+    private bool _buildInitialized = false;
 
     /// <summary>
     /// Creates an instance with all variables zeroed or empty.
@@ -95,11 +131,6 @@ public partial class VersionInfo : Resource // Would be super useful if custom s
     /// <param name="build">The fourth number</param>
     /// <param name="tag">The tag added on</param>
     public VersionInfo(byte major, byte minor, byte patch, byte build, string tag = null)
-    {
-        SetVersion(major, minor, patch, build, tag);
-    }
-
-    public void SetVersion(byte major, byte minor, byte patch, byte build, string tag = null)
     {
         Raw = ((uint)major << 24) | ((uint)minor << 16) | ((uint)patch << 8) | build;
         Tag = tag ?? string.Empty;

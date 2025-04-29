@@ -52,11 +52,6 @@ namespace Rubicon.Core.Rulesets;
     [Export] public RuleSet RuleSet;
 
     /// <summary>
-    /// The events for this song.
-    /// </summary>
-    [Export] public EventMeta Events;
-
-    /// <summary>
     /// The UiStyle currently being used
     /// </summary>
     [Export] public UiStyle UiStyle;
@@ -64,12 +59,7 @@ namespace Rubicon.Core.Rulesets;
     /// <summary>
     /// A control node that's constantly on the screen.
     /// </summary>
-    [Export] public GameHud GameHud;
-
-    /// <summary>
-    /// A control node that's attached to the player's <see cref="BarLine"/>.
-    /// </summary>
-    [Export] public GameHud PlayerHud;
+    [Export] public GameHud GlobalHud;
     
     /// <summary>
     /// The bar lines associated with this play field.
@@ -125,15 +115,11 @@ namespace Rubicon.Core.Rulesets;
     /// Emitted when a bar line is removed.
     /// </summary>
     [Signal] public delegate void BarLineRemovedEventHandler(StringName barLineName);
-    
-    /// <summary>
-    /// Emitted by <see cref="PlayField.UpdateOptions"/>, in case anything needs changing after options were changed.
-    /// </summary>
-    [Signal] public delegate void OptionsUpdatedEventHandler();
 
     /// <summary>
     /// Readies the PlayField for gameplay!
     /// </summary>
+    /// <param name="ruleSetData">The ruleset data.</param>
     /// <param name="meta">The song meta</param>
     /// <param name="chart">The chart loaded</param>
     /// <param name="targetIndex">The index to play in <see cref="SongMeta.PlayableCharts"/>.</param>
@@ -179,34 +165,26 @@ namespace Rubicon.Core.Rulesets;
             AfterBarLineSetup(curBarLine);
         }
         
+        if (UiStyle.RuleSets.TryGetValue(RuleSet.UniqueId, out RuleSetUiData ruleSetUiStyle))
+        {
+            PackedScene mainHud = ruleSetUiStyle.GlobalHud;
+            if (mainHud != null && mainHud.CanInstantiate())
+                AssignGlobalHud(mainHud.InstantiateOrNull<GameHud>());
+
+            PackedScene barLineHud = ruleSetUiStyle.LocalHud;
+            if (barLineHud != null && barLineHud.CanInstantiate())
+            {
+                BarLine targetBarLine = BarLines[TargetIndex];
+                targetBarLine.AssignLocalHud(barLineHud.InstantiateOrNull<GameHud>());
+            }
+        }
+        
         Conductor.Reset();
         Conductor.Offset = Metadata.Offset;
         Conductor.TimeChanges = Metadata.TimeChanges;
 
         Music = AudioManager.GetGroup("Music").Play(Metadata.Instrumental, false);
         PrintUtility.Print("PlayField", "Instrumental loaded", true);
-        
-        
-
-        if (UiStyle.MainHud != null && UiStyle.MainHud.CanInstantiate())
-        {
-            GameHud = UiStyle.MainHud.Instantiate<GameHud>();
-            AddChild(GameHud);
-            
-            GameHud.Setup(this);
-        }
-        
-        if (UiStyle.BarLineHud != null && UiStyle.BarLineHud.CanInstantiate())
-        {
-            PlayerHud = UiStyle.BarLineHud.Instantiate<GameHud>();
-            
-            BarLines[TargetIndex].AddChild(PlayerHud);
-            BarLines[TargetIndex].MoveChild(PlayerHud, 0);
-            
-            PlayerHud.Setup(this);
-        }
-        
-        UpdateOptions();
 
         // TODO: BAD CODE, CHANGE LATER
         Dictionary<StringName, Array<NoteData>> noteTypeMap = new Dictionary<StringName, Array<NoteData>>();
@@ -284,92 +262,6 @@ namespace Rubicon.Core.Rulesets;
     }
 
     /// <summary>
-    /// Get the judgment UI component for the currently running PlayField.
-    /// </summary>
-    /// <returns>The Judgment UI component if it exists, or null if it doesn't</returns>
-    public Node GetJudgment()
-    {
-        if (PlayerHud != null && PlayerHud.Judgment != null)
-            return PlayerHud.Judgment;
-        
-        if (GameHud != null && GameHud.Judgment != null)
-            return GameHud.Judgment;
-        
-        return null;
-    }
-    
-    /// <summary>
-    /// Get the combo display UI component for the currently running PlayField.
-    /// </summary>
-    /// <returns>The combo display UI component if it exists, or null if it doesn't</returns>
-    public Node GetComboDisplay()
-    {
-        if (PlayerHud != null && PlayerHud.Combo != null)
-            return PlayerHud.Combo;
-        
-        if (GameHud != null && GameHud.Combo != null)
-            return GameHud.Combo;
-        
-        return null;
-    }
-    
-    /// <summary>
-    /// Get the hit distance UI component for the currently running PlayField.
-    /// </summary>
-    /// <returns>The hit distance UI component if it exists, or null if it doesn't</returns>
-    public Node GetHitDistance()
-    {
-        if (PlayerHud != null && PlayerHud.HitDistance != null)
-            return PlayerHud.HitDistance;
-        
-        if (GameHud != null && GameHud.HitDistance != null)
-            return GameHud.HitDistance;
-        
-        return null;
-    }
-
-    public Node GetHealthBar()
-    {
-        if (PlayerHud != null && PlayerHud.HealthBar != null)
-            return PlayerHud.HealthBar;
-
-        if (GameHud != null && GameHud.HealthBar != null)
-            return GameHud.HealthBar;
-        
-        return null;
-    }
-    
-    public Node GetScorePanel()
-    {
-        if (PlayerHud != null && PlayerHud.ScorePanel != null)
-            return PlayerHud.ScorePanel;
-
-        if (GameHud != null && GameHud.ScorePanel != null)
-            return GameHud.ScorePanel;
-        
-        return null;
-    }
-    
-    public Node GetTimerBar()
-    {
-        if (PlayerHud != null && PlayerHud.TimerBar != null)
-            return PlayerHud.TimerBar;
-
-        if (GameHud != null && GameHud.TimerBar != null)
-            return GameHud.TimerBar;
-        
-        return null;
-    }
-
-    /// <summary>
-    /// This function is triggered upon an update to the settings.
-    /// </summary>
-    public virtual void UpdateOptions()
-    {
-        EmitSignalOptionsUpdated();
-    }
-
-    /// <summary>
     /// Triggers every time the player hits a note to update their health.
     /// </summary>
     public abstract void UpdateHealth(Judgment hit);
@@ -398,10 +290,7 @@ namespace Rubicon.Core.Rulesets;
 
     public void AddBarLine(BarLine barLine)
     {
-        Array<BarLine> barLines = new Array<BarLine>(BarLines);
-        barLines.Add(barLine);
-        BarLines = barLines.ToArray();
-        
+        BarLines = [..BarLines, barLine];
         EmitSignalBarLineAdded(barLine.Name);
     }
 
@@ -414,6 +303,25 @@ namespace Rubicon.Core.Rulesets;
         BarLines = barLines.ToArray();
         
         EmitSignalBarLineRemoved(name);
+    }
+
+    public virtual void AssignGlobalHud(GameHud hud, bool queueFree = true, bool keepTransform = false)
+    {
+        if (hud == null || GlobalHud == hud)
+            return;
+        
+        if (queueFree)
+            GlobalHud?.QueueFree();
+        
+        GlobalHud = hud;
+        GlobalHud.Name = "HUD";
+        
+        if (GlobalHud.GetParent() == null)
+            AddChild(GlobalHud);
+        else
+            GlobalHud.Reparent(this, keepTransform);
+        
+        GlobalHud.Setup(this);
     }
 
     /// <summary>
@@ -447,7 +355,7 @@ namespace Rubicon.Core.Rulesets;
             element.Initialize();
 
             if (node is CsHudElement hudElement)
-                OptionsUpdated += hudElement.OptionsUpdated;
+                UserSettings.SettingsChanged += hudElement.OptionsUpdated;
             
             return;
         }
@@ -460,6 +368,6 @@ namespace Rubicon.Core.Rulesets;
         node.Call("initialize");
 
         if (node.InheritsFrom(ApiConstants.GdScriptHudElement))
-            Connect(SignalName.OptionsUpdated, new Callable(node, "options_updated"));
+            Connect(UserSettingsInstance.SignalName.SettingsChanged, new Callable(node, "options_updated"));
     }
 }

@@ -1,11 +1,10 @@
+using Godot.Collections;
+
 namespace Rubicon.Core.UI;
 
-[GlobalClass]
-public partial class UiStyle : Resource
+[GlobalClass] public partial class UiStyle : Resource
 {
-    [Export] public PackedScene MainHud;
-
-    [Export] public PackedScene BarLineHud;
+    [Export] public Dictionary<StringName, RuleSetUiData> RuleSets = new();
     
     [Export] public PackedScene PauseMenu;
 }

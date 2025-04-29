@@ -46,7 +46,7 @@ namespace Rubicon.Core.UI;
     /// </summary>
     [Export] public Node[] UpdateExceptions = [];
 
-    private bool _flipped = false;
+    private bool _flipVertical = false;
 
     public void Setup(PlayField playField)
     {
@@ -54,12 +54,12 @@ namespace Rubicon.Core.UI;
     }
 
     /// <summary>
-    /// Flips its own children's anchors.
+    /// Flips its own children's anchors vertically.
     /// </summary>
     /// <param name="flip">Whether to flip the elements on this HUD.</param>
-    public void Flip(bool flip)
+    public void FlipVertical(bool flip)
     {
-        if (_flipped == flip)
+        if (_flipVertical == flip)
             return;
         
         Array<Node> children = GetChildren();
@@ -85,7 +85,7 @@ namespace Rubicon.Core.UI;
             control.OffsetTop = offsetBottom * -1f;
         }
 
-        _flipped = flip;
+        _flipVertical = flip;
     }
 
     private void InitializeChildren(Array<Node> children, PlayField playField)

@@ -135,13 +135,16 @@ public partial class ConductorInstance : Node
 		int curStep = Mathf.FloorToInt(CurrentStep);
 
 		if (curMeasure != _lastMeasure)
-			EmitSignal(SignalName.MeasureHit, curMeasure);
+			for (int i = _lastMeasure + 1; i <= curMeasure; i++)
+				EmitSignalMeasureHit(i);
 
 		if (curBeat != _lastBeat)
-			EmitSignal(SignalName.BeatHit, curBeat);
+			for (int i = _lastBeat + 1; i <= curBeat; i++)
+				EmitSignalBeatHit(i);
 
 		if (curStep != _lastStep)
-			EmitSignal(SignalName.StepHit, curStep);
+			for (int i = _lastStep + 1; i <= curStep; i++)
+				EmitSignalStepHit(i);
 
 		_lastMeasure = curMeasure;
 		_lastBeat = curBeat;
@@ -165,6 +168,10 @@ public partial class ConductorInstance : Node
 	{
 		SetAudioTime((float)_time);
 		Playing = true;
+
+		_lastMeasure = Mathf.FloorToInt(GetCurrentMeasure());
+		_lastBeat = Mathf.FloorToInt(GetCurrentBeat());
+		_lastStep = Mathf.FloorToInt(GetCurrentStep());
 	}
 
 	/// <summary>

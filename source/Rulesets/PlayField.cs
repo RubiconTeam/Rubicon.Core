@@ -17,6 +17,11 @@ namespace Rubicon.Core.Rulesets;
 [GlobalClass] public abstract partial class PlayField : Control
 {
     /// <summary>
+    /// The range in which the audio is allowed to be delayed from the Conductor.
+    /// </summary>
+    public const double LatencyThreshold = 0.15;
+    
+    /// <summary>
     /// The current health the player has.
     /// </summary>
     [Export] public int Health = 50;
@@ -90,6 +95,11 @@ namespace Rubicon.Core.Rulesets;
     /// A signal that is emitted upon failure.
     /// </summary>
     [Signal] public delegate void FailedEventHandler();
+    
+    /// <summary>
+    /// Emitted when the PlayField resynchronizes with the Conductor, in case of any delays.
+    /// </summary>
+    [Signal] public delegate void ResynchronizedEventHandler();
     
     /// <summary>
     /// Emitted for every note type to set everything up initially.
@@ -226,6 +236,17 @@ namespace Rubicon.Core.Rulesets;
         
         if (HasFailed())
             Fail();
+
+        if (Music == null || !Music.IsPlaying())
+            return;
+
+        // Synchronize with Conductor
+        double currentMusicPosition = AudioServer.GetTimeSinceLastMix() + Music.GetPlaybackPosition();
+        if (Mathf.Abs(currentMusicPosition - Conductor.AudioTime) <= LatencyThreshold)
+            return;
+        
+        Music.Seek(Conductor.AudioTime);
+        EmitSignalResynchronized();
     }
 
     public void Start(float time = 0f)

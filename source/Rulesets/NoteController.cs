@@ -124,7 +124,7 @@ namespace Rubicon.Core.Rulesets;
 		{
 			while (NoteSpawnIndex < Notes.Length && Notes[NoteSpawnIndex].MsTime - time <= 2000f)
 			{
-				if (Notes[NoteSpawnIndex].MsTime - time < 0f || Notes[NoteSpawnIndex].Spawned)
+				if (Notes[NoteSpawnIndex].MsTime - time < 0f)
 				{
 					NoteSpawnIndex++;
 					continue;
@@ -137,7 +137,6 @@ namespace Rubicon.Core.Rulesets;
 				HitObjects[NoteSpawnIndex] = note;
 				note.Name = $"Note {NoteSpawnIndex}";
 				AssignData(note, Notes[NoteSpawnIndex]);
-				Notes[NoteSpawnIndex].Spawned = true;
 				NoteSpawnIndex++;
 				
 				EmitSignalNoteSpawned(note);
@@ -261,7 +260,6 @@ namespace Rubicon.Core.Rulesets;
 	/// <param name="element">Contains information about a note and its hits</param>
 	protected virtual void OnNoteHit(NoteResult element)
 	{
-		element.Note.Hit = true;
 		EmitSignalNoteHit(element);
 		ParentBarLine.OnNoteHit(element);
 	}

@@ -18,7 +18,7 @@ public partial class RubiChart : Resource
     /// <summary>
     /// The name of the people who helped with this chart.
     /// </summary>
-    [Export] public string Charter = "";
+    [Export(PropertyHint.MultilineText)] public string Charter = "";
     
     /// <summary>
     /// How hard the chart really is.

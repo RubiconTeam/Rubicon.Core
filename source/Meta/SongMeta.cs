@@ -22,7 +22,7 @@ namespace Rubicon.Core.Meta;
     /// <summary>
     /// The artist who made the song.
     /// </summary>
-    [Export] public string Artist = "Hideo Kojima";
+    [Export(PropertyHint.MultilineText)] public string Artist = "Hideo Kojima";
 
     /// <summary>
     /// The instrumental for this song.
